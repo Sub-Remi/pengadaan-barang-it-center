@@ -1,0 +1,163 @@
+"use client";
+import Link from "next/link";
+import React from "react";
+import { FaPlus, FaPen, FaTrash } from "react-icons/fa";
+
+export default function DrafPermintaanPage() {
+  const data = [
+    { no: 1, divisi: "HR", tanggal: "dd/mm/yyyy" },
+    { no: 2, divisi: "Marketing", tanggal: "dd/mm/yyyy" },
+    { no: 3, divisi: "Finance", tanggal: "dd/mm/yyyy" },
+    { no: 4, divisi: "IT", tanggal: "dd/mm/yyyy" },
+    { no: 5, divisi: "Marketing", tanggal: "dd/mm/yyyy" },
+  ];
+
+  return (
+    <div className="flex flex-col min-h-screen font-poppins bg-gray-100">
+      {/* Header */}
+      <header className="flex bg-white shadow-sm items-center">
+        <div className="bg-white w-60 h-20 flex items-center justify-center border-r border-white">
+          <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
+        </div>
+        <div className="flex-1 h-20 flex items-center px-8"></div>
+      </header>
+
+      <div className="flex flex-1">
+        {/* Sidebar */}
+        <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1">
+          <nav className="flex-1 mt-6">
+            <ul className="space-y-1">
+              <Link href="/Divisi/dashboard_divisi">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Dashboard
+                </li>
+              </Link>
+
+              <hr className="border-t border-white/30 my-2" />
+
+              <li className="px-5 py-2 font-semibold text-x1 text-gray-200 mt-2 cursor-default">
+                PENGADAAN
+              </li>
+
+              <Link href="/Divisi/draf_permintaan">
+                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
+                  Draf Permintaan
+                </li>
+              </Link>
+
+              <Link href="/Divisi/permintaan_divisi">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Permintaan
+                </li>
+              </Link>
+
+              <Link href="/Divisi/riwayat_divisi">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Riwayat
+                </li>
+              </Link>
+            </ul>
+          </nav>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 p-8 bg-gray-200">
+          <h2 className="text-3xl font-semibold mb-6">Draf Permintaan</h2>
+
+          {/* Card container */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            {/* Header atas */}
+            <div className="flex justify-between items-center px-6 py-4 border-b">
+              <h3 className="text-xl font-semibold text-teal-600">
+                Draf Permintaan
+              </h3>
+              <Link href="/Divisi/form_permintaan">
+              <button className="flex items-center gap-2 bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition">
+                <FaPlus />
+                Tambah Permintaan
+              </button>
+              </Link>
+            </div>
+
+            {/* Filter */}
+            <div className="flex items-center gap-3 px-6 py-4 border-b bg-white">
+              <label htmlFor="search" className="text-gray-700 font-medium">
+                Search
+              </label>
+              <input
+                id="search"
+                type="text"
+                className="border border-gray-300 rounded px-2 py-1 text-x1"
+              />
+
+            </div>
+
+            {/* Tabel */}
+            <table className="w-full border-collapse text-x1">
+              <thead>
+                <tr className="bg-white text-left border-b">
+                  <th className="px-6 py-3 font-semibold">No</th>
+                  <th className="px-6 py-3 font-semibold">Divisi</th>
+                  <th className="px-6 py-3 font-semibold">Tanggal</th>
+                  <th className="px-6 py-3 font-semibold text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((row, index) => (
+                  <tr
+                    key={index}
+                    className={`${
+                      index % 2 === 0 ? "bg-gray-100" : "bg-white"
+                    }`}
+                  >
+                    <td className="px-6 py-3">{row.no}</td>
+                    <td className="px-6 py-3 font-medium text-gray-800">
+                      {row.divisi}
+                    </td>
+                    <td className="px-6 py-3">{row.tanggal}</td>
+                    <td className="px-6 py-3 text-center">
+                      <div className="flex justify-center gap-2">
+                        <Link href="/Divisi/form_permintaan">
+                        <button className="bg-green-600 hover:bg-green-700 text-white p-2 rounded">
+                          <FaPen />
+                        </button>
+                        </Link>
+                        <button className="bg-red-600 hover:bg-red-700 text-white p-2 rounded">
+                          <FaTrash />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Pagination */}
+            <div className="flex justify-end px-6 py-4 bg-white border-t">
+              <div className="inline-flex text-sm border rounded-md overflow-hidden">
+                <button className="px-3 py-1 bg-white hover:bg-gray-100 border-r">
+                  Previous
+                </button>
+                <button className="px-3 py-1 bg-teal-600 text-white border-r">
+                  1
+                </button>
+                <button className="px-3 py-1 bg-white hover:bg-gray-100 border-r">
+                  2
+                </button>
+                <button className="px-3 py-1 bg-white hover:bg-gray-100 border-r">
+                  3
+                </button>
+                <button className="px-3 py-1 bg-white hover:bg-gray-100">
+                  Next
+                </button>
+              </div>
+            </div>
+
+            {/* Garis bawah hijau */}
+            <div className="h-1 bg-teal-600 w-full"></div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
