@@ -5,11 +5,11 @@ import { FaEye } from "react-icons/fa";
 
 export default function RiwayatDivisiPage() {
   const data = [
-    { no: 1, idPB: "00000", divisi: "HR", tanggal: "dd/mm/yyyy", status: "Selesai" },
-    { no: 2, idPB: "00000", divisi: "Marketing", tanggal: "dd/mm/yyyy", status: "Selesai" },
-    { no: 3, idPB: "00000", divisi: "Finance", tanggal: "dd/mm/yyyy", status: "Selesai" },
-    { no: 4, idPB: "00000", divisi: "IT", tanggal: "dd/mm/yyyy", status: "Selesai" },
-    { no: 5, idPB: "00000", divisi: "Marketing", tanggal: "dd/mm/yyyy", status: "Selesai" },
+    { no: 1, idPB: "00000", judul: "Permintaan", tanggal: "dd/mm/yyyy", status: "Selesai" },
+    { no: 2, idPB: "00000", judul: "Permintaan", tanggal: "dd/mm/yyyy", status: "Selesai" },
+    { no: 3, idPB: "00000", judul: "Permintaan", tanggal: "dd/mm/yyyy", status: "Selesai" },
+    { no: 4, idPB: "00000", judul: "Permintaan", tanggal: "dd/mm/yyyy", status: "Selesai" },
+    { no: 5, idPB: "00000", judul: "Permintaan", tanggal: "dd/mm/yyyy", status: "Selesai" },
   ];
 
   return (
@@ -83,11 +83,11 @@ export default function RiwayatDivisiPage() {
                   type="text"
                   className="border border-gray-300 rounded px-2 py-1 text-x1"
                 />
+
                 <select className="border border-gray-300 rounded px-2 py-1 text-x1">
-                  <option>Divisi</option>
-                  <option>HR</option>
-                  <option>IT</option>
-                  <option>Finance</option>
+                  <option>Menunggu</option>
+                  <option>Selesai</option>
+                  <option>Diproses</option>
                 </select>
               </div>
 
@@ -107,7 +107,7 @@ export default function RiwayatDivisiPage() {
                 <tr className="bg-white text-left border-b">
                   <th className="px-6 py-3 font-semibold">No</th>
                   <th className="px-6 py-3 font-semibold">Id PB</th>
-                  <th className="px-6 py-3 font-semibold">Divisi</th>
+                  <th className="px-6 py-3 font-semibold">Judul</th>
                   <th className="px-6 py-3 font-semibold">Tanggal</th>
                   <th className="px-6 py-3 font-semibold">Status</th>
                   <th className="px-6 py-3 font-semibold text-center">Aksi</th>
@@ -124,7 +124,7 @@ export default function RiwayatDivisiPage() {
                     <td className="px-6 py-3">{row.no}</td>
                     <td className="px-6 py-3">{row.idPB}</td>
                     <td className="px-6 py-3 font-medium text-gray-800">
-                      {row.divisi}
+                      {row.judul}
                     </td>
                     <td className="px-6 py-3">{row.tanggal}</td>
                     <td className="px-6 py-3">{row.status}</td>

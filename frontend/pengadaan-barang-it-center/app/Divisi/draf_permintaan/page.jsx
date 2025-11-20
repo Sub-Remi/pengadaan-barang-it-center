@@ -5,11 +5,11 @@ import { FaPlus, FaPen, FaTrash } from "react-icons/fa";
 
 export default function DrafPermintaanPage() {
   const data = [
-    { no: 1, divisi: "HR", tanggal: "dd/mm/yyyy" },
-    { no: 2, divisi: "Marketing", tanggal: "dd/mm/yyyy" },
-    { no: 3, divisi: "Finance", tanggal: "dd/mm/yyyy" },
-    { no: 4, divisi: "IT", tanggal: "dd/mm/yyyy" },
-    { no: 5, divisi: "Marketing", tanggal: "dd/mm/yyyy" },
+    { no: 1, judul: "Permintaan 1", tanggal: "dd/mm/yyyy" },
+    { no: 2, judul: "Permintaan 2", tanggal: "dd/mm/yyyy" },
+    { no: 3, judul: "Permintaan 3", tanggal: "dd/mm/yyyy" },
+    { no: 4, judul: "Permintaan 4", tanggal: "dd/mm/yyyy" },
+    { no: 5, judul: "Permintaan 5", tanggal: "dd/mm/yyyy" },
   ];
 
   return (
@@ -97,7 +97,7 @@ export default function DrafPermintaanPage() {
               <thead>
                 <tr className="bg-white text-left border-b">
                   <th className="px-6 py-3 font-semibold">No</th>
-                  <th className="px-6 py-3 font-semibold">Divisi</th>
+                  <th className="px-6 py-3 font-semibold">Judul</th>
                   <th className="px-6 py-3 font-semibold">Tanggal</th>
                   <th className="px-6 py-3 font-semibold text-center">Aksi</th>
                 </tr>
@@ -112,7 +112,7 @@ export default function DrafPermintaanPage() {
                   >
                     <td className="px-6 py-3">{row.no}</td>
                     <td className="px-6 py-3 font-medium text-gray-800">
-                      {row.divisi}
+                      {row.judul}
                     </td>
                     <td className="px-6 py-3">{row.tanggal}</td>
                     <td className="px-6 py-3 text-center">

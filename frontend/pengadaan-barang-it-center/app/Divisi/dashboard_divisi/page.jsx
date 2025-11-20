@@ -85,13 +85,7 @@ function App() {
               </div>
             </Link>
 
-            {/* Tambah Pengadaan */}
-            <Link href="/Divisi/form_permintaan">
-              <div className="bg-white w-64 h-28 rounded-lg shadow-md p-4 border-l-8 border-blue-800 text-xl">
-                <h3 className="text-blue-800 font-medium mb-2">Tambah Pengadaan</h3>
-                <p className="text-2xl">📄</p>
-              </div>
-            </Link>
+         
           </div>
         </main>
       </div>

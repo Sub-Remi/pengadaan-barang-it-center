@@ -10,21 +10,15 @@ export default function FormPermintaanBarangPage() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen font-poppins bg-gray-100">
-      {/* Header */}
-      <header className="flex bg-white shadow-sm items-center">
-        <div className="bg-white w-60 h-20 flex items-center justify-center border-r border-white">
-          <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
+    <div className="flex h-screen font-poppins bg-gray-100 overflow-hidden">
+      {/* Sidebar */}
+      <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1 fixed top-0 left-0 h-full">
+        <div className="h-20 border-b border-white flex items-center justify-center bg-white">
+          <img src="/logo/ItCenter.png" alt="IT Center" className="w-32 border-white" />
         </div>
-        <div className="flex-1 h-20 flex items-center px-8"></div>
-      </header>
-
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1">
-          <nav className="flex-1 mt-6">
-            <ul className="space-y-1">
-              <Link href="/divisi/dashboard_divisi">
+        <nav className="flex-1 mt-6 overflow-y-auto">
+          <ul className="space-y-1 pb-6">
+            <Link href="/divisi/dashboard_divisi">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Dashboard
                 </li>
@@ -51,12 +45,21 @@ export default function FormPermintaanBarangPage() {
                   Riwayat
                 </li>
               </Link>
-            </ul>
-          </nav>
-        </aside>
+          </ul>
+        </nav>
+      </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 p-8 bg-gray-200">
+      {/* Main Wrapper (Header + Content) */}
+      <div className="flex flex-col flex-1 ml-60 h-full">
+        {/* Header */}
+        <header className="flex bg-white shadow-sm items-center h-20 fixed top-0 left-60 right-0 z-10">
+          <div className="flex-1 h-full flex items-center px-8">
+
+          </div>
+        </header>
+
+        {/* Main Content Scrollable */}
+        <main className="flex-1 mt-20 overflow-y-auto bg-gray-200 p-8">
           <h2 className="text-3xl font-semibold mb-6">Permintaan</h2>
 
           {/* Card Form */}
@@ -73,43 +76,54 @@ export default function FormPermintaanBarangPage() {
               </Link>
             </div>
 
-            {/* Data Pemohon */}
+            {/* Data Permintaan */}
             <div className="px-6 py-4 border-b-4 border-b-gray-300">
               <h4 className="text-lg font-semibold mb-4 text-gray-800">
-                Data Pemohon
+                Data Permintaan
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-medium text-gray-700">Nama Pemohon</label>
+                  <label className="font-medium text-gray-700">Nama</label>
                   <input
                     type="text"
-                    placeholder="Nama"
-                    className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
+                    value="John Doe"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Divisi</label>
-                  <select className="w-full border border-gray-300 rounded px-3 py-2 mt-1">
-                    <option>Pilih Divisi</option>
-                    <option>HR</option>
-                    <option>Finance</option>
-                    <option>IT Support</option>
-                    <option>Marketing</option>
-                  </select>
+                  <label className="font-medium text-gray-700">Departemen/Divisi</label>
+                  <input
+                    type="text"
+                    value="Finance"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
                 </div>
 
                 <div>
                   <label className="font-medium text-gray-700">Email</label>
                   <input
-                    type="email"
+                    type="text"
+                    value="john.doe@itcenter.co.id"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <hr className="border-white"></hr>
+
+                <div>
+                  <label className="font-medium text-gray-700">Judul Permintaan</label>
+                  <input
+                    type="text"
                     className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
-                    placeholder="Email"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Tanggal Kebutuhan</label>
+                  <label className="font-medium text-gray-700">Tanggal Permintaan</label>
                   <input
                     type="date"
                     className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
@@ -137,27 +151,22 @@ export default function FormPermintaanBarangPage() {
 
                 {/* Nama Barang */}
                 <div>
-                  <label className="font-medium text-gray-800">Nama Barang</label>
-                  <div className="flex gap-2 mt-1">
-                    <input
-                      type="text"
-                      className="flex-1 border border-gray-300 rounded px-3 py-2"
-                      placeholder="Nama barang"
-                    />
-                    <button className="bg-gray-300 hover:bg-gray-400 rounded px-3 py-2">
-                      <Search className="w-4 h-4 text-gray-700" />
-                    </button>
-                  </div>
+                  <label className="font-medium text-gray-700">Nama Barang</label>
+                  <select className="w-full border border-gray-300 rounded px-3 py-2 mt-1">
+                    <option>Nama Barang</option>
+                    <option>Laptop</option>
+                    <option>HVS</option>
+                  </select>
                 </div>
 
                 {/* Spesifikasi (Dropdown) */}
                 <div>
-                  <label className="font-medium text-gray-700">Spesifikasi</label>
+                  <label className="font-medium text-gray-700">Satuan</label>
                   <select className="w-full border border-gray-300 rounded px-3 py-2 mt-1">
-                    <option>Pilih Spesifikasi</option>
-                    <option>Standar</option>
-                    <option>Premium</option>
-                    <option>Custom</option>
+                    <option>Pilih Satuan</option>
+                    <option>Rim</option>
+                    <option>Pack</option>
+                    <option>Pcs</option>
                   </select>
                 </div>
 

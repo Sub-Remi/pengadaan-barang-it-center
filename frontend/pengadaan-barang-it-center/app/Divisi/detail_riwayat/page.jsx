@@ -36,7 +36,7 @@ export default function DetailPermintaanPage() {
                 </li>
               </Link>
 
-              <Link href="/Divisi/form_permintaan">
+              <Link href="/Divisi/permintaan_divisi">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Permintaan</li>
               </Link>
 
@@ -69,11 +69,11 @@ export default function DetailPermintaanPage() {
             {/* Data Pemohon */}
             <div className="px-6 py-4 border-b-4 border-b-gray-300">
               <h4 className="text-lg font-semibold mb-4 text-gray-800">
-                Data Pemohon
+                Data Permintaan
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-medium text-gray-700">Nama Pemohon</label>
+                  <label className="font-medium text-gray-700">Nama</label>
                   <input
                     type="text"
                     value="John Doe"
@@ -102,11 +102,21 @@ export default function DetailPermintaanPage() {
                   />
                 </div>
 
+                  <hr className="border-white"></hr>
+
                 <div>
-                  <label className="font-medium text-gray-700">Tanggal Kebutuhan</label>
+                  <label className="font-medium text-gray-700">Judul Permintaan</label>
                   <input
                     type="text"
-                    value="2025-10-01"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-700">Tanggal Permintaan</label>
+                  <input
+                    type="date"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />

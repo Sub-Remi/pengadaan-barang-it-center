@@ -324,7 +324,7 @@ export default function DetailPengadaanPage() {
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Spesifikasi</label>
+                  <label className="font-medium text-gray-700">Satuan</label>
                   <input
                     type="text"
                     value="Core i5, RAM 16GB, SSD 512GB"

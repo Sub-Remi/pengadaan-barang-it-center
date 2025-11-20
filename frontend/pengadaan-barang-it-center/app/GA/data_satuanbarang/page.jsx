@@ -1,15 +1,15 @@
 "use client";
 import Link from "next/link";
 import React from "react";
-import { FaPlus, FaEye } from "react-icons/fa";
+import { FaPlus, FaPen, FaTrash } from "react-icons/fa";
 
-export default function PermintaanPage() {
+export default function DataDivisiPage() {
   const data = [
-    { no: 1, idPB: "00000", judul: "Permintaan", tanggal: "dd/mm/yyyy", status: "Menunggu" },
-    { no: 2, idPB: "00000", judul: "Permintaan", tanggal: "dd/mm/yyyy", status: "Selesai" },
-    { no: 3, idPB: "00000", judul: "Permintaan", tanggal: "dd/mm/yyyy", status: "Menunggu" },
-    { no: 4, idPB: "00000", judul: "Permintaan", tanggal: "dd/mm/yyyy", status: "Diproses" },
-    { no: 5, idPB: "00000", judul: "Permintaan", tanggal: "dd/mm/yyyy", status: "Menunggu" },
+    { no: 1, nama: "Divisi 1" },
+    { no: 2, nama: "Divisi 2" },
+    { no: 3, nama: "Divisi 3" },
+    { no: 4, nama: "Divisi 4" },
+    { no: 5, nama: "Divisi 5" },
   ];
 
   return (
@@ -27,7 +27,7 @@ export default function PermintaanPage() {
         <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1">
           <nav className="flex-1 mt-6">
             <ul className="space-y-1">
-              <Link href="/Divisi/dashboard_divisi">
+              <Link href="/GA/dashboard_ga">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Dashboard
                 </li>
@@ -35,25 +35,64 @@ export default function PermintaanPage() {
 
               <hr className="border-t border-white/30 my-2" />
 
-              <li className="px-5 py-2 font-semibold text-x1 text-gray-200 mt-2 cursor-default">
-                PENGADAAN
+              {/* DATA MASTER */}
+              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+                DATA MASTER
               </li>
 
-              <Link href="/Divisi/draf_permintaan">
+              <Link href="/GA/data_permintaan">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Draf Permintaan
-                </li>
-              </Link>
-
-              <Link href="/Divisi/permintaan_divisi">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
                   Permintaan
                 </li>
               </Link>
 
-              <Link href="/Divisi/riwayat_divisi">
+              <Link href="/GA/data_barang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Barang
+                </li>
+              </Link>
+
+              <Link href="/GA/data_divisi">
+                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
+                  Divisi
+                </li>
+              </Link>
+
+              <Link href="/GA/manajemen_user">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Manajemen User
+                </li>
+              </Link>
+
+              <hr className="border-t border-white/30 my-2" />
+
+              {/* MONITORING */}
+              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+                MONITORING
+              </li>
+
+              <Link href="/GA/laporan_ga">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Laporan
+                </li>
+              </Link>
+
+              <Link href="/GA/riwayat_ga">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Riwayat
+                </li>
+              </Link>
+
+              <hr className="border-t border-white/30 my-2" />
+
+              {/* PEMESANAN */}
+              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+                PEMESANAN
+              </li>
+
+              <Link href="/GA/list_pemesanan">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  List Pemesanan
                 </li>
               </Link>
             </ul>
@@ -62,57 +101,40 @@ export default function PermintaanPage() {
 
         {/* Main Content */}
         <main className="flex-1 p-8 bg-gray-200">
-          <h2 className="text-3xl font-semibold mb-6">Permintaan</h2>
+          <h2 className="text-3xl font-semibold mb-6">Divisi</h2>
 
+          {/* Card container */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             {/* Header atas */}
             <div className="flex justify-between items-center px-6 py-4 border-b">
-              <h3 className="text-xl font-semibold text-teal-600">Permintaan</h3>
-              <Link href="/Divisi/form_permintaan">
-              <button className="flex items-center gap-2 bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition">
-                <FaPlus />
-                Tambah Permintaan
+              <h3 className="text-xl font-semibold text-teal-600">
+                Data Divisi
+              </h3>
+              <Link href="/GA/tambah_divisi"> 
+              <button className="flex items-center bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition">
+                <FaPlus className="mr-2" /> Tambah Divisi
               </button>
               </Link>
             </div>
 
-            {/* Filter dan tombol Excel/PDF */}
-            <div className="flex justify-between items-center px-6 py-4 border-b bg-white">
-              <div className="flex items-center gap-3">
-                <label htmlFor="search" className="text-gray-700 font-medium">
-                  Search
-                </label>
-                <input
-                  id="search"
-                  type="text"
-                  className="border border-gray-300 rounded px-2 py-1 text-x1"
-                />
-                <select className="border border-gray-300 rounded px-2 py-1 text-x1">
-                  <option>Menunggu</option>
-                  <option>Selesai</option>
-                  <option>Diproses</option>
-                </select>
-              </div>
-
-              <div className="flex gap-2 mt-3 sm:mt-0">
-                <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded">
-                  Excel
-                </button>
-                <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded">
-                  PDF
-                </button>
-              </div>
+            {/* Search */}
+            <div className="flex items-center gap-3 px-6 py-4 border-b bg-white">
+              <label htmlFor="search" className="text-gray-700 font-medium">
+                Search
+              </label>
+              <input
+                id="search"
+                type="text"
+                className="border border-gray-300 rounded px-2 py-1 text-sx1"
+              />
             </div>
 
             {/* Tabel */}
             <table className="w-full border-collapse text-x1">
               <thead>
-                <tr className="bg-white text-left border-b">
+                <tr className="bg-white text-left">
                   <th className="px-6 py-3 font-semibold">No</th>
-                  <th className="px-6 py-3 font-semibold">Id PB</th>
-                  <th className="px-6 py-3 font-semibold">Judul</th>
-                  <th className="px-6 py-3 font-semibold">Tanggal</th>
-                  <th className="px-6 py-3 font-semibold">Status</th>
+                  <th className="px-6 py-3 font-semibold">Nama Divisi</th>
                   <th className="px-6 py-3 font-semibold text-center">Aksi</th>
                 </tr>
               </thead>
@@ -125,18 +147,15 @@ export default function PermintaanPage() {
                     }`}
                   >
                     <td className="px-6 py-3">{row.no}</td>
-                    <td className="px-6 py-3">{row.idPB}</td>
                     <td className="px-6 py-3 font-medium text-gray-800">
-                      {row.judul}
+                      {row.nama}
                     </td>
-                    <td className="px-6 py-3">{row.tanggal}</td>
-                    <td className="px-6 py-3">{row.status}</td>
                     <td className="px-6 py-3 text-center">
-                        <Link href="/Divisi/detail_permintaan">
-                      <button className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded">
-                        <FaEye />
-                      </button>
-                      </Link>
+                      <div className="flex justify-center gap-2">
+                        <button className="bg-red-600 hover:bg-red-700 text-white p-2 rounded">
+                          <FaTrash />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
