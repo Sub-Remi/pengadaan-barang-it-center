@@ -30,42 +30,84 @@ export default function DetailBarangPage() {
 
               <hr className="border-t border-white/30 my-2" />
 
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">DATA MASTER</li>
+              {/* DATA MASTER */}
+              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+                DATA MASTER
+              </li>
 
               <Link href="/GA/data_permintaan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Permintaan</li>
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Permintaan
+                </li>
               </Link>
 
               <Link href="/GA/data_barang">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">Barang</li>
+                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
+                  Barang
+                </li>
+              </Link>
+
+              <Link href="/GA/data_kategoribarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Kategori Barang
+                </li>
+              </Link>
+
+
+              <Link href="/GA/data_satuanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Satuan Barang
+                </li>
               </Link>
 
               <Link href="/GA/data_divisi">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Divisi</li>
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Divisi
+                </li>
               </Link>
 
               <Link href="/GA/manajemen_user">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Manajemen User</li>
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Manajemen User
+                </li>
               </Link>
 
               <hr className="border-t border-white/30 my-2" />
 
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">MONITORING</li>
+              {/* MONITORING */}
+              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+                MONITORING
+              </li>
 
               <Link href="/GA/laporan_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Laporan</li>
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Laporan
+                </li>
               </Link>
 
               <Link href="/GA/riwayat_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Riwayat</li>
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Riwayat
+                </li>
               </Link>
 
               <hr className="border-t border-white/30 my-2" />
 
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">PEMESANAN</li>
+              {/* PEMESANAN */}
+              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+                PEMESANAN
+              </li>
 
               <Link href="/GA/list_pemesanan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">List Pemesanan</li>
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  List Pemesanan
+                </li>
+              </Link>
+
+              <Link href="/GA/form_penerimaanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Form Penerimaan
+                </li>
               </Link>
             </ul>
           </nav>

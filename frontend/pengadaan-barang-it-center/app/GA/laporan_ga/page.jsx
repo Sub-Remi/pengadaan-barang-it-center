@@ -51,6 +51,19 @@ export default function LaporanGAPage() {
                 </li>
               </Link>
 
+              <Link href="/GA/data_kategoribarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Kategori Barang
+                </li>
+              </Link>
+
+
+              <Link href="/GA/data_satuanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Satuan Barang
+                </li>
+              </Link>
+
               <Link href="/GA/data_divisi">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Divisi
@@ -71,7 +84,9 @@ export default function LaporanGAPage() {
               </li>
 
               <Link href="/GA/laporan_ga">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">Laporan</li>
+                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
+                  Laporan
+                </li>
               </Link>
 
               <Link href="/GA/riwayat_ga">
@@ -90,6 +105,12 @@ export default function LaporanGAPage() {
               <Link href="/GA/list_pemesanan">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   List Pemesanan
+                </li>
+              </Link>
+
+              <Link href="/GA/form_penerimaanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Form Penerimaan
                 </li>
               </Link>
             </ul>

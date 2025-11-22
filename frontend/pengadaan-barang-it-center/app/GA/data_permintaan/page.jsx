@@ -5,11 +5,11 @@ import { FaEye } from "react-icons/fa";
 
 export default function DataPermintaanPage() {
   const data = [
-    { no: 1, idpb: "10111", divisi: "HR", tanggal: "01/01/2025", status: "Menunggu" },
-    { no: 2, idpb: "10777", divisi: "Marketing", tanggal: "02/06/2025", status: "Selesai" },
-    { no: 3, idpb: "10222", divisi: "Finance", tanggal: "24/04/2025", status: "Menunggu" },
-    { no: 4, idpb: "115551", divisi: "IT", tanggal: "04/10/2025", status: "Diproses" },
-    { no: 5, idpb: "110110", divisi: "Marketing", tanggal: "05/05/2025", status: "Menunggu" },
+    { no: 1, idpb: "10111", divisi: "HR", tanggal: "05/12/2025", status: "Menunggu" },
+    { no: 2, idpb: "10777", divisi: "Marketing", tanggal: "04/012/2025", status: "Selesai" },
+    { no: 3, idpb: "10222", divisi: "Finance", tanggal: "03/12/2025", status: "Menunggu" },
+    { no: 4, idpb: "115551", divisi: "IT", tanggal: "02/12/2025", status: "Diproses" },
+    { no: 5, idpb: "110110", divisi: "Marketing", tanggal: "01/12/2025", status: "Menunggu" },
   ];
 
   return (
@@ -41,12 +41,27 @@ export default function DataPermintaanPage() {
               </li>
 
               <Link href="/GA/data_permintaan">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">Permintaan</li>
+                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
+                  Permintaan
+                </li>
               </Link>
 
               <Link href="/GA/data_barang">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Barang
+                </li>
+              </Link>
+
+              <Link href="/GA/data_kategoribarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Kategori Barang
+                </li>
+              </Link>
+
+
+              <Link href="/GA/data_satuanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Satuan Barang
                 </li>
               </Link>
 
@@ -91,6 +106,12 @@ export default function DataPermintaanPage() {
               <Link href="/GA/list_pemesanan">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   List Pemesanan
+                </li>
+              </Link>
+
+              <Link href="/GA/form_penerimaanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Form Penerimaan
                 </li>
               </Link>
             </ul>

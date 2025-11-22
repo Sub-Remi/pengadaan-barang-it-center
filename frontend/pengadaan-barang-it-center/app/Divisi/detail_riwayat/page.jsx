@@ -18,7 +18,7 @@ export default function DetailPermintaanPage() {
         <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1">
           <nav className="flex-1 mt-6">
             <ul className="space-y-1">
-              <Link href="/divisi/dashboard_divisi">
+              <Link href="/Divisi/dashboard_divisi">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Dashboard
                 </li>
@@ -73,6 +73,15 @@ export default function DetailPermintaanPage() {
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
+                  <label className="font-medium text-gray-700">ID Permintaan</label>
+                  <input
+                    type="text"
+                    value="0000"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+                <div>
                   <label className="font-medium text-gray-700">Nama</label>
                   <input
                     type="text"
@@ -86,7 +95,7 @@ export default function DetailPermintaanPage() {
                   <label className="font-medium text-gray-700">Departemen/Divisi</label>
                   <input
                     type="text"
-                    value="Finance"
+                    value="IT"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -102,12 +111,13 @@ export default function DetailPermintaanPage() {
                   />
                 </div>
 
-                  <hr className="border-white"></hr>
+ 
 
                 <div>
                   <label className="font-medium text-gray-700">Judul Permintaan</label>
                   <input
                     type="text"
+                    value="Permintaan ATK"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -150,10 +160,10 @@ export default function DetailPermintaanPage() {
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Spesifikasi</label>
+                  <label className="font-medium text-gray-700">Satuan</label>
                   <input
                     type="text"
-                    value="Standard"
+                    value="Pack"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -163,16 +173,26 @@ export default function DetailPermintaanPage() {
                   <label className="font-medium text-gray-700">Jumlah</label>
                   <input
                     type="text"
-                    value="20"
+                    value="5"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-700">Status</label>
+                  <input
+                    type="text"
+                    value="Divalidasi"
+                    disabled
+                    className="w-full border border-gray-300 bg-green-600 text-white font-semibold rounded px-3 py-2 mt-1"
                   />
                 </div>
 
                 <div className="md:col-span-2">
                   <label className="font-medium text-gray-700">Keterangan</label>
                   <textarea
-                    value="Kebutuhan meeting bulanan"
+                    value="Kebutuhan Kantor"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                     rows="3"

@@ -5,11 +5,10 @@ import { FaPlus, FaPen, FaTrash } from "react-icons/fa";
 
 export default function DataSatuanPage() {
   const data = [
-    { no: 1, nama: "Pack" },
-    { no: 2, nama: "Rim" },
-    { no: 3, nama: "Rim" },
-    { no: 4, nama: "Pack" },
-    { no: 5, nama: "Rim" },
+    { no: 1, nama: "ATK" },
+    { no: 2, nama: "Elektronik" },
+    { no: 3, nama: "Furnitur" },
+
   ];
 
   return (
@@ -108,24 +107,30 @@ export default function DataSatuanPage() {
                   List Pemesanan
                 </li>
               </Link>
+
+              <Link href="/GA/form_penerimaanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Form Penerimaan
+                </li>
+              </Link>
             </ul>
           </nav>
         </aside>
 
         {/* Main Content */}
         <main className="flex-1 p-8 bg-gray-200">
-          <h2 className="text-3xl font-semibold mb-6">Divisi</h2>
+          <h2 className="text-3xl font-semibold mb-6">Kategori Barang</h2>
 
           {/* Card container */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             {/* Header atas */}
             <div className="flex justify-between items-center px-6 py-4 border-b">
               <h3 className="text-xl font-semibold text-teal-600">
-                Data Divisi
+                Data Kategori
               </h3>
-              <Link href="/GA/tambah_divisi"> 
+              <Link href="/GA/tambah_kategoribarang"> 
               <button className="flex items-center bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition">
-                <FaPlus className="mr-2" /> Tambah Divisi
+                <FaPlus className="mr-2" /> Tambah Kategori
               </button>
               </Link>
             </div>
@@ -147,7 +152,7 @@ export default function DataSatuanPage() {
               <thead>
                 <tr className="bg-white text-left">
                   <th className="px-6 py-3 font-semibold">No</th>
-                  <th className="px-6 py-3 font-semibold">Nama Divisi</th>
+                  <th className="px-6 py-3 font-semibold">Nama Kategori</th>
                   <th className="px-6 py-3 font-semibold text-center">Aksi</th>
                 </tr>
               </thead>

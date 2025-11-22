@@ -87,7 +87,15 @@ export default function PermintaanPage() {
                   type="text"
                   className="border border-gray-300 rounded px-2 py-1 text-x1"
                 />
+
+                <label className="font-medium text-gray-700">Dari Tanggal</label>
+              <input type="date" className="border border-gray-300 rounded px-2 py-1" />
+
+              <label className="font-medium text-gray-700">Sampai Tanggal</label>
+              <input type="date" className="border border-gray-300 rounded px-2 py-1" />
+              
                 <select className="border border-gray-300 rounded px-2 py-1 text-x1">
+                  <option>Semua</option>
                   <option>Menunggu</option>
                   <option>Selesai</option>
                   <option>Diproses</option>

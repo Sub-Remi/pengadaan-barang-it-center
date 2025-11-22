@@ -90,6 +90,12 @@ export default function DrafPermintaanPage() {
                 className="border border-gray-300 rounded px-2 py-1 text-x1"
               />
 
+              <label className="font-medium text-gray-700">Dari Tanggal</label>
+              <input type="date" className="border border-gray-300 rounded px-2 py-1" />
+
+              <label className="font-medium text-gray-700">Sampai Tanggal</label>
+              <input type="date" className="border border-gray-300 rounded px-2 py-1" />
+
             </div>
 
             {/* Tabel */}
@@ -117,7 +123,7 @@ export default function DrafPermintaanPage() {
                     <td className="px-6 py-3">{row.tanggal}</td>
                     <td className="px-6 py-3 text-center">
                       <div className="flex justify-center gap-2">
-                        <Link href="/Divisi/form_permintaan">
+                        <Link href="/Divisi/form_draf">
                         <button className="bg-green-600 hover:bg-green-700 text-white p-2 rounded">
                           <FaPen />
                         </button>

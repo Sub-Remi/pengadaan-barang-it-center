@@ -47,52 +47,85 @@ export default function TambahUserPage() {
               </li>
             </Link>
             <hr className="border-t border-white/30 my-2" />
-            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-              DATA MASTER
-            </li>
-            <Link href="/GA/data_permintaan">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Permintaan
+            {/* DATA MASTER */}
+              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+                DATA MASTER
               </li>
-            </Link>
-            <Link href="/GA/data_barang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Barang
+
+              <Link href="/GA/data_permintaan">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Permintaan
+                </li>
+              </Link>
+
+              <Link href="/GA/data_barang">
+                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
+                  Barang
+                </li>
+              </Link>
+
+              <Link href="/GA/data_kategoribarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Kategori Barang
+                </li>
+              </Link>
+
+
+              <Link href="/GA/data_satuanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Satuan Barang
+                </li>
+              </Link>
+
+              <Link href="/GA/data_divisi">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Divisi
+                </li>
+              </Link>
+
+              <Link href="/GA/manajemen_user">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Manajemen User
+                </li>
+              </Link>
+
+              <hr className="border-t border-white/30 my-2" />
+
+              {/* MONITORING */}
+              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+                MONITORING
               </li>
-            </Link>
-            <Link href="/GA/data_divisi">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Divisi
+
+              <Link href="/GA/laporan_ga">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Laporan
+                </li>
+              </Link>
+
+              <Link href="/GA/riwayat_ga">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Riwayat
+                </li>
+              </Link>
+
+              <hr className="border-t border-white/30 my-2" />
+
+              {/* PEMESANAN */}
+              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+                PEMESANAN
               </li>
-            </Link>
-            <Link href="/GA/manajemen_user">
-              <li className="bg-blue-500 px-5 py-2 cursor-pointer">
-                Manajemen User
-              </li>
-            </Link>
-            <hr className="border-t border-white/30 my-2" />
-            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-              MONITORING
-            </li>
-            <Link href="/GA/laporan_ga">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Laporan
-              </li>
-            </Link>
-            <Link href="/GA/riwayat_ga">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Riwayat
-              </li>
-            </Link>
-            <hr className="border-t border-white/30 my-2" />
-            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-              PEMESANAN
-            </li>
-            <Link href="/GA/list_pemesanan">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointe">
-                List Pemesanan
-              </li>
-            </Link>
+
+              <Link href="/GA/list_pemesanan">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  List Pemesanan
+                </li>
+              </Link>
+
+              <Link href="/GA/form_penerimaanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Form Penerimaan
+                </li>
+              </Link>
           </ul>
         </nav>
       </aside>
@@ -211,35 +244,18 @@ export default function TambahUserPage() {
                 />
               </div>
 
-              {/* Role */}
+              {/* Divisi */}
               <div>
                 <label className="block font-semibold text-gray-800 mb-1">
-                  Role
+                  Divisi
                 </label>
-                <div className="flex gap-6 items-center mt-1">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="role"
-                      value="Divisi"
-                      checked={formData.role === "Divisi"}
-                      onChange={handleChange}
-                      className="accent-[#00A651]"
-                    />
-                    <span>Divisi</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="role"
-                      value="Finance"
-                      checked={formData.role === "Finance"}
-                      onChange={handleChange}
-                      className="accent-[#00A651]"
-                    />
-                    <span>Finance</span>
-                  </label>
-                </div>
+                <input
+                  type="divisi"
+                  name="divisi"
+                  value={formData.divisi}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2 focus:outline-none"
+                />
               </div>
 
               {/* Tombol */}

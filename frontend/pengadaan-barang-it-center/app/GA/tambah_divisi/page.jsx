@@ -40,6 +40,7 @@ export default function TambahBarangPage() {
 
               <hr className="border-t border-white/30 my-2" />
 
+              {/* DATA MASTER */}
               <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
                 DATA MASTER
               </li>
@@ -53,6 +54,19 @@ export default function TambahBarangPage() {
               <Link href="/GA/data_barang">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Barang
+                </li>
+              </Link>
+
+              <Link href="/GA/data_kategoribarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Kategori Barang
+                </li>
+              </Link>
+
+
+              <Link href="/GA/data_satuanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Satuan Barang
                 </li>
               </Link>
 
@@ -70,6 +84,7 @@ export default function TambahBarangPage() {
 
               <hr className="border-t border-white/30 my-2" />
 
+              {/* MONITORING */}
               <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
                 MONITORING
               </li>
@@ -88,6 +103,7 @@ export default function TambahBarangPage() {
 
               <hr className="border-t border-white/30 my-2" />
 
+              {/* PEMESANAN */}
               <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
                 PEMESANAN
               </li>
@@ -95,6 +111,12 @@ export default function TambahBarangPage() {
               <Link href="/GA/list_pemesanan">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   List Pemesanan
+                </li>
+              </Link>
+
+              <Link href="/GA/form_penerimaanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Form Penerimaan
                 </li>
               </Link>
             </ul>
@@ -111,7 +133,7 @@ export default function TambahBarangPage() {
               <h3 className="text-xl font-semibold text-teal-600">
                 Tambah Divisi
               </h3>
-              <Link href="/GA/data_barang">
+              <Link href="/GA/data_divisi">
                 <button className="bg-teal-600 hover:bg-green-600 text-white px-4 py-1.5 rounded">
                   &lt; Kembali
                 </button>

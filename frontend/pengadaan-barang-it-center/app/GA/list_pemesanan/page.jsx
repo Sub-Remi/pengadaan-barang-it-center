@@ -36,17 +36,33 @@ export default function ListPemesananPage() {
               <hr className="border-t border-white/30 my-2" />
 
               {/* DATA MASTER */}
+              {/* DATA MASTER */}
               <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
                 DATA MASTER
               </li>
 
               <Link href="/GA/data_permintaan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Permintaan</li>
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Permintaan
+                </li>
               </Link>
 
               <Link href="/GA/data_barang">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Barang
+                </li>
+              </Link>
+
+              <Link href="/GA/data_kategoribarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Kategori Barang
+                </li>
+              </Link>
+
+
+              <Link href="/GA/data_satuanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Satuan Barang
                 </li>
               </Link>
 
@@ -91,6 +107,12 @@ export default function ListPemesananPage() {
               <Link href="/GA/list_pemesanan">
                 <li className="bg-blue-500 px-5 py-2 cursor-pointer">
                   List Pemesanan
+                </li>
+              </Link>
+
+              <Link href="/GA/form_penerimaanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Form Penerimaan
                 </li>
               </Link>
             </ul>

@@ -5,11 +5,11 @@ import { FaPlus, FaPen } from "react-icons/fa";
 
 export default function DataBarangPage() {
   const data = [
-    { no: 1, kode: "101", kategori: "ATK", nama: "Kertas HVS A4", spesifikasi: "80 gr Kenko", stok: 70 },
-    { no: 2, kode: "107", kategori: "ATK", nama: "Map Coklat A4", spesifikasi: "Kenko", stok: 50 },
-    { no: 3, kode: "102", kategori: "ATK", nama: "Kertas Cover Biru", spesifikasi: "Kenko", stok: 35 },
-    { no: 4, kode: "115", kategori: "ATK", nama: "Sticky Notes", spesifikasi: "Kenko 3x3 inch", stok: 20 },
-    { no: 5, kode: "110", kategori: "ATK", nama: "Bolpoin Hitam", spesifikasi: "Kenko", stok: 65 },
+    { no: 1, kode: "101", kategori: "ATK", nama: "Kertas HVS A4", satuan: "Pack", stok: 10 },
+    { no: 2, kode: "107", kategori: "ATK", nama: "Map Coklat A4", satuan: "Pack", stok: 50 },
+    { no: 3, kode: "102", kategori: "ATK", nama: "Kertas Cover Biru", satuan: "Pack", stok: 35 },
+    { no: 4, kode: "115", kategori: "ATK", nama: "Sticky Notes", satuan: "Pad", stok: 20 },
+    { no: 5, kode: "110", kategori: "ATK", nama: "Bolpoin Hitam", satuan: "Pack", stok: 65 },
   ];
 
   return (
@@ -47,6 +47,19 @@ export default function DataBarangPage() {
               <Link href="/GA/data_barang">
                 <li className="bg-blue-500 px-5 py-2 cursor-pointer">
                   Barang
+                </li>
+              </Link>
+
+              <Link href="/GA/data_kategoribarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Kategori Barang
+                </li>
+              </Link>
+
+
+              <Link href="/GA/data_satuanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Satuan Barang
                 </li>
               </Link>
 
@@ -91,6 +104,12 @@ export default function DataBarangPage() {
               <Link href="/GA/list_pemesanan">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   List Pemesanan
+                </li>
+              </Link>
+
+              <Link href="/GA/form_penerimaanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Form Penerimaan
                 </li>
               </Link>
             </ul>
@@ -141,7 +160,7 @@ export default function DataBarangPage() {
                   <th className="px-6 py-3 font-semibold">Kode Barang</th>
                   <th className="px-6 py-3 font-semibold">Kategori</th>
                   <th className="px-6 py-3 font-semibold">Nama Barang</th>
-                  <th className="px-6 py-3 font-semibold">Spesifikasi</th>
+                  <th className="px-6 py-3 font-semibold">Satuan</th>
                   <th className="px-6 py-3 font-semibold">Stok</th>
                   <th className="px-6 py-3 font-semibold text-center">Aksi</th>
                 </tr>
@@ -158,7 +177,7 @@ export default function DataBarangPage() {
                     <td className="px-6 py-3">{row.kode}</td>
                     <td className="px-6 py-3">{row.kategori}</td>
                     <td className="px-6 py-3 font-medium text-gray-800">{row.nama}</td>
-                    <td className="px-6 py-3">{row.spesifikasi}</td>
+                    <td className="px-6 py-3">{row.satuan}</td>
                     <td className="px-6 py-3">{row.stok}</td>
                     <td className="px-6 py-3 text-center">
                     <Link href="/GA/kelola_barang">

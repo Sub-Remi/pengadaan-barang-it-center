@@ -19,41 +19,83 @@ export default function DetailPengadaanPage() {
             </Link>
             <hr className="border-t border-white/30 my-2" />
             <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-              DATA MASTER
-            </li>
-            <Link href="/GA/data_permintaan">
-              <li className="bg-blue-500 px-5 py-2 cursor-pointer">Permintaan</li>
-            </Link>
-            <Link href="/GA/data_barang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Barang</li>
-            </Link>
-            <Link href="/GA/data_divisi">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Divisi</li>
-            </Link>
-            <Link href="/GA/manajemen_user">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Manajemen User
+                DATA MASTER
               </li>
-            </Link>
-            <hr className="border-t border-white/30 my-2" />
-            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-              MONITORING
-            </li>
-            <Link href="/GA/laporan_ga">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Laporan</li>
-            </Link>
-            <Link href="/GA/riwayat_ga">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Riwayat</li>
-            </Link>
-            <hr className="border-t border-white/30 my-2" />
-            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-              PEMESANAN
-            </li>
-            <Link href="/GA/list_pemesanan">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                List Pemesanan
+
+              <Link href="/GA/data_permintaan">
+                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
+                  Permintaan
+                </li>
+              </Link>
+
+              <Link href="/GA/data_barang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Barang
+                </li>
+              </Link>
+
+              <Link href="/GA/data_kategoribarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Kategori Barang
+                </li>
+              </Link>
+
+
+              <Link href="/GA/data_satuanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Satuan Barang
+                </li>
+              </Link>
+
+              <Link href="/GA/data_divisi">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Divisi
+                </li>
+              </Link>
+
+              <Link href="/GA/manajemen_user">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Manajemen User
+                </li>
+              </Link>
+
+              <hr className="border-t border-white/30 my-2" />
+
+              {/* MONITORING */}
+              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+                MONITORING
               </li>
-            </Link>
+
+              <Link href="/GA/laporan_ga">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Laporan
+                </li>
+              </Link>
+
+              <Link href="/GA/riwayat_ga">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Riwayat
+                </li>
+              </Link>
+
+              <hr className="border-t border-white/30 my-2" />
+
+              {/* PEMESANAN */}
+              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+                PEMESANAN
+              </li>
+
+              <Link href="/GA/list_pemesanan">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  List Pemesanan
+                </li>
+              </Link>
+
+              <Link href="/GA/form_penerimaanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Form Penerimaan
+                </li>
+              </Link>
           </ul>
         </nav>
       </aside>
@@ -75,7 +117,7 @@ export default function DetailPengadaanPage() {
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="flex justify-between items-center px-6 py-5 border-b-4 border-b-gray-300">
               <h3 className="text-xl font-semibold text-teal-600">
-                Detail Pengadaan
+                Detail Permintaan
               </h3>
               <Link href="/GA/data_permintaan">
                 <button className="bg-teal-600 hover:bg-green-600 text-white px-4 py-1.5 rounded">
@@ -87,11 +129,20 @@ export default function DetailPengadaanPage() {
             {/* Data Pemohon */}
             <div className="px-6 py-4 border-b-4 border-b-gray-300">
               <h4 className="text-lg font-semibold mb-4 text-gray-800">
-                Data Pemohon
+                Data Permintaan
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-medium text-gray-700">Nama Pemohon</label>
+                  <label className="font-medium text-gray-700">ID Permintaan</label>
+                  <input
+                    type="text"
+                    value="0000"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="font-medium text-gray-700">Nama</label>
                   <input
                     type="text"
                     value="John Doe"
@@ -101,10 +152,10 @@ export default function DetailPengadaanPage() {
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Departemen/Divisi</label>
+                  <label className="font-medium text-gray-700">Divisi</label>
                   <input
                     type="text"
-                    value="Finance"
+                    value="IT"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -119,9 +170,18 @@ export default function DetailPengadaanPage() {
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
                 </div>
+                <div>
+                  <label className="font-medium text-gray-700">Judul Permintaan</label>
+                  <input
+                    type="text"
+                    value="Permintaan Laptop"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Tanggal Kebutuhan</label>
+                  <label className="font-medium text-gray-700">Tanggal Permintaan</label>
                   <input
                     type="text"
                     value="2025-10-01"
@@ -159,10 +219,10 @@ export default function DetailPengadaanPage() {
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Spesifikasi</label>
+                  <label className="font-medium text-gray-700">Satuan</label>
                   <input
                     type="text"
-                    value="Core i5, RAM 16GB, SSD 512GB"
+                    value="Unit"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -172,7 +232,7 @@ export default function DetailPengadaanPage() {
                   <label className="font-medium text-gray-700">Jumlah</label>
                   <input
                     type="text"
-                    value="5 Unit"
+                    value="2"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -235,17 +295,17 @@ export default function DetailPengadaanPage() {
                   <label className="font-medium text-gray-700">Nama Barang</label>
                   <input
                     type="text"
-                    value="Laptop Lenovo ThinkPad"
+                    value="Kertas HVS"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Spesifikasi</label>
+                  <label className="font-medium text-gray-700">Satuan</label>
                   <input
                     type="text"
-                    value="Core i5, RAM 16GB, SSD 512GB"
+                    value="Rim"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -255,7 +315,7 @@ export default function DetailPengadaanPage() {
                   <label className="font-medium text-gray-700">Jumlah</label>
                   <input
                     type="text"
-                    value="5 Unit"
+                    value="5"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -317,7 +377,7 @@ export default function DetailPengadaanPage() {
                   <label className="font-medium text-gray-700">Nama Barang</label>
                   <input
                     type="text"
-                    value="Laptop Lenovo ThinkPad"
+                    value="Pulpen"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -327,7 +387,7 @@ export default function DetailPengadaanPage() {
                   <label className="font-medium text-gray-700">Satuan</label>
                   <input
                     type="text"
-                    value="Core i5, RAM 16GB, SSD 512GB"
+                    value="Pack"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -337,7 +397,7 @@ export default function DetailPengadaanPage() {
                   <label className="font-medium text-gray-700">Jumlah</label>
                   <input
                     type="text"
-                    value="5 Unit"
+                    value="2"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />

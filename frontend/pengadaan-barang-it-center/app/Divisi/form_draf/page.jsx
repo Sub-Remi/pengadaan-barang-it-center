@@ -31,13 +31,13 @@ export default function FormPermintaanBarangPage() {
               </li>
 
               <Link href="/Divisi/draf_permintaan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
                   Draf Permintaan
                 </li>
               </Link>
 
               <Link href="/Divisi/permintaan_divisi">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">Permintaan</li>
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Permintaan</li>
               </Link>
 
               <Link href="/Divisi/riwayat_divisi">
@@ -60,14 +60,14 @@ export default function FormPermintaanBarangPage() {
 
         {/* Main Content Scrollable */}
         <main className="flex-1 mt-20 overflow-y-auto bg-gray-200 p-8">
-          <h2 className="text-3xl font-semibold mb-6">Permintaan</h2>
+          <h2 className="text-3xl font-semibold mb-6">Draf Permintaan</h2>
 
           {/* Card Form */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             {/* Header Form */}
             <div className="flex justify-between items-center px-6 py-5 border-b-4 border-b-gray-300">
               <h3 className="text-xl font-semibold text-teal-600">
-                Form Permintaan Barang
+                Draf Form Permintaan Barang
               </h3>
               <Link href="/Divisi/draf_permintaan">
               <button className="bg-teal-600 hover:bg-green-600 text-white px-4 py-1.5 rounded">
@@ -82,16 +82,6 @@ export default function FormPermintaanBarangPage() {
                 Data Permintaan
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="font-medium text-gray-700">ID Permintaan</label>
-                  <input
-                    type="text"
-                    value="0000"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                </div>
-
                 <div>
                   <label className="font-medium text-gray-700">Nama</label>
                   <input
@@ -121,6 +111,8 @@ export default function FormPermintaanBarangPage() {
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
                 </div>
+
+                <hr className="border-white"></hr>
 
                 <div>
                   <label className="font-medium text-gray-700">Judul Permintaan</label>

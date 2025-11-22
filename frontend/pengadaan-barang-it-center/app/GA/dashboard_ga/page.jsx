@@ -38,12 +38,27 @@ function DashboardGA() {
               </li>
 
               <Link href="/GA/data_permintaan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Permintaan</li>
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Permintaan
+                </li>
               </Link>
 
               <Link href="/GA/data_barang">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Barang
+                </li>
+              </Link>
+
+              <Link href="/GA/data_kategoribarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Kategori Barang
+                </li>
+              </Link>
+
+
+              <Link href="/GA/data_satuanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Satuan Barang
                 </li>
               </Link>
 
@@ -88,6 +103,12 @@ function DashboardGA() {
               <Link href="/GA/list_pemesanan">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   List Pemesanan
+                </li>
+              </Link>
+
+              <Link href="/GA/form_penerimaanbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Form Penerimaan
                 </li>
               </Link>
             </ul>
