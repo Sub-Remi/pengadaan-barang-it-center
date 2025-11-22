@@ -166,18 +166,16 @@ export default function DetailBarangPage() {
                 {/* Dropdown Spesifikasi */}
                 <div>
                   <label className="font-medium text-gray-700">Spesifikasi</label>
-                  <select
+                  <input
+                    type="text"
+                    defaultValue="A4"
                     disabled={!isEditMode}
                     className={`w-full border rounded px-3 py-2 mt-1 transition ${
                       isEditMode
                         ? "border-gray-300 bg-white text-gray-800"
                         : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
                     }`}
-                  >
-                    <option>80 gr Kenko</option>
-                    <option>100 gr PaperOne</option>
-                    <option>70 gr Sinar Dunia</option>
-                  </select>
+                  />
                 </div>
 
                 {/* Satuan */}

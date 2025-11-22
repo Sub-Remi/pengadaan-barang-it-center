@@ -5,11 +5,11 @@ import { FaEye } from "react-icons/fa";
 
 export default function ListPemesananPage() {
   const data = [
-    { no: 1, idpb: "10111", tanggal: "01/01/2025", divisi: "HR", status: "Selesai" },
-    { no: 2, idpb: "10777", tanggal: "02/06/2025", divisi: "Marketing", status: "Diproses" },
-    { no: 3, idpb: "10222", tanggal: "24/04/2025", divisi: "Finance", status: "Diproses" },
-    { no: 4, idpb: "115551", tanggal: "04/10/2025", divisi: "IT", status: "Diproses" },
-    { no: 5, idpb: "110110", tanggal: "05/05/2025", divisi: "Marketing", status: "Diproses" },
+    { no: 1, idpb: "10111", tanggal: "01/01/2025", barang: "Laptop", status: "Selesai" },
+    { no: 2, idpb: "10777", tanggal: "02/06/2025", barang: "Kertas HVS", status: "Diproses" },
+    { no: 3, idpb: "10222", tanggal: "24/04/2025", barang: "Sticky Notes", status: "Diproses" },
+    { no: 4, idpb: "115551", tanggal: "04/10/2025", barang: "Pulpen", status: "Diproses" },
+    { no: 5, idpb: "110110", tanggal: "05/05/2025", barang: "Mouse", status: "Diproses" },
   ];
 
   return (
@@ -145,13 +145,6 @@ export default function ListPemesananPage() {
                   type="date"
                   className="border border-gray-300 rounded px-2 py-1 text-x1"
                 />
-                <select className="border border-gray-300 rounded px-2 py-1 text-x1">
-                <option>Divisi</option>
-                <option>Finance</option>
-                <option>Marketing</option>
-                <option>HR</option>
-                <option>IT</option>
-              </select>
 
               <select className="border border-gray-300 rounded px-2 py-1 text-x1">
                   <option>Menunggu</option>
@@ -167,7 +160,7 @@ export default function ListPemesananPage() {
                   <th className="px-6 py-3 font-semibold">No</th>
                   <th className="px-6 py-3 font-semibold">ID PB</th>
                   <th className="px-6 py-3 font-semibold">Tanggal</th>
-                  <th className="px-6 py-3 font-semibold">Divisi</th>
+                  <th className="px-6 py-3 font-semibold">Nama Barang</th>
                   <th className="px-6 py-3 font-semibold">Status</th>
                   <th className="px-6 py-3 font-semibold text-center">Aksi</th>
                 </tr>
@@ -181,7 +174,7 @@ export default function ListPemesananPage() {
                     <td className="px-6 py-3">{row.no}</td>
                     <td className="px-6 py-3">{row.idpb}</td>
                     <td className="px-6 py-3">{row.tanggal}</td>
-                    <td className="px-6 py-3 font-medium text-gray-800">{row.divisi}</td>
+                    <td className="px-6 py-3 font-medium text-gray-800">{row.barang}</td>
                     <td className="px-6 py-3">{row.status}</td>
                     <td className="px-6 py-3 text-center">
                       <Link href="/GA/detail_pemesanan">

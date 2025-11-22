@@ -18,7 +18,7 @@ export default function DokumenPenerimaanPage() {
     id: "10111",
     tanggal: "01/01/2025",
     namaBarang: "Kertas HVS A4",
-    divisi: "HR",
+    satuan: "Rim",
     jumlah: 4,
     nota: "/uploads/nota_10111.jpg", // bisa png/jpg
     po: "/uploads/po_10111.jpg",
@@ -207,7 +207,7 @@ export default function DokumenPenerimaanPage() {
                   <input type="text" value={pb.namaBarang} disabled className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm" />
                 </div>
                 <div>
-                  <label className="font-medium text-gray-700">Spesifikasi</label>
+                  <label className="font-medium text-gray-700"></label>
                   <input type="text" value={pb.rincian.spesifikasi} disabled className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm" />
                 </div>
                 <div>

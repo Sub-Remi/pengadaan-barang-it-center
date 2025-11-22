@@ -4,38 +4,29 @@ import React from "react";
 
 export default function LaporanGAPage() {
   const data = [
-    { no: 1, divisi: "HR", tanggal: "01/10/2025", kategori: "ATK", status: "Diproses" },
-    { no: 2, divisi: "Marketing", tanggal: "02/10/2025", kategori: "Perlengkapan IT", status: "Menunggu" },
-    { no: 3, divisi: "Finance", tanggal: "03/10/2025", kategori: "Perabot Kantor", status: "Selesai" },
-    { no: 4, divisi: "IT Support", tanggal: "06/10/2025", kategori: "ATK", status: "Diproses" },
-    { no: 5, divisi: "Marketing", tanggal: "07/10/2025", kategori: "Perabot Kantor", status: "Selesai" },
+    { no: 1, divisi: "HR", tanggal: "01/10/2025", status: "Diproses" },
+    { no: 2, divisi: "Marketing", tanggal: "02/10/2025", status: "Menunggu" },
+    { no: 3, divisi: "Finance", tanggal: "03/10/2025", status: "Selesai" },
+    { no: 4, divisi: "IT Support", tanggal: "06/10/2025", status: "Diproses" },
+    { no: 5, divisi: "Marketing", tanggal: "07/10/2025", status: "Selesai" },
   ];
 
   return (
-    <div className="flex flex-col min-h-screen font-poppins bg-gray-100">
-      {/* Header */}
-      <header className="flex bg-white shadow-sm items-center">
-        <div className="bg-white w-60 h-20 flex items-center justify-center border-r border-white">
-          <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
+    <div className="flex h-screen font-poppins bg-gray-100 overflow-hidden">
+      {/* Sidebar */}
+      <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1 fixed top-0 left-0 h-full">
+        <div className="h-20 border-b border-white flex items-center justify-center bg-white">
+          <img src="/logo/ItCenter.png" alt="IT Center" className="w-32 border-white" />
         </div>
-        <div className="flex-1 h-20 flex items-center px-8"></div>
-      </header>
-
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1">
-          <nav className="flex-1 mt-6">
-            <ul className="space-y-1">
-              <Link href="/GA/dashboard_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Dashboard
-                </li>
-              </Link>
-
-              <hr className="border-t border-white/30 my-2" />
-
-              {/* DATA MASTER */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+        <nav className="flex-1 mt-6 overflow-y-auto">
+          <ul className="space-y-1 pb-6">
+            <Link href="/GA/dashboard_ga">
+              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                Dashboard
+              </li>
+            </Link>
+            <hr className="border-t border-white/30 my-2" />
+            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
                 DATA MASTER
               </li>
 
@@ -113,13 +104,45 @@ export default function LaporanGAPage() {
                   Form Penerimaan
                 </li>
               </Link>
-            </ul>
-          </nav>
-        </aside>
+          </ul>
+        </nav>
+      </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 p-8 bg-gray-200">
+      {/* Main Wrapper (Header + Content) */}
+      <div className="flex flex-col flex-1 ml-60 h-full">
+        {/* Header */}
+        <header className="flex bg-white shadow-sm items-center h-20 fixed top-0 left-60 right-0 z-10">
+          <div className="flex-1 h-full flex items-center px-8">
+
+          </div>
+        </header>
+
+        {/* Main Content Scrollable */}
+        <main className="flex-1 mt-20 overflow-y-auto bg-gray-200 p-8">
           <h2 className="text-3xl font-semibold mb-6">Laporan</h2>
+
+          {/* Statistik Bawah */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-4 mb-5">
+            <div className="bg-white shadow-md rounded-lg p-4 text-center">
+              <p className="text-gray-600 font-medium">Total Permintaan</p>
+              <h3 className="text-2xl font-bold text-gray-800 mt-2">5</h3>
+            </div>
+
+            <div className="bg-white shadow-md rounded-lg p-4 text-center">
+              <p className="text-gray-600 font-medium">Permintaan Selesai</p>
+              <h3 className="text-2xl font-bold text-gray-800 mt-2">2</h3>
+            </div>
+
+            <div className="bg-white shadow-md rounded-lg p-4 text-center">
+              <p className="text-gray-600 font-medium">Permintaan Diproses</p>
+              <h3 className="text-2xl font-bold text-gray-800 mt-2">2</h3>
+            </div>
+
+            <div className="bg-white shadow-md rounded-lg p-4 text-center">
+              <p className="text-gray-600 font-medium">Permintaan Ditolak</p>
+              <h3 className="text-2xl font-bold text-gray-800 mt-2">0</h3>
+            </div>
+          </div>
 
           {/* Card Container */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -133,13 +156,6 @@ export default function LaporanGAPage() {
             {/* Filter */}
             <div className="flex flex-wrap items-center justify-between px-6 py-4 border-b bg-white">
               <div className="flex items-center gap-3 flex-wrap">
-                <label className="font-medium text-gray-700">Kategori:</label>
-                <select className="border border-gray-300 rounded px-2 py-1 text-x1">
-                  <option>Pilih</option>
-                  <option>ATK</option>
-                  <option>Perlengkapan IT</option>
-                  <option>Perabot Kantor</option>
-                </select>
 
                 <label className="font-medium text-gray-700">Dari Tanggal:</label>
                 <input
@@ -180,7 +196,6 @@ export default function LaporanGAPage() {
                   <th className="px-6 py-3 font-semibold">No</th>
                   <th className="px-6 py-3 font-semibold">Divisi</th>
                   <th className="px-6 py-3 font-semibold">Tanggal</th>
-                  <th className="px-6 py-3 font-semibold">Kategori</th>
                   <th className="px-6 py-3 font-semibold">Status</th>
                 </tr>
               </thead>
@@ -193,7 +208,7 @@ export default function LaporanGAPage() {
                     <td className="px-6 py-3">{row.no}</td>
                     <td className="px-6 py-3">{row.divisi}</td>
                     <td className="px-6 py-3">{row.tanggal}</td>
-                    <td className="px-6 py-3">{row.kategori}</td>
+              
                     <td className="px-6 py-3">{row.status}</td>
                   </tr>
                 ))}
@@ -225,28 +240,7 @@ export default function LaporanGAPage() {
             <div className="h-1 bg-teal-600 w-full"></div>
           </div>
 
-          {/* Statistik Bawah */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-            <div className="bg-white shadow-md rounded-lg p-4 text-center">
-              <p className="text-gray-600 font-medium">Total Permintaan</p>
-              <h3 className="text-2xl font-bold text-gray-800 mt-2">5</h3>
-            </div>
-
-            <div className="bg-white shadow-md rounded-lg p-4 text-center">
-              <p className="text-gray-600 font-medium">Permintaan Selesai</p>
-              <h3 className="text-2xl font-bold text-gray-800 mt-2">2</h3>
-            </div>
-
-            <div className="bg-white shadow-md rounded-lg p-4 text-center">
-              <p className="text-gray-600 font-medium">Permintaan Diproses</p>
-              <h3 className="text-2xl font-bold text-gray-800 mt-2">2</h3>
-            </div>
-
-            <div className="bg-white shadow-md rounded-lg p-4 text-center">
-              <p className="text-gray-600 font-medium">Permintaan Ditolak</p>
-              <h3 className="text-2xl font-bold text-gray-800 mt-2">0</h3>
-            </div>
-          </div>
+          
         </main>
       </div>
     </div>

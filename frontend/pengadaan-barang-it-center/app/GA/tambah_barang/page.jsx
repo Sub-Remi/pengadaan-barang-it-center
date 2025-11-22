@@ -189,34 +189,22 @@ export default function TambahBarangPage() {
                   />
                 </div>
 
-                {/* Spesifikasi (Dropdown) */}
+                {/* Satuan */}
                 <div>
                   <label className="font-medium text-gray-700">
-                    Spesifikasi
+                    Kategori Barang
                   </label>
                   <select
-                    name="spesifikasi"
-                    value={formData.spesifikasi}
+                    name="kategori"
+                    value={formData.kategori}
                     onChange={handleChange}
                     className="w-full border border-gray-400 rounded px-3 py-2 mt-1 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                   >
-                    <option value="">-- Pilih Spesifikasi --</option>
-                    <option value="80 gr Kenko">80 gr Kenko</option>
-                    <option value="100 gr PaperOne">100 gr PaperOne</option>
-                    <option value="70 gr Sinar Dunia">70 gr Sinar Dunia</option>
+                    <option value="">-- Pilih Satuan --</option>
+                    <option value="ATK">Rim</option>
+                    <option value="Elektronik">Unit</option>
+                    <option value="Perabot">Pack</option>
                   </select>
-                </div>
-
-                {/* Satuan */}
-                <div>
-                  <label className="font-medium text-gray-700">Satuan</label>
-                  <input
-                    type="text"
-                    name="satuan"
-                    value={formData.satuan}
-                    onChange={handleChange}
-                    className="w-full border border-gray-400 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                  />
                 </div>
 
                 {/* Stok */}
