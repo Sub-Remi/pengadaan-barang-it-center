@@ -38,9 +38,7 @@ import {
 import {
   uploadDokumenPembelian,
   getDokumenByBarangPermintaan,
-  getDokumenByPermintaan,
   getDokumenDetail,
-  updateDokumen,
   deleteDokumen,
   downloadDokumen,
   getDokumenStats,
@@ -139,7 +137,7 @@ router.post(
 
 // ==================== ROUTES DOKUMEN PEMBELIAN ====================
 
-// Upload dokumen pembelian (PO, Nota, dll)
+// Upload dokumen pembelian (PO, Nota, dll) - SIMPLIFIED
 router.post(
   "/dokumen-pembelian",
   authenticate,
@@ -157,22 +155,11 @@ router.get(
   getDokumenByBarangPermintaan
 );
 
-// Get dokumen by permintaan_id
-router.get(
-  "/dokumen/permintaan/:permintaan_id",
-  authenticate,
-  requireAdmin,
-  getDokumenByPermintaan
-);
-
 // Get dokumen statistics
 router.get("/dokumen/stats", authenticate, requireAdmin, getDokumenStats);
 
 // Get dokumen detail
 router.get("/dokumen/:id", authenticate, requireAdmin, getDokumenDetail);
-
-// Update dokumen (metadata)
-router.put("/dokumen/:id", authenticate, requireAdmin, updateDokumen);
 
 // Delete dokumen
 router.delete("/dokumen/:id", authenticate, requireAdmin, deleteDokumen);
@@ -184,5 +171,4 @@ router.get(
   requireAdmin,
   downloadDokumen
 );
-
 export default router;

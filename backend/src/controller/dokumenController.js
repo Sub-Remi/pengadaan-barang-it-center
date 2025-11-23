@@ -1,32 +1,21 @@
 import DokumenPembelian from "../models/dokumen_pembelian.js";
 import BarangPermintaan from "../models/barang_permintaan.js";
 import fs from "fs";
-import path from "path";
 
-// Upload dokumen pembelian
+// Upload dokumen pembelian - SIMPLIFIED
 export const uploadDokumenPembelian = async (req, res) => {
   try {
-    const {
-      barang_permintaan_id,
-      jenis_dokumen,
-      nomor_dokumen,
-      tanggal_dokumen,
-      vendor,
-      total_harga,
-      catatan,
-    } = req.body;
-
+    const { barang_permintaan_id, jenis_dokumen } = req.body;
     const uploaded_by = req.user.id;
     const file = req.file;
 
     console.log("📄 Uploading dokumen pembelian:", {
       barang_permintaan_id,
       jenis_dokumen,
-      nomor_dokumen,
       uploaded_by,
     });
 
-    // Validasi input
+    // Validasi input - HANYA 2 FIELD WAJIB
     if (!barang_permintaan_id || !jenis_dokumen) {
       return res.status(400).json({
         error: "Barang permintaan ID dan jenis dokumen harus diisi.",
@@ -55,19 +44,14 @@ export const uploadDokumenPembelian = async (req, res) => {
         .json({ error: "Barang permintaan tidak ditemukan." });
     }
 
-    // Upload dokumen
+    // Upload dokumen - HANYA SIMPAN METADATA FILE
     const dokumenId = await DokumenPembelian.create({
       barang_permintaan_id,
       jenis_dokumen,
-      nomor_dokumen: nomor_dokumen || null,
-      tanggal_dokumen: tanggal_dokumen || null,
-      vendor: vendor || null,
-      total_harga: total_harga ? parseFloat(total_harga) : null,
       file_url: file.path,
       original_name: file.originalname,
       file_size: file.size,
       uploaded_by,
-      catatan: catatan || null,
     });
 
     console.log("✅ Dokumen pembelian uploaded with ID:", dokumenId);
@@ -116,27 +100,6 @@ export const getDokumenByBarangPermintaan = async (req, res) => {
   }
 };
 
-// Get all dokumen by permintaan_id
-export const getDokumenByPermintaan = async (req, res) => {
-  try {
-    const { permintaan_id } = req.params;
-
-    console.log("📋 Getting dokumen for permintaan:", permintaan_id);
-
-    const dokumenList = await DokumenPembelian.findByPermintaanId(
-      permintaan_id
-    );
-
-    res.json({
-      message: "Daftar dokumen berhasil diambil.",
-      data: dokumenList,
-    });
-  } catch (error) {
-    console.error("💥 Get dokumen by permintaan error:", error);
-    res.status(500).json({ error: "Terjadi kesalahan server." });
-  }
-};
-
 // Get dokumen detail
 export const getDokumenDetail = async (req, res) => {
   try {
@@ -156,60 +119,6 @@ export const getDokumenDetail = async (req, res) => {
     });
   } catch (error) {
     console.error("💥 Get dokumen detail error:", error);
-    res.status(500).json({ error: "Terjadi kesalahan server." });
-  }
-};
-
-// Update dokumen (metadata only, not file)
-export const updateDokumen = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const {
-      jenis_dokumen,
-      nomor_dokumen,
-      tanggal_dokumen,
-      vendor,
-      total_harga,
-      catatan,
-    } = req.body;
-
-    console.log("✏️ Updating dokumen:", id);
-
-    // Validasi input
-    if (!jenis_dokumen) {
-      return res.status(400).json({ error: "Jenis dokumen harus diisi." });
-    }
-
-    // Validasi jenis dokumen
-    const validJenisDokumen = ["PO", "Nota", "Form Penerimaan", "Lainnya"];
-    if (!validJenisDokumen.includes(jenis_dokumen)) {
-      return res.status(400).json({ error: "Jenis dokumen tidak valid." });
-    }
-
-    // Cek apakah dokumen ada
-    const existingDokumen = await DokumenPembelian.findById(id);
-    if (!existingDokumen) {
-      return res.status(404).json({ error: "Dokumen tidak ditemukan." });
-    }
-
-    const affectedRows = await DokumenPembelian.update(id, {
-      jenis_dokumen,
-      nomor_dokumen: nomor_dokumen || null,
-      tanggal_dokumen: tanggal_dokumen || null,
-      vendor: vendor || null,
-      total_harga: total_harga ? parseFloat(total_harga) : null,
-      catatan: catatan || null,
-    });
-
-    if (affectedRows === 0) {
-      return res.status(400).json({ error: "Gagal mengupdate dokumen." });
-    }
-
-    res.json({
-      message: "Dokumen berhasil diupdate.",
-    });
-  } catch (error) {
-    console.error("💥 Update dokumen error:", error);
     res.status(500).json({ error: "Terjadi kesalahan server." });
   }
 };
@@ -261,7 +170,7 @@ export const downloadDokumen = async (req, res) => {
       return res.status(404).json({ error: "Dokumen tidak ditemukan." });
     }
 
-    if (!dokumen.file_url || !fs.existsSync(dokumen.file_url)) {
+    if (!dokumen.file_path || !fs.existsSync(dokumen.file_path)) {
       return res.status(404).json({ error: "File dokumen tidak ditemukan." });
     }
 
@@ -274,7 +183,7 @@ export const downloadDokumen = async (req, res) => {
     res.setHeader("Content-Length", dokumen.file_size);
 
     // Stream file ke client
-    const fileStream = fs.createReadStream(dokumen.file_url);
+    const fileStream = fs.createReadStream(dokumen.file_path);
     fileStream.pipe(res);
   } catch (error) {
     console.error("💥 Download dokumen error:", error);
@@ -302,9 +211,7 @@ export const getDokumenStats = async (req, res) => {
 export default {
   uploadDokumenPembelian,
   getDokumenByBarangPermintaan,
-  getDokumenByPermintaan,
   getDokumenDetail,
-  updateDokumen,
   deleteDokumen,
   downloadDokumen,
   getDokumenStats,
