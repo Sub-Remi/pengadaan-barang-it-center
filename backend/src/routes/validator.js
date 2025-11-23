@@ -1,23 +1,65 @@
-import express from 'express';
-import { authenticate } from '../middleware/auth.js';
-import { requireValidator } from '../middleware/roleAuth.js';
-import { getPermintaanForValidation, validateBarang } from '../controller/validatorController.js';
+import express from "express";
+import {
+  getDokumenForValidation,
+  getValidatedDokumen,
+  getDokumenDetailForValidation,
+  validateDokumen,
+  getValidatorStats,
+  getPermintaanWithPemesanan,
+} from "../controller/validatorController.js";
+
+import { authenticate } from "../middleware/auth.js";
+import { requireValidator } from "../middleware/roleAuth.js";
 
 const router = express.Router();
 
-// All routes require validator role
-router.use(authenticate, requireValidator);
+// ==================== DASHBOARD & STATS ====================
 
-router.get('/permintaan', getPermintaanForValidation);
-router.put('/permintaan/:id/validate', validateBarang);
-// ... tambahkan routes validator lainnya
+// Get validator dashboard statistics
+router.get("/stats", authenticate, requireValidator, getValidatorStats);
+
+// ==================== VIEW PERMINTAAN ====================
+
+// Get permintaan dengan barang dalam pemesanan
+router.get(
+  "/permintaan",
+  authenticate,
+  requireValidator,
+  getPermintaanWithPemesanan
+);
+
+// ==================== DOKUMEN VALIDATION ====================
+
+// Get dokumen yang perlu divalidasi
+router.get(
+  "/dokumen/pending",
+  authenticate,
+  requireValidator,
+  getDokumenForValidation
+);
+
+// Get riwayat dokumen yang sudah divalidasi
+router.get(
+  "/dokumen/validated",
+  authenticate,
+  requireValidator,
+  getValidatedDokumen
+);
+
+// Get detail dokumen untuk validasi
+router.get(
+  "/dokumen/:id",
+  authenticate,
+  requireValidator,
+  getDokumenDetailForValidation
+);
+
+// Validasi dokumen (approve/reject)
+router.put(
+  "/dokumen/:id/validate",
+  authenticate,
+  requireValidator,
+  validateDokumen
+);
 
 export default router;
-
-/*
-GET    /api/validator/permintaan
-GET    /api/validator/permintaan/:id
-PUT    /api/validator/barang/:id/validasi
-GET    /api/validator/riwayat
-GET    /api/validator/penerimaan-barang
-*/

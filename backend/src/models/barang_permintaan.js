@@ -167,6 +167,32 @@ const BarangPermintaan = {
     const [result] = await dbPool.execute(query, [penerimaan_barang_id, id]);
     return result.affectedRows;
   },
+
+  // Update status barang setelah validasi
+  updateStatusAfterValidation: async (id, status) => {
+    const query = `
+      UPDATE barang_permintaan 
+      SET status = ?, updated_at = CURRENT_TIMESTAMP 
+      WHERE id = ?
+    `;
+    const [result] = await dbPool.execute(query, [status, id]);
+    return result.affectedRows;
+  },
+
+  // Cek apakah semua dokumen untuk barang sudah divalidasi
+  checkAllDokumenValidated: async (barang_permintaan_id) => {
+    const query = `
+      SELECT 
+        COUNT(*) as total_dokumen,
+        SUM(CASE WHEN is_valid = 1 THEN 1 ELSE 0 END) as validated_count,
+        SUM(CASE WHEN is_valid = 0 THEN 1 ELSE 0 END) as rejected_count,
+        SUM(CASE WHEN is_valid IS NULL THEN 1 ELSE 0 END) as pending_count
+      FROM dokumen_pembelian 
+      WHERE barang_permintaan_id = ?
+    `;
+    const [rows] = await dbPool.execute(query, [barang_permintaan_id]);
+    return rows[0];
+  },
 };
 
 export default BarangPermintaan;
