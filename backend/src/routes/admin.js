@@ -1,0 +1,188 @@
+import express from "express";
+import {
+  getAllPermintaan,
+  getPermintaanDetail,
+  updatePermintaanStatus,
+  updateBarangStatus,
+  createPenerimaanBarang,
+} from "../controller/adminController.js";
+import {
+  getAllStok,
+  getStokDetail,
+  createStok,
+  updateStok,
+  deleteStok,
+} from "../controller/stokController.js";
+
+import {
+  getAllDivisi,
+  getDivisiDropdown,
+  getDivisiDetail,
+  createDivisi,
+  updateDivisi,
+  deleteDivisi,
+  getDivisiStats,
+} from "../controller/divisiController.js";
+
+import {
+  getAllUsers,
+  getUserDetail,
+  createUser,
+  updateUser,
+  updateUserPassword,
+  resetUserPassword,
+  deleteUser,
+  getUserStats,
+} from "../controller/userController.js";
+
+import {
+  uploadDokumenPembelian,
+  getDokumenByBarangPermintaan,
+  getDokumenByPermintaan,
+  getDokumenDetail,
+  updateDokumen,
+  deleteDokumen,
+  downloadDokumen,
+  getDokumenStats,
+} from "../controller/dokumenController.js";
+
+import { authenticate } from "../middleware/auth.js";
+import { requireAdmin } from "../middleware/roleAuth.js";
+import {
+  uploadBuktiPenerimaan,
+  uploadDokumenPembelian as uploadDokumenMiddleware,
+  handleUploadError,
+} from "../middleware/upload.js";
+
+const router = express.Router();
+
+// All routes require admin role
+router.use(authenticate, requireAdmin);
+
+// ===== PERMINTAAN MANAGEMENT =====
+router.get("/permintaan", getAllPermintaan);
+router.get("/permintaan/:id", getPermintaanDetail);
+router.put("/permintaan/:id/status", updatePermintaanStatus);
+router.put("/barang/:id/status", updateBarangStatus);
+
+// ===== PENERIMAAN BARANG =====
+router.post(
+  "/penerimaan-barang",
+  uploadBuktiPenerimaan.single("foto_bukti"),
+  createPenerimaanBarang
+);
+
+// ===== STOK MANAGEMENT =====
+router.get("/stok", getAllStok);
+router.get("/stok/:id", getStokDetail);
+router.post("/stok", createStok);
+router.put("/stok/:id", updateStok);
+router.delete("/stok/:id", deleteStok);
+
+// ===== DIVISI MANAGEMENT =====
+// Get all divisi dengan pagination
+router.get("/divisi", authenticate, requireAdmin, getAllDivisi);
+
+// Get divisi untuk dropdown
+router.get("/divisi/dropdown", authenticate, requireAdmin, getDivisiDropdown);
+
+// Get divisi statistics
+router.get("/divisi/stats", authenticate, requireAdmin, getDivisiStats);
+
+// Get divisi detail
+router.get("/divisi/:id", authenticate, requireAdmin, getDivisiDetail);
+
+// Create new divisi
+router.post("/divisi", authenticate, requireAdmin, createDivisi);
+
+// Update divisi
+router.put("/divisi/:id", authenticate, requireAdmin, updateDivisi);
+
+// Delete divisi
+router.delete("/divisi/:id", authenticate, requireAdmin, deleteDivisi);
+
+// ==================== ROUTES USER MANAGEMENT ====================
+
+// Get all users dengan pagination dan filter
+router.get("/users", authenticate, requireAdmin, getAllUsers);
+
+// Get user statistics
+router.get("/users/stats", authenticate, requireAdmin, getUserStats);
+
+// Get user detail
+router.get("/users/:id", authenticate, requireAdmin, getUserDetail);
+
+// Create new user
+router.post("/users", authenticate, requireAdmin, createUser);
+
+// Update user
+router.put("/users/:id", authenticate, requireAdmin, updateUser);
+
+// Delete user
+router.delete("/users/:id", authenticate, requireAdmin, deleteUser);
+
+// Update user password
+router.put(
+  "/users/:id/password",
+  authenticate,
+  requireAdmin,
+  updateUserPassword
+);
+
+// Reset user password to default
+router.post(
+  "/users/:id/reset-password",
+  authenticate,
+  requireAdmin,
+  resetUserPassword
+);
+
+// ==================== ROUTES DOKUMEN PEMBELIAN ====================
+
+// Upload dokumen pembelian (PO, Nota, dll)
+router.post(
+  "/dokumen-pembelian",
+  authenticate,
+  requireAdmin,
+  uploadDokumenMiddleware.single("file_dokumen"),
+  handleUploadError,
+  uploadDokumenPembelian
+);
+
+// Get dokumen by barang_permintaan_id
+router.get(
+  "/dokumen/barang/:barang_permintaan_id",
+  authenticate,
+  requireAdmin,
+  getDokumenByBarangPermintaan
+);
+
+// Get dokumen by permintaan_id
+router.get(
+  "/dokumen/permintaan/:permintaan_id",
+  authenticate,
+  requireAdmin,
+  getDokumenByPermintaan
+);
+
+// Get dokumen statistics
+router.get("/dokumen/stats", authenticate, requireAdmin, getDokumenStats);
+
+// Get dokumen detail
+router.get("/dokumen/:id", authenticate, requireAdmin, getDokumenDetail);
+
+// Update dokumen (metadata)
+router.put("/dokumen/:id", authenticate, requireAdmin, updateDokumen);
+
+// Delete dokumen
+router.delete("/dokumen/:id", authenticate, requireAdmin, deleteDokumen);
+
+// Download dokumen
+router.get(
+  "/dokumen/:id/download",
+  authenticate,
+  requireAdmin,
+  downloadDokumen
+);
+
+export default router;

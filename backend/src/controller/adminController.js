@@ -1,0 +1,282 @@
+import Permintaan from "../models/permintaan.js";
+import BarangPermintaan from "../models/barang_permintaan.js";
+import StokBarang from "../models/stok_barang.js";
+import PenerimaanBarang from "../models/penerimaan_barang.js";
+import dbPool from "../config/database.js";
+
+// Get all permintaan dengan filter untuk admin
+export const getAllPermintaan = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    // Filters
+    const filters = {
+      status: req.query.status,
+      divisi_id: req.query.divisi_id,
+      start_date: req.query.start_date,
+      end_date: req.query.end_date,
+      search: req.query.search,
+    };
+
+    console.log("📋 Admin getting all permintaan with filters:", filters);
+
+    const result = await Permintaan.findAllWithFilters(filters, page, limit);
+
+    res.json({
+      message: "Daftar permintaan berhasil diambil.",
+      data: result.data,
+      pagination: {
+        currentPage: result.page,
+        totalPages: result.totalPages,
+        totalItems: result.total,
+        itemsPerPage: result.limit,
+      },
+    });
+  } catch (error) {
+    console.error("💥 Get all permintaan error:", error);
+    res.status(500).json({ error: "Terjadi kesalahan server." });
+  }
+};
+
+// Get detail permintaan untuk admin
+export const getPermintaanDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log("🔍 Admin getting permintaan detail:", id);
+
+    // Get permintaan detail
+    const query = `
+      SELECT p.*, u.nama_lengkap, u.email, d.nama_divisi 
+      FROM permintaan p 
+      JOIN users u ON p.user_id = u.id 
+      JOIN divisi d ON u.divisi_id = d.id 
+      WHERE p.id = ?
+    `;
+
+    // We'll need to execute this manually since we don't have this function in model yet
+    const [permintaanRows] = await dbPool.execute(query, [id]);
+    const permintaan = permintaanRows[0];
+
+    if (!permintaan) {
+      return res.status(404).json({ error: "Permintaan tidak ditemukan." });
+    }
+
+    // Get barang-barang dalam permintaan
+    const barangList = await BarangPermintaan.findByPermintaanId(id);
+
+    res.json({
+      message: "Detail permintaan berhasil diambil.",
+      data: {
+        ...permintaan,
+        barang: barangList,
+      },
+    });
+  } catch (error) {
+    console.error("💥 Get permintaan detail error:", error);
+    res.status(500).json({ error: "Terjadi kesalahan server." });
+  }
+};
+
+// Update status permintaan
+export const updatePermintaanStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    console.log("🔄 Admin updating permintaan status:", { id, status });
+
+    if (!status) {
+      return res.status(400).json({ error: "Status harus diisi." });
+    }
+
+    const validStatuses = ["menunggu", "diproses", "selesai", "ditolak"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: "Status tidak valid." });
+    }
+
+    const affectedRows = await Permintaan.updateStatus(id, status);
+
+    if (affectedRows === 0) {
+      return res.status(404).json({ error: "Permintaan tidak ditemukan." });
+    }
+
+    res.json({
+      message: `Status permintaan berhasil diubah menjadi ${status}.`,
+    });
+  } catch (error) {
+    console.error("💥 Update permintaan status error:", error);
+    res.status(500).json({ error: "Terjadi kesalahan server." });
+  }
+};
+
+// Update status barang
+export const updateBarangStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, catatan_admin } = req.body;
+
+    console.log("🔄 Admin updating barang status:", {
+      id,
+      status,
+      catatan_admin,
+    });
+
+    if (!status) {
+      return res.status(400).json({ error: "Status harus diisi." });
+    }
+
+    const validStatuses = [
+      "menunggu validasi",
+      "diproses",
+      "dalam pemesanan",
+      "selesai",
+      "ditolak",
+    ];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: "Status tidak valid." });
+    }
+
+    const affectedRows = await BarangPermintaan.updateStatus(
+      id,
+      status,
+      catatan_admin
+    );
+
+    if (affectedRows === 0) {
+      return res.status(404).json({ error: "Barang tidak ditemukan." });
+    }
+
+    res.json({
+      message: `Status barang berhasil diubah menjadi ${status}.`,
+    });
+  } catch (error) {
+    console.error("💥 Update barang status error:", error);
+    res.status(500).json({ error: "Terjadi kesalahan server." });
+  }
+};
+
+// Buat form penerimaan barang
+export const createPenerimaanBarang = async (req, res) => {
+  try {
+    // DEBUG: Lihat seluruh request body dan file
+    console.log("📦 Full request body:", req.body);
+    console.log("📦 Request file:", req.file);
+    console.log("📦 All request fields:", Object.keys(req.body));
+    const {
+      barang_permintaan_id,
+      tanggal_penerimaan,
+      penerima,
+      nama_barang,
+      spesifikasi,
+      jumlah_dipesan,
+      jumlah_diterima,
+      diperiksa_oleh,
+      tanggal_pemeriksaan,
+    } = req.body;
+
+    const foto_bukti = req.file ? req.file.path : null;
+
+    console.log("📦 Admin creating penerimaan barang:", {
+      barang_permintaan_id,
+      tanggal_penerimaan,
+      penerima,
+      nama_barang,
+      spesifikasi,
+      jumlah_dipesan,
+      jumlah_diterima,
+      diperiksa_oleh,
+      tanggal_pemeriksaan,
+      foto_bukti,
+    });
+
+    // Validasi input
+    if (
+      !barang_permintaan_id ||
+      !tanggal_penerimaan ||
+      !penerima ||
+      !nama_barang ||
+      !jumlah_dipesan ||
+      !jumlah_diterima ||
+      !diperiksa_oleh ||
+      !tanggal_pemeriksaan
+    ) {
+      console.log("❌ Missing required fields:", {
+        barang_permintaan_id: !!barang_permintaan_id,
+        tanggal_penerimaan: !!tanggal_penerimaan,
+        penerima: !!penerima,
+        nama_barang: !!nama_barang,
+        jumlah_dipesan: !!jumlah_dipesan,
+        jumlah_diterima: !!jumlah_diterima,
+        diperiksa_oleh: !!diperiksa_oleh,
+        tanggal_pemeriksaan: !!tanggal_pemeriksaan,
+      });
+      return res
+        .status(400)
+        .json({ error: "Semua field harus diisi kecuali foto bukti." });
+    }
+
+    // Cek apakah barang permintaan ada
+    const barang = await BarangPermintaan.findById(barang_permintaan_id);
+    if (!barang) {
+      return res
+        .status(404)
+        .json({ error: "Barang permintaan tidak ditemukan." });
+    }
+
+    // Buat penerimaan barang
+    const penerimaanId = await PenerimaanBarang.create({
+      barang_permintaan_id,
+      tanggal_penerimaan,
+      penerima,
+      nama_barang,
+      spesifikasi: spesifikasi || barang.spesifikasi,
+      jumlah_dipesan,
+      jumlah_diterima,
+      diperiksa_oleh,
+      tanggal_pemeriksaan,
+      foto_bukti,
+    });
+
+    // Update barang permintaan sebagai sudah diterima
+    await BarangPermintaan.markAsReceived(barang_permintaan_id, penerimaanId);
+
+    // Update stok jika barang ada di stok
+    const stokBarang = await StokBarang.findByNamaAndSpesifikasi(
+      nama_barang,
+      spesifikasi
+    );
+    if (stokBarang) {
+      const newStok = stokBarang.stok + parseInt(jumlah_diterima);
+      await StokBarang.updateStokQuantity(stokBarang.id, newStok);
+    }
+
+    console.log("✅ Penerimaan barang created with ID:", penerimaanId);
+
+    res.status(201).json({
+      message: "Form penerimaan barang berhasil dibuat.",
+      data: { id: penerimaanId },
+    });
+  } catch (error) {
+    console.error("💥 Create penerimaan barang error:", error);
+    res.status(500).json({ error: "Terjadi kesalahan server." });
+  }
+};
+
+// We need to add this function to StokBarang model
+// Add this to src/models/stok_barang.js
+StokBarang.findByNamaAndSpesifikasi = async (nama_barang, spesifikasi) => {
+  const query =
+    "SELECT * FROM stok_barang WHERE nama_barang = ? AND spesifikasi = ?";
+  const [rows] = await dbPool.execute(query, [nama_barang, spesifikasi]);
+  return rows[0];
+};
+
+export default {
+  getAllPermintaan,
+  getPermintaanDetail,
+  updatePermintaanStatus,
+  updateBarangStatus,
+  createPenerimaanBarang,
+};
