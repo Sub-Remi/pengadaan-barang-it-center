@@ -2,19 +2,11 @@
 import Link from "next/link";
 import React, { useState } from "react";
 
-export default function TambahBarangPage() {
-  const [formData, setFormData] = useState({
-    kode: "",
-    kategori: "",
-    nama: "",
-    spesifikasi: "",
-    satuan: "",
-    stok: "",
-  });
+export default function DetailBarangPage() {
+  const [isEditMode, setIsEditMode] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const handleEditToggle = () => {
+    setIsEditMode(!isEditMode);
   };
 
   return (
@@ -33,9 +25,7 @@ export default function TambahBarangPage() {
           <nav className="flex-1 mt-6">
             <ul className="space-y-1">
               <Link href="/GA/dashboard_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Dashboard
-                </li>
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Dashboard</li>
               </Link>
 
               <hr className="border-t border-white/30 my-2" />
@@ -65,13 +55,13 @@ export default function TambahBarangPage() {
 
 
               <Link href="/GA/data_satuanbarang">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Satuan Barang
                 </li>
               </Link>
 
               <Link href="/GA/data_stokbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
                   Stok Barang
                 </li>
               </Link>
@@ -131,43 +121,105 @@ export default function TambahBarangPage() {
 
         {/* Main Content */}
         <main className="flex-1 p-8 bg-gray-200">
-          <h2 className="text-3xl font-semibold mb-6">Satuan Barang</h2>
+          <h2 className="text-3xl font-semibold mb-6">Stok Barang</h2>
 
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            {/* Header */}
+            {/* Header atas */}
             <div className="flex justify-between items-center px-6 py-5 border-b-4 border-b-gray-300">
-              <h3 className="text-xl font-semibold text-teal-600">
-                Tambah Satuan
-              </h3>
-              <Link href="/GA/data_satuanbarang">
+              <h3 className="text-xl font-semibold text-teal-600">Kelola Stok Barang</h3>
+              <Link href="/GA/data_barang">
                 <button className="bg-teal-600 hover:bg-green-600 text-white px-4 py-1.5 rounded">
                   &lt; Kembali
                 </button>
               </Link>
             </div>
 
-            {/* Form Input */}
+            {/* Isi form */}
             <div className="px-8 py-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Nama Kategori */}
+                {/* Dropdown Kategori */}
                 <div>
-                  <label className="font-medium text-gray-700">
-                    Nama Satuan
-                  </label>
+                  <label className="font-medium text-gray-700">Kategori Barang</label>
+                  <select
+                    disabled
+                    className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-300 text-gray-800"
+                  >
+                    <option>ATK</option>
+                    <option>Elektronik</option>
+                    <option>Perabot</option>
+                  </select>
+                </div>
+
+                {/* Nama Barang */}
+                <div>
+                  <label className="font-medium text-gray-700">Nama Barang</label>
                   <input
                     type="text"
-                    name="nama"
-                    value={formData.nama}
-                    onChange={handleChange}
-                    className="w-full border border-gray-400 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    defaultValue="Kertas HVS"
+                    disabled
+                    className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-300 text-gray-800"
+                  />
+                </div>
+
+                {/* Dropdown Spesifikasi */}
+                <div>
+                  <label className="font-medium text-gray-700">Spesifikasi</label>
+                  <input
+                    type="text"
+                    defaultValue="A4"
+                    disabled
+                   className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-300 text-gray-800"
+                  />
+                </div>
+
+                {/* Satuan */}
+                <div>
+                  <label className="font-medium text-gray-700">Satuan</label>
+                  <select
+                    disabled
+                    className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-300 text-gray-800"
+                  >
+                    <option>Rim</option>
+                    <option>Pack</option>
+                  </select>
+                </div>
+
+                {/* Stok */}
+                <div>
+                  <label className="font-medium text-gray-700">Stok</label>
+                  <input
+                    type="number"
+                    defaultValue="70"
+                    className={`w-full border rounded px-3 py-2 mt-1 transition ${
+                      isEditMode
+                        ? "border-gray-300 bg-white text-gray-800"
+                        : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
+                    }`}
                   />
                 </div>
               </div>
 
-              {/* Tombol Tambah */}
-              <div className="flex justify-end mt-8">
-                <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded">
-                  Tambah
+              {/* Tombol Simpan dan Ubah */}
+              <div className="flex justify-end mt-8 gap-2">
+                <button
+                  onClick={handleEditToggle}
+                  className={`${
+                    isEditMode
+                      ? "bg-gray-600 hover:bg-gray-700"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  } text-white px-5 py-2 rounded`}
+                >
+                  {isEditMode ? "Batal" : "Ubah"}
+                </button>
+                <button
+                  disabled={!isEditMode}
+                  className={`px-5 py-2 font-medium rounded text-white transition ${
+                    isEditMode
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  Simpan
                 </button>
               </div>
             </div>

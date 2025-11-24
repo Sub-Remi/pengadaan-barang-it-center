@@ -10,7 +10,8 @@ export default function TambahUserPage() {
     confirmPassword: "",
     nama: "",
     email: "",
-    role: "Divisi",
+    divisi: "",
+    role: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -28,7 +29,8 @@ export default function TambahUserPage() {
       confirmPassword: "",
       nama: "",
       email: "",
-      role: "Divisi",
+      divisi: "",
+      role: "",
     });
   };
 
@@ -47,85 +49,91 @@ export default function TambahUserPage() {
               </li>
             </Link>
             <hr className="border-t border-white/30 my-2" />
+
             {/* DATA MASTER */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                DATA MASTER
+            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+              DATA MASTER
+            </li>
+
+            <Link href="/GA/data_permintaan">
+              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                Permintaan
               </li>
+            </Link>
 
-              <Link href="/GA/data_permintaan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Permintaan
-                </li>
-              </Link>
-
-              <Link href="/GA/data_barang">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
-                  Barang
-                </li>
-              </Link>
-
-              <Link href="/GA/data_kategoribarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Kategori Barang
-                </li>
-              </Link>
-
-
-              <Link href="/GA/data_satuanbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Satuan Barang
-                </li>
-              </Link>
-
-              <Link href="/GA/data_divisi">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Divisi
-                </li>
-              </Link>
-
-              <Link href="/GA/manajemen_user">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Manajemen User
-                </li>
-              </Link>
-
-              <hr className="border-t border-white/30 my-2" />
-
-              {/* MONITORING */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                MONITORING
+            <Link href="/GA/data_barang">
+              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                Barang
               </li>
+            </Link>
 
-              <Link href="/GA/laporan_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Laporan
-                </li>
-              </Link>
-
-              <Link href="/GA/riwayat_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Riwayat
-                </li>
-              </Link>
-
-              <hr className="border-t border-white/30 my-2" />
-
-              {/* PEMESANAN */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                PEMESANAN
+            <Link href="/GA/data_kategoribarang">
+              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                Kategori Barang
               </li>
+            </Link>
 
-              <Link href="/GA/list_pemesanan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  List Pemesanan
-                </li>
-              </Link>
+            <Link href="/GA/data_satuanbarang">
+              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                Satuan Barang
+              </li>
+            </Link>
 
-              <Link href="/GA/form_penerimaanbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Form Penerimaan
-                </li>
-              </Link>
+            <Link href="/GA/data_stokbarang">
+              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                Stok Barang
+              </li>
+            </Link>
+
+            <Link href="/GA/data_divisi">
+              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                Divisi
+              </li>
+            </Link>
+
+            <Link href="/GA/manajemen_user">
+              <li className="bg-blue-500 px-5 py-2 cursor-pointer">
+                Manajemen User
+              </li>
+            </Link>
+
+            <hr className="border-t border-white/30 my-2" />
+
+            {/* MONITORING */}
+            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+              MONITORING
+            </li>
+
+            <Link href="/GA/laporan_ga">
+              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                Laporan
+              </li>
+            </Link>
+
+            <Link href="/GA/riwayat_ga">
+              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                Riwayat
+              </li>
+            </Link>
+
+            <hr className="border-t border-white/30 my-2" />
+
+            {/* PEMESANAN */}
+            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+              PEMESANAN
+            </li>
+
+            <Link href="/GA/list_pemesanan">
+              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                List Pemesanan
+              </li>
+            </Link>
+
+            <Link href="/GA/form_penerimaanbarang">
+              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                Form Penerimaan
+              </li>
+            </Link>
           </ul>
         </nav>
       </aside>
@@ -139,7 +147,6 @@ export default function TambahUserPage() {
 
         {/* Main Content */}
         <main className="flex-1 p-8 bg-gray-200 mt-20 overflow-y-auto">
-
           <h2 className="text-3xl font-semibold mb-6">Manajemen User</h2>
 
           <div className="bg-white rounded-lg shadow-md relative">
@@ -213,7 +220,7 @@ export default function TambahUserPage() {
                 </button>
               </div>
 
-              {/* Garis pemisah */}
+              {/* Garis Pemisah */}
               <hr className="border-b-2 border-gray-300 -mx-99" />
 
               {/* Nama */}
@@ -244,18 +251,65 @@ export default function TambahUserPage() {
                 />
               </div>
 
-              {/* Divisi */}
+              {/* Divisi (Dropdown) */}
               <div>
                 <label className="block font-semibold text-gray-800 mb-1">
                   Divisi
                 </label>
-                <input
-                  type="divisi"
+                <select
                   name="divisi"
                   value={formData.divisi}
                   onChange={handleChange}
                   className="w-full border rounded px-3 py-2 focus:outline-none"
-                />
+                >
+                  <option value="">Pilih Divisi</option>
+                  <option value="HR">HR</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Finance">Finance</option>
+                  <option value="IT">IT</option>
+                </select>
+              </div>
+
+              {/* Role (Radio Button) */}
+              <div>
+                <label className="block font-semibold text-gray-800 mb-2">
+                  Role
+                </label>
+
+                <div className="flex gap-6">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="role"
+                      value="Pemohon"
+                      checked={formData.role === "Pemohon"}
+                      onChange={handleChange}
+                    />
+                    Pemohon
+                  </label>
+
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="role"
+                      value="Admin"
+                      checked={formData.role === "Admin"}
+                      onChange={handleChange}
+                    />
+                    Admin
+                  </label>
+
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="role"
+                      value="Validator"
+                      checked={formData.role === "Validator"}
+                      onChange={handleChange}
+                    />
+                    Validator
+                  </label>
+                </div>
               </div>
 
               {/* Tombol */}
@@ -276,7 +330,7 @@ export default function TambahUserPage() {
               </div>
             </form>
 
-            {/* Garis bawah hijau tosca */}
+            {/* Garis bawah */}
             <div className="h-2 bg-[#00A99D] w-full rounded-b-lg"></div>
           </div>
         </main>

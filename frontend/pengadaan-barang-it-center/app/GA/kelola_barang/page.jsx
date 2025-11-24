@@ -60,6 +60,12 @@ export default function DetailBarangPage() {
                 </li>
               </Link>
 
+              <Link href="/GA/data_stokbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Stok Barang
+                </li>
+              </Link>
+
               <Link href="/GA/data_divisi">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Divisi
@@ -153,7 +159,7 @@ export default function DetailBarangPage() {
                   <label className="font-medium text-gray-700">Nama Barang</label>
                   <input
                     type="text"
-                    defaultValue="Kertas HVS A4"
+                    defaultValue="Kertas HVS"
                     disabled={!isEditMode}
                     className={`w-full border rounded px-3 py-2 mt-1 transition ${
                       isEditMode
@@ -181,16 +187,17 @@ export default function DetailBarangPage() {
                 {/* Satuan */}
                 <div>
                   <label className="font-medium text-gray-700">Satuan</label>
-                  <input
-                    type="text"
-                    defaultValue="Rim"
+                  <select
                     disabled={!isEditMode}
                     className={`w-full border rounded px-3 py-2 mt-1 transition ${
                       isEditMode
                         ? "border-gray-300 bg-white text-gray-800"
                         : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
                     }`}
-                  />
+                  >
+                    <option>Rim</option>
+                    <option>Pack</option>
+                  </select>
                 </div>
 
                 {/* Stok */}
@@ -199,12 +206,8 @@ export default function DetailBarangPage() {
                   <input
                     type="number"
                     defaultValue="70"
-                    disabled={!isEditMode}
-                    className={`w-full border rounded px-3 py-2 mt-1 transition ${
-                      isEditMode
-                        ? "border-gray-300 bg-white text-gray-800"
-                        : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
-                    }`}
+                    disabled
+                    className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-300 text-gray-800"
                   />
                 </div>
               </div>

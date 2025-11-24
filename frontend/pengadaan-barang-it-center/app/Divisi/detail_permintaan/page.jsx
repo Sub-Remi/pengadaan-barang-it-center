@@ -132,6 +132,16 @@ export default function DetailPermintaanPage() {
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
                 </div>
+
+                <div>
+                  <label className="font-medium text-gray-700">Jumlah Barang Diminta</label>
+                  <input
+                    type="text"
+                    value="1"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
               </div>
             </div>
 
@@ -180,6 +190,16 @@ export default function DetailPermintaanPage() {
                   />
                 </div>
 
+                <div className="md:col-span-2">
+                  <label className="font-medium text-gray-700">Keterangan</label>
+                  <textarea
+                    value="Kebutuhan meeting bulanan"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    rows="3"
+                  />
+                </div>
+
                 <div>
                   <label className="font-medium text-gray-700">Status</label>
                   <input
@@ -187,6 +207,53 @@ export default function DetailPermintaanPage() {
                     value="Divalidasi"
                     disabled
                     className="w-full border border-gray-300 bg-green-600 text-white font-semibold rounded px-3 py-2 mt-1"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Data Barang */}
+            <div className="px-6 py-4 border-b-4 border-b-gray-300">
+              <h4 className="text-lg font-semibold mb-4 text-gray-800">Data Barang 2</h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="font-medium text-gray-700">Kategori Barang</label>
+                  <input
+                    type="text"
+                    value="ATK"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-700">Nama Barang</label>
+                  <input
+                    type="text"
+                    value="Pulpen"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-700">Satuan</label>
+                  <input
+                    type="text"
+                    value="Pack"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-700">Jumlah</label>
+                  <input
+                    type="text"
+                    value="5"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
                 </div>
 
@@ -200,7 +267,24 @@ export default function DetailPermintaanPage() {
                   />
                 </div>
 
-              
+                <div>
+                  <label className="font-medium text-gray-700">Status</label>
+                  <input
+                    type="text"
+                    value="Ditolak"
+                    disabled
+                    className="w-full border border-gray-300 bg-red-500 text-white font-semibold rounded px-3 py-2 mt-1"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="font-medium text-gray-700">Keterangan ditolak</label>
+                  <textarea
+                    value="Belum bisa"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    rows="3"
+                  />
+                </div>
               </div>
             </div>
 

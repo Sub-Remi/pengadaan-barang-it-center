@@ -1,14 +1,15 @@
 "use client";
 import Link from "next/link";
 import React from "react";
+import { FaEye } from "react-icons/fa";
 
 export default function RiwayatGAPage() {
   const data = [
-    { no: 1, divisi: "HR", namaBarang: "Kertas HVS A4", tanggal: "01/01/2025", jumlah: 5, status: "Selesai" },
-    { no: 2, divisi: "Marketing", namaBarang: "Map Coklat A4", tanggal: "02/06/2025", jumlah: 24, status: "Ditolak" },
-    { no: 3, divisi: "Finance", namaBarang: "Kertas Cover Biru", tanggal: "24/04/2025", jumlah: 10, status: "Selesai" },
-    { no: 4, divisi: "IT", namaBarang: "Sticky Notes Kuning", tanggal: "04/10/2025", jumlah: 5, status: "Selesai" },
-    { no: 5, divisi: "Marketing", namaBarang: "Bolpoin Hitam", tanggal: "05/05/2025", jumlah: 2, status: "Ditolak" },
+    { no: 1, idpb: "10111", divisi: "HR", tanggal: "05/12/2025", status: "Menunggu" },
+    { no: 2, idpb: "10777", divisi: "Marketing", tanggal: "04/012/2025", status: "Selesai" },
+    { no: 3, idpb: "10222", divisi: "Finance", tanggal: "03/12/2025", status: "Menunggu" },
+    { no: 4, idpb: "115551", divisi: "IT", tanggal: "02/12/2025", status: "Diproses" },
+    { no: 5, idpb: "110110", divisi: "Marketing", tanggal: "01/12/2025", status: "Menunggu" },
   ];
 
   return (
@@ -60,6 +61,12 @@ export default function RiwayatGAPage() {
                   Satuan Barang
                 </li>
               </Link>
+
+              <Link href="/GA/data_stokbarang">
+              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                Stok Barang
+              </li>
+            </Link>
 
               <Link href="/GA/data_divisi">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
@@ -118,62 +125,83 @@ export default function RiwayatGAPage() {
         <main className="flex-1 p-8 bg-gray-200">
           <h2 className="text-3xl font-semibold mb-6">Riwayat</h2>
 
-          {/* Card */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            {/* Header Atas */}
+            {/* Header atas */}
             <div className="flex justify-between items-center px-6 py-5 border-b">
-              <h3 className="text-xl font-semibold text-teal-600">Riwayat Pengadaan</h3>
+              <h3 className="text-xl font-semibold text-teal-600">
+                Riwayat Permintaan
+              </h3>
             </div>
 
-            {/* Filter */}
-            <div className="flex flex-wrap items-center gap-3 px-6 py-4 border-b bg-white">
-              <label className="font-medium text-gray-700">Search</label>
-              <input
-                type="text"
-                placeholder="Cari nama barang..."
-                className="border border-gray-300 rounded px-3 py-1"
-              />
+            {/* Filter dan tombol Excel/PDF */}
+            <div className="flex justify-between items-center px-6 py-4 border-b bg-white">
+              <div className="flex items-center gap-3">
+                <label htmlFor="search" className="text-gray-700 font-medium">
+                  Search
+                </label>
+                <input
+                  id="search"
+                  type="text"
+                  className="border border-gray-300 rounded px-2 py-1 text-x1"
+                />
 
-              <label className="font-medium text-gray-700">Dari Tanggal</label>
+                <label className="font-medium text-gray-700">Dari Tanggal</label>
               <input type="date" className="border border-gray-300 rounded px-2 py-1" />
 
               <label className="font-medium text-gray-700">Sampai Tanggal</label>
               <input type="date" className="border border-gray-300 rounded px-2 py-1" />
 
-              <label className="font-medium text-gray-700">Divisi</label>
-              <select className="border border-gray-300 rounded px-2 py-1">
-                <option>Pilih</option>
-                <option>HR</option>
-                <option>Marketing</option>
-                <option>Finance</option>
-                <option>IT</option>
-              </select>
+                <select className="border border-gray-300 rounded px-2 py-1 text-x1">
+                  <option>Semua</option>
+                  <option>Selesai</option>
+                  <option>Ditolak</option>
+                </select>
+              </div>
+
+              <div className="flex gap-2 mt-3 sm:mt-0">
+                <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded">
+                  Excel
+                </button>
+                <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded">
+                  PDF
+                </button>
+              </div>
             </div>
 
             {/* Tabel */}
             <table className="w-full border-collapse text-x1">
               <thead>
-                <tr className="bg-white text-left">
+                <tr className="bg-white text-left border-b">
                   <th className="px-6 py-3 font-semibold">No</th>
+                  <th className="px-6 py-3 font-semibold">Id PB</th>
                   <th className="px-6 py-3 font-semibold">Divisi</th>
-                  <th className="px-6 py-3 font-semibold">Nama Barang</th>
                   <th className="px-6 py-3 font-semibold">Tanggal</th>
-                  <th className="px-6 py-3 font-semibold">Jumlah</th>
                   <th className="px-6 py-3 font-semibold">Status</th>
+                  <th className="px-6 py-3 font-semibold text-center">Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {data.map((row, index) => (
                   <tr
                     key={index}
-                    className={`${index % 2 === 0 ? "bg-gray-100" : "bg-white"}`}
+                    className={`${
+                      index % 2 === 0 ? "bg-gray-100" : "bg-white"
+                    }`}
                   >
                     <td className="px-6 py-3">{row.no}</td>
-                    <td className="px-6 py-3">{row.divisi}</td>
-                    <td className="px-6 py-3">{row.namaBarang}</td>
+                    <td className="px-6 py-3">{row.idpb}</td>
+                    <td className="px-6 py-3 font-medium text-gray-800">
+                      {row.divisi}
+                    </td>
                     <td className="px-6 py-3">{row.tanggal}</td>
-                    <td className="px-6 py-3">{row.jumlah}</td>
                     <td className="px-6 py-3">{row.status}</td>
+                    <td className="px-6 py-3 text-center">
+                        <Link href="/GA/detail_riwayatga">
+                      <button className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded">
+                        <FaEye />
+                      </button>
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>

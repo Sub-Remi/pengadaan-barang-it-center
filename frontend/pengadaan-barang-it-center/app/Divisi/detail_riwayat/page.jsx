@@ -131,6 +131,16 @@ export default function DetailPermintaanPage() {
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
                 </div>
+
+                <div>
+                  <label className="font-medium text-gray-700">Jumlah Barang Diminta</label>
+                  <input
+                    type="text"
+                    value="1"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
               </div>
             </div>
 
@@ -179,16 +189,6 @@ export default function DetailPermintaanPage() {
                   />
                 </div>
 
-                <div>
-                  <label className="font-medium text-gray-700">Status</label>
-                  <input
-                    type="text"
-                    value="Divalidasi"
-                    disabled
-                    className="w-full border border-gray-300 bg-green-600 text-white font-semibold rounded px-3 py-2 mt-1"
-                  />
-                </div>
-
                 <div className="md:col-span-2">
                   <label className="font-medium text-gray-700">Keterangan</label>
                   <textarea
@@ -196,6 +196,16 @@ export default function DetailPermintaanPage() {
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                     rows="3"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-700">Status</label>
+                  <input
+                    type="text"
+                    value="Divalidasi"
+                    disabled
+                    className="w-full border border-gray-300 bg-green-600 text-white font-semibold rounded px-3 py-2 mt-1 mb-3"
                   />
                 </div>
               </div>
