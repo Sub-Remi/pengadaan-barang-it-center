@@ -221,7 +221,7 @@ export default function DetailPermintaanPage() {
                   <label className="font-medium text-gray-700">Kategori Barang</label>
                   <input
                     type="text"
-                    value="ATK"
+                    value="Elektronik"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -231,7 +231,7 @@ export default function DetailPermintaanPage() {
                   <label className="font-medium text-gray-700">Nama Barang</label>
                   <input
                     type="text"
-                    value="Pulpen"
+                    value="Laptop"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -241,7 +241,7 @@ export default function DetailPermintaanPage() {
                   <label className="font-medium text-gray-700">Satuan</label>
                   <input
                     type="text"
-                    value="Pack"
+                    value="Unit"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -251,7 +251,7 @@ export default function DetailPermintaanPage() {
                   <label className="font-medium text-gray-700">Jumlah</label>
                   <input
                     type="text"
-                    value="5"
+                    value="3"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -260,7 +260,7 @@ export default function DetailPermintaanPage() {
                 <div className="md:col-span-2">
                   <label className="font-medium text-gray-700">Keterangan</label>
                   <textarea
-                    value="Kebutuhan meeting bulanan"
+                    value="Kebutuhan Kantor"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                     rows="3"
@@ -279,7 +279,7 @@ export default function DetailPermintaanPage() {
                 <div className="md:col-span-2">
                   <label className="font-medium text-gray-700">Keterangan ditolak</label>
                   <textarea
-                    value="Belum bisa"
+                    value="Barang masih kosong"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                     rows="3"

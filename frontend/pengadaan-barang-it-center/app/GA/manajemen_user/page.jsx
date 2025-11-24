@@ -5,128 +5,126 @@ import { FaPlus, FaTrash } from "react-icons/fa";
 
 export default function ManajemenUserPage() {
   const data = [
-    { no: 1, nama: "John doe", username: "johndodo", email: "johndodo@ymail.com", role: "Finance" },
-    { no: 2, nama: "Ellen", username: "ellenG", email: "ellenG@ymail.com", role: "Divisi" },
-    { no: 3, nama: "David", username: "urdavid", email: "urdavid@ymail.com", role: "Divisi" },
-    { no: 4, nama: "Casie", username: "casieya", email: "casieya@ymail.com", role: "Divisi" },
-    { no: 5, nama: "Vanesh", username: "panesha", email: "panesha@ymail.com", role: "Finance" },
+    { no: 1, nama: "John doe", username: "johndodo", email: "johndodo@ymail.com", role: "Admin" },
+    { no: 2, nama: "Ellen", username: "ellenG", email: "ellenG@ymail.com", role: "Pemohon" },
+    { no: 3, nama: "David", username: "urdavid", email: "urdavid@ymail.com", role: "Pemohon" },
+    { no: 4, nama: "Casie", username: "casieya", email: "casieya@ymail.com", role: "Pemohon" },
+    { no: 5, nama: "Vanesh", username: "panesha", email: "panesha@ymail.com", role: "Validator" },
   ];
 
   return (
     <div className="flex flex-col min-h-screen font-poppins bg-gray-100">
-      {/* Header */}
-      <header className="flex bg-white shadow-sm items-center">
-        <div className="bg-white w-60 h-20 flex items-center justify-center border-r border-white">
-          <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
-        </div>
-        <div className="flex-1 h-20 flex items-center px-8"></div>
-      </header>
-
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1">
-          <nav className="flex-1 mt-6">
-            <ul className="space-y-1">
-              <Link href="/GA/dashboard_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Dashboard
-                </li>
-              </Link>
-
-              <hr className="border-t border-white/30 my-2" />
-
-             {/* DATA MASTER */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                DATA MASTER
-              </li>
-
-              <Link href="/GA/data_permintaan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Permintaan
-                </li>
-              </Link>
-
-              <Link href="/GA/data_barang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Barang
-                </li>
-              </Link>
-
-              <Link href="/GA/data_kategoribarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Kategori Barang
-                </li>
-              </Link>
-
-
-              <Link href="/GA/data_satuanbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Satuan Barang
-                </li>
-              </Link>
-
-              <Link href="/GA/data_stokbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Stok Barang
-                </li>
-              </Link>
-
-              <Link href="/GA/data_divisi">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Divisi
-                </li>
-              </Link>
-
-              <Link href="/GA/manajemen_user">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
-                  Manajemen User
-                </li>
-              </Link>
-
-              <hr className="border-t border-white/30 my-2" />
-
-              {/* MONITORING */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                MONITORING
-              </li>
-
-              <Link href="/GA/laporan_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Laporan
-                </li>
-              </Link>
-
-              <Link href="/GA/riwayat_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Riwayat
-                </li>
-              </Link>
-
-              <hr className="border-t border-white/30 my-2" />
-
-              {/* PEMESANAN */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                PEMESANAN
-              </li>
-
-              <Link href="/GA/list_pemesanan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  List Pemesanan
-                </li>
-              </Link>
-
-              <Link href="/GA/form_penerimaanbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Form Penerimaan
-                </li>
-              </Link>
-            </ul>
-          </nav>
-        </aside>
-
-        {/* Main Content */}
-        <main className="flex-1 p-8 bg-gray-200">
-          <h2 className="text-3xl font-semibold mb-6">Manajemen User</h2>
+          {/* Header */}
+          <header className="flex bg-white shadow-sm items-center">
+            <div className="bg-white w-60 h-20 flex items-center justify-center border-r border-white">
+              <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
+            </div>
+            <div className="flex-1 h-20 flex items-center px-8"></div>
+          </header>
+    
+          <div className="flex flex-1">
+            {/* Sidebar */}
+            <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1">
+              <nav className="flex-1 mt-6">
+                <ul className="space-y-1">
+                  <Link href="/GA/dashboard_ga">
+                    <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Dashboard</li>
+                  </Link>
+    
+                  <hr className="border-t border-white/30 my-2" />
+    
+                  {/* DATA MASTER */}
+                  <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+                    DATA MASTER
+                  </li>
+    
+                  <Link href="/GA/data_permintaan">
+                    <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                      Permintaan
+                    </li>
+                  </Link>
+    
+                  <Link href="/GA/data_barang">
+                    <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                      Barang
+                    </li>
+                  </Link>
+    
+                  <Link href="/GA/data_kategoribarang">
+                    <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                      Kategori Barang
+                    </li>
+                  </Link>
+    
+    
+                  <Link href="/GA/data_satuanbarang">
+                    <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                      Satuan Barang
+                    </li>
+                  </Link>
+    
+                  <Link href="/GA/data_stokbarang">
+                    <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                      Stok Barang
+                    </li>
+                  </Link>
+    
+                  <Link href="/GA/data_divisi">
+                    <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                      Divisi
+                    </li>
+                  </Link>
+    
+                  <Link href="/GA/manajemen_user">
+                    <li className="bg-blue-500 px-5 py-2 cursor-pointer">
+                      Manajemen User
+                    </li>
+                  </Link>
+    
+                  <hr className="border-t border-white/30 my-2" />
+    
+                  {/* MONITORING */}
+                  <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+                    MONITORING
+                  </li>
+    
+                  <Link href="/GA/laporan_ga">
+                    <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                      Laporan
+                    </li>
+                  </Link>
+    
+                  <Link href="/GA/riwayat_ga">
+                    <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                      Riwayat
+                    </li>
+                  </Link>
+    
+                  <hr className="border-t border-white/30 my-2" />
+    
+                  {/* PEMESANAN */}
+                  <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+                    PEMESANAN
+                  </li>
+    
+                  <Link href="/GA/list_pemesanan">
+                    <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                      List Pemesanan
+                    </li>
+                  </Link>
+    
+                  <Link href="/GA/form_penerimaanbarang">
+                    <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                      Form Penerimaan
+                    </li>
+                  </Link>
+                </ul>
+              </nav>
+            </aside>
+    
+            {/* Main Content */}
+            <main className="flex-1 p-8 bg-gray-200">
+              <h2 className="text-3xl font-semibold mb-6">Manajemen User</h2>
 
           {/* Card container */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -151,13 +149,12 @@ export default function ManajemenUserPage() {
                 className="border border-gray-300 rounded px-2 py-1 text-x1"
               />
 
-              <label className="font-medium text-gray-700">Divisi</label>
+              <label className="font-medium text-gray-700">Peran</label>
               <select className="border border-gray-300 rounded px-2 py-1">
                 <option>Pilih</option>
-                <option>HR</option>
-                <option>Marketing</option>
-                <option>Finance</option>
-                <option>IT</option>
+                <option>Admin</option>
+                <option>Pemohon</option>
+                <option>Validator</option>
               </select>
             </div>
 
@@ -169,7 +166,7 @@ export default function ManajemenUserPage() {
                   <th className="px-6 py-3 font-semibold">Nama</th>
                   <th className="px-6 py-3 font-semibold">Username</th>
                   <th className="px-6 py-3 font-semibold">Email</th>
-                  <th className="px-6 py-3 font-semibold">Role</th>
+                  <th className="px-6 py-3 font-semibold">Peran</th>
                   <th className="px-6 py-3 font-semibold text-center">Aksi</th>
                 </tr>
               </thead>

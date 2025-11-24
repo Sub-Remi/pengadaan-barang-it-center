@@ -137,21 +137,16 @@ export default function DetailBarangPage() {
             {/* Isi form */}
             <div className="px-8 py-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Dropdown Kategori */}
+
+                {/* Kode Barang */}
                 <div>
-                  <label className="font-medium text-gray-700">Kategori Barang</label>
-                  <select
-                    disabled={!isEditMode}
-                    className={`w-full border rounded px-3 py-2 mt-1 transition ${
-                      isEditMode
-                        ? "border-gray-300 bg-white text-gray-800"
-                        : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
-                    }`}
-                  >
-                    <option>ATK</option>
-                    <option>Elektronik</option>
-                    <option>Perabot</option>
-                  </select>
+                  <label className="font-medium text-gray-700">Kode Barang</label>
+                  <input
+                    type="number"
+                    defaultValue="101"
+                    disabled
+                    className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-300 text-gray-800"
+                  />
                 </div>
 
                 {/* Nama Barang */}
@@ -169,19 +164,21 @@ export default function DetailBarangPage() {
                   />
                 </div>
 
-                {/* Dropdown Spesifikasi */}
+                {/* Dropdown Kategori */}
                 <div>
-                  <label className="font-medium text-gray-700">Spesifikasi</label>
-                  <input
-                    type="text"
-                    defaultValue="A4"
+                  <label className="font-medium text-gray-700">Kategori Barang</label>
+                  <select
                     disabled={!isEditMode}
                     className={`w-full border rounded px-3 py-2 mt-1 transition ${
                       isEditMode
                         ? "border-gray-300 bg-white text-gray-800"
                         : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
                     }`}
-                  />
+                  >
+                    <option>ATK</option>
+                    <option>Elektronik</option>
+                    <option>Perabot</option>
+                  </select>
                 </div>
 
                 {/* Satuan */}
@@ -198,6 +195,21 @@ export default function DetailBarangPage() {
                     <option>Rim</option>
                     <option>Pack</option>
                   </select>
+                </div>
+
+                {/*Spesifikasi */}
+                <div>
+                  <label className="font-medium text-gray-700">Spesifikasi</label>
+                  <input
+                    type="text"
+                    defaultValue="A4"
+                    disabled={!isEditMode}
+                    className={`w-full border rounded px-3 py-2 mt-1 transition ${
+                      isEditMode
+                        ? "border-gray-300 bg-white text-gray-800"
+                        : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
+                    }`}
+                  />
                 </div>
 
                 {/* Stok */}

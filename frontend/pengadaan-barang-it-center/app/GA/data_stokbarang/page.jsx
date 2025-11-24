@@ -5,11 +5,11 @@ import { FaPlus, FaPen, FaTrash } from "react-icons/fa";
 
 export default function DataDivisiPage() {
   const data = [
-    { no: 1, kode: 101, nama:"Laptop", satuan: "Pack", stok: 10 },
-    { no: 2, kode: 102, nama:"Kertas HVS", satuan: "Unit", stok: 10 },
-    { no: 3, kode: 103, nama:"Sticky Notes", satuan: "Rim", stok: 10 },
-    { no: 4, kode: 104, nama:"Map biru", satuan: "Pcs", stok: 10 },
-    { no: 5, kode: 105, nama:"Map Coklat", satuan: "Pad", stok: 10},
+    { no: 1, kode: 101, nama:"Laptop", satuan: "Unit", stok: 10 },
+    { no: 2, kode: 102, nama:"Kertas HVS", satuan: "Pack", stok: 10 },
+    { no: 3, kode: 103, nama:"Sticky Notes", satuan: "Pad", stok: 10 },
+    { no: 4, kode: 104, nama:"Map biru", satuan: "Pack", stok: 10 },
+    { no: 5, kode: 105, nama:"Map Coklat", satuan: "Pack", stok: 10},
   ];
 
   return (
