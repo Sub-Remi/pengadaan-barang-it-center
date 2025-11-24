@@ -10,7 +10,7 @@ export default function LoginPage() {
 
         {/* Title */}
         <h1 className="text-center text-white font-bold text-2xl mb-6 drop-shadow">
-          Login Admin
+          Login
         </h1>
 
         {/* Form */}

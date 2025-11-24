@@ -67,7 +67,7 @@ export default function PermintaanPage() {
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             {/* Header atas */}
             <div className="flex justify-between items-center px-6 py-4 border-b">
-              <h3 className="text-xl font-semibold text-teal-600">Permintaan</h3>
+              <h3 className="text-xl font-semibold text-teal-600">Data Permintaan</h3>
               <Link href="/Divisi/form_permintaan">
               <button className="flex items-center gap-2 bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition">
                 <FaPlus />
