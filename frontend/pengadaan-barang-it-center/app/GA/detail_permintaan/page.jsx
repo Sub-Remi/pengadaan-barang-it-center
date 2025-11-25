@@ -252,6 +252,9 @@ export default function DetailPengadaanPage() {
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
+                  <p className="text-red-700 italic text-sm mt-1">
+                    Barang tidak tersedia (jumlah stok: 0)
+                  </p>
                 </div>
 
                 <div className="md:col-span-2">
@@ -330,10 +333,13 @@ export default function DetailPengadaanPage() {
                   <label className="font-medium text-gray-700">Jumlah</label>
                   <input
                     type="text"
-                    value="5"
+                    value="3"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
+                  <p className="text-green-700 italic text-sm mt-1">
+                    Barang tersedia (jumlah stok: 20)
+                  </p>
                 </div>
 
                 <div className="md:col-span-2">
@@ -412,10 +418,13 @@ export default function DetailPengadaanPage() {
                   <label className="font-medium text-gray-700">Jumlah</label>
                   <input
                     type="text"
-                    value="10"
+                    value="3"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
+                  <p className="text-red-700 italic text-sm mt-1">
+                    Barang tidak tersedia (jumlah stok: 0)
+                  </p>
                 </div>
 
                 <div className="md:col-span-2">
