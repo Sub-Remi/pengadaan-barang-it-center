@@ -224,8 +224,18 @@ export default function DetailBarangPage() {
                 </div>
               </div>
 
-              {/* Tombol Simpan dan Ubah */}
-              <div className="flex justify-end mt-8 gap-2">
+              {/* Tombol Hapus, Ubah, Simpan */}
+<div className="flex justify-end mt-8 gap-2">
+
+                {/* Tombol Hapus */}
+                <button
+                  className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded"
+                  onClick={() => alert("Yakin ingin menghapus barang ini?")}
+                >
+                  Hapus
+                </button>
+
+                {/* Tombol Ubah / Batal */}
                 <button
                   onClick={handleEditToggle}
                   className={`${
@@ -236,6 +246,8 @@ export default function DetailBarangPage() {
                 >
                   {isEditMode ? "Batal" : "Ubah"}
                 </button>
+
+                {/* Tombol Simpan */}
                 <button
                   disabled={!isEditMode}
                   className={`px-5 py-2 font-medium rounded text-white transition ${

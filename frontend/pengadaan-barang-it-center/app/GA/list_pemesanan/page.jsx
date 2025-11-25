@@ -6,8 +6,8 @@ import { FaEye } from "react-icons/fa";
 export default function ListPemesananPage() {
   // DATA PERMINTAAN
   const dataPermintaan = [
-    { no: 1, idpb: "10111", tanggal: "01/01/2025", barang: "Laptop", status: "Selesai" },
-    { no: 2, idpb: "10777", tanggal: "02/06/2025", barang: "Kertas HVS", status: "Diproses" },
+    { no: 1, idpb: "10111", tanggal: "01/01/2025", Divisi: "HR", status: "Selesai" },
+    { no: 2, idpb: "10777", tanggal: "02/06/2025", Divisi: "IT", status: "Diproses" },
   ];
 
   // DATA INDEPENDEN
@@ -194,11 +194,17 @@ export default function ListPemesananPage() {
                   <th className="px-6 py-3 font-semibold">No</th>
                   <th className="px-6 py-3 font-semibold">ID PB</th>
                   <th className="px-6 py-3 font-semibold">Tanggal</th>
-                  <th className="px-6 py-3 font-semibold">Nama Barang</th>
+
+                  {/* Header dinamis */}
+                  <th className="px-6 py-3 font-semibold">
+                    {filter === "permintaan" ? "Divisi" : "Nama Barang"}
+                  </th>
+
                   <th className="px-6 py-3 font-semibold">Status</th>
                   <th className="px-6 py-3 font-semibold text-center">Aksi</th>
                 </tr>
               </thead>
+
               <tbody>
                 {displayedData.map((row, index) => (
                   <tr
@@ -208,10 +214,22 @@ export default function ListPemesananPage() {
                     <td className="px-6 py-3">{row.no}</td>
                     <td className="px-6 py-3">{row.idpb}</td>
                     <td className="px-6 py-3">{row.tanggal}</td>
-                    <td className="px-6 py-3 font-medium text-gray-800">{row.barang}</td>
+
+                    {/* Isi kolom dinamis */}
+                    <td className="px-6 py-3 font-medium text-gray-800">
+                      {filter === "permintaan" ? row.Divisi : row.barang}
+                    </td>
+
                     <td className="px-6 py-3">{row.status}</td>
+
                     <td className="px-6 py-3 text-center">
-                      <Link href="/GA/detail_pemesanan">
+                      <Link
+                        href={
+                          filter === "permintaan"
+                            ? `/GA/detail_pemesanan_perm?id=${row.idpb}`
+                            : `/GA/detail_pemesanan_indep?id=${row.idpb}`
+                        }
+                      >
                         <button className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded">
                           <FaEye />
                         </button>

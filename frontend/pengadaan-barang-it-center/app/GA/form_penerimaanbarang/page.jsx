@@ -342,7 +342,7 @@ export default function FormPenerimaanBarangPage() {
                   />
 
                   <small className="text-gray-500 text-xs mt-1 block">
-                    * Maksimal 3 gambar
+                    *.png, .jpg, .jpeg
                   </small>
 
                   {renderPreview(fotoBukti)}
