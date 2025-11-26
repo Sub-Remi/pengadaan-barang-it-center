@@ -15,35 +15,18 @@ export default function DokumenPenerimaanPage() {
 
   // placeholder data (ganti dengan data nyata nanti)
   const pb = {
-    id: "10111",
-    tanggal: "01/01/2025",
-    namaBarang: "Kertas HVS A4",
-    satuan: "Rim",
-    jumlah: 4,
-    nota: "/uploads/nota_10111.jpg", // bisa png/jpg
-    po: "/uploads/po_10111.jpg",
-    bukti: [
-      "/uploads/bukti_10111_1.jpg",
-      "/uploads/bukti_10111_2.jpg",
-    ],
-    informasiUmum: {
-      tanggalPenerimaan: "01/08/2025",
-      penerima: "Kepala GA",
-    },
-    rincian: {
-      spesifikasi: "80 gr Kenko",
-      jumlahDipesan: 4,
-      jumlahDiterima: 4,
-    },
-    pemeriksaan: {
-      diperiksaOleh: "Kepala GA",
-      tanggalPemeriksaan: "01/08/2025",
-      hasil: "Tidak Ditemukan barang rusak atau kurang",
-    },
+
+  nota: "/uploads/nota_10111.jpg",
+  po: "/uploads/po_10111.jpg",
+  formPermintaan: "/uploads/form_perm_10111.pdf",
   };
 
   const openPreview = (src) => setPreviewSrc(src);
   const closePreview = () => setPreviewSrc(null);
+  const [showRejectNote, setShowRejectNote] = useState(false);
+const [rejectNote, setRejectNote] = useState("");
+
+
 
   // helper: render thumbnail (image or pdf)
   const renderThumb = (url, alt = "") => {
@@ -92,7 +75,7 @@ export default function DokumenPenerimaanPage() {
             <li className="px-5 py-2 text-x1 font-semibold text-gray-200">PEMESANAN</li>
 
             <Link href="/finance/data_pemesanan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
                     Data Pemesanan
                 </li>
             </Link>
@@ -121,40 +104,147 @@ export default function DokumenPenerimaanPage() {
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             {/* header kartu */}
             <div className="flex justify-between items-center px-6 py-5 border-b-4 border-b-gray-300">
-              <h3 className="text-xl font-semibold text-teal-600">Cek Dokumen Penerimaan</h3>
+              <h3 className="text-xl font-semibold text-teal-600">Cek Dokumen Pemesanan</h3>
               <Link href="/finance/data_pemesanan">
                 <button className="bg-teal-600 hover:bg-green-600 text-white px-4 py-1.5 rounded">&lt; Kembali</button>
               </Link>
             </div>
 
-            {/* ringkasan PB (tabel sederhana) */}
+            {/* Data Permintaan */}
             <div className="px-6 py-4 border-b-4 border-b-gray-300">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="text-sm text-gray-600">
-                      <th className="py-2">ID PB</th>
-                      <th className="py-2">Tanggal</th>
-                      <th className="py-2">Nama Barang</th>
-                      <th className="py-2">Divisi</th>
-                      <th className="py-2">Jumlah</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="bg-gray-50">
-                      <td className="py-3 font-medium">{pb.id}</td>
-                      <td className="py-3">{pb.tanggal}</td>
-                      <td className="py-3">{pb.namaBarang}</td>
-                      <td className="py-3">{pb.divisi}</td>
-                      <td className="py-3">{pb.jumlah}</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <h4 className="text-lg font-semibold mb-4 text-gray-800">
+                Data Permintaan
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="font-medium text-gray-700">ID Permintaan</label>
+                  <input
+                    type="text"
+                    value="0000"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="font-medium text-gray-700">Nama</label>
+                  <input
+                    type="text"
+                    value="John Doe"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-700">Divisi</label>
+                  <input
+                    type="text"
+                    value="IT"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-700">Email</label>
+                  <input
+                    type="text"
+                    value="john.doe@itcenter.co.id"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="font-medium text-gray-700">Judul Permintaan</label>
+                  <input
+                    type="text"
+                    value="Permintaan Laptop"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-700">Tanggal Permintaan</label>
+                  <input
+                    type="text"
+                    value="2025-10-01"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-700">Jumlah Barang Diminta</label>
+                  <input
+                    type="text"
+                    value="2"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
               </div>
             </div>
 
+            
+
             {/* Nota / PO preview */}
-            <div className="px-6 pt-6 pb-4 border-b">
+            <div className="px-6 pt-6 pb-4 border-b border-b-gray-300">
+              <h4 className="text-lg font-semibold mb-4 text-gray-800">
+                Data Barang 1
+              </h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="font-medium text-gray-700">Kategori Barang</label>
+                  <input
+                    type="text"
+                    value="Elektronik"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-700">Nama Barang</label>
+                  <input
+                    type="text"
+                    value="Laptop Lenovo"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-700">Satuan</label>
+                  <input
+                    type="text"
+                    value="Unit"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-700">Jumlah</label>
+                  <input
+                    type="text"
+                    value="2"
+                    disabled
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <label className="font-medium text-gray-700">Keterangan</label>
+                <textarea
+                  disabled
+                  value="Pengadaan untuk operasional"
+                  className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  rows="3"
+                />
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <h4 className="text-base font-medium mb-3 text-gray-700">Nota</h4>
@@ -179,83 +269,152 @@ export default function DokumenPenerimaanPage() {
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
+                </div> 
 
-            {/* Informasi Umum */}
-            <div className="px-6 py-6 border-b">
-              <h4 className="text-lg font-semibold mb-4 text-gray-800">Informasi Umum</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-medium text-gray-700">Tanggal Penerimaan</label>
-                  <input type="text" value={pb.informasiUmum.tanggalPenerimaan} disabled className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm" />
-                </div>
-                <div>
-                  <label className="font-medium text-gray-700">Penerima</label>
-                  <input type="text" value={pb.informasiUmum.penerima} disabled className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm" />
-                </div>
-              </div>
-            </div>
-
-            {/* Rincian Barang Diterima */}
-            <div className="px-6 py-6 border-b">
-              <h4 className="text-lg font-semibold mb-4 text-gray-800">Rincian Barang Diterima</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="font-medium text-gray-700">Nama Barang</label>
-                  <input type="text" value={pb.namaBarang} disabled className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm" />
-                </div>
-                <div>
-                  <label className="font-medium text-gray-700"></label>
-                  <input type="text" value={pb.rincian.spesifikasi} disabled className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm" />
-                </div>
-                <div>
-                  <label className="font-medium text-gray-700">Jumlah Dipesan</label>
-                  <input type="text" value={pb.rincian.jumlahDipesan} disabled className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm" />
-                </div>
-                <div>
-                  <label className="font-medium text-gray-700">Jumlah Diterima</label>
-                  <input type="text" value={pb.rincian.jumlahDiterima} disabled className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm" />
-                </div>
-              </div>
-            </div>
-
-            {/* Pemeriksaan & Verifikasi + Foto Bukti */}
-            <div className="px-6 py-6">
-              <h4 className="text-lg font-semibold mb-4 text-gray-800">Pemeriksaan & Verifikasi</h4>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="font-medium text-gray-700">Diperiksa oleh</label>
-                  <input type="text" value={pb.pemeriksaan.diperiksaOleh} disabled className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm" />
-                </div>
-                <div>
-                  <label className="font-medium text-gray-700">Tanggal Pemeriksaan</label>
-                  <input type="text" value={pb.pemeriksaan.tanggalPemeriksaan} disabled className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm" />
-                </div>
-                <div className="col-span-1 md:col-span-2">
-                  <label className="font-medium text-gray-700">Hasil Pemeriksaan</label>
-                  <input type="text" value={pb.pemeriksaan.hasil} disabled className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm" />
-                </div>
-
-                <div className="col-span-1 md:col-span-2">
-                  <label className="font-medium text-gray-700 block mb-2">Foto Bukti</label>
-                  <div className="flex gap-4 items-start">
-                    {pb.bukti.map((b, idx) => (
-                      <div key={idx}>{renderThumb(b, `bukti-${idx}`)}</div>
-                    ))}
+                  <h4 className="text-base font-medium mb-3 text-gray-700">Form Permintaan</h4>
+                  <div className="p-4 bg-white border border-gray-200 rounded">
+                    <div className="flex gap-6">
+                      {renderThumb(pb.formPermintaan, "Form Permintaan")}
+                      <div className="flex-1">
+                        <div className="text-sm text-gray-500 mb-2">Klik dokumen untuk lihat</div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="mt-2 text-xs text-gray-500">maks 3, png, jpg, jpeg</div>
+                </div>
+              </div>
+              {/* ✅ Catatan alasan ditolak muncul setelah tombol tolak ditekan */}
+                {showRejectNote && (
+                  <div className="px-2 py-4">
+                    <label className="font-medium text-gray-700 block mb-1">
+                      Catatan Alasan Ditolak
+                    </label>
+                    <textarea
+                      value={rejectNote}
+                      onChange={(e) => setRejectNote(e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2"
+                      rows="3"
+                      placeholder="Masukkan alasan penolakan..."
+                    />
+                  </div>
+                )}
+
+
+                {/* ✅ Tombol Aksi */}
+                <div className="flex justify-end gap-3 px-2 py-5">
+
+                  {/* ✅ Kondisi awal: Tolak + Validasi */}
+                  {!showRejectNote && (
+                    <>
+                      <button
+                        className="bg-red-600 hover:bg-red-700 text-white font-medium px-5 py-2 rounded"
+                        onClick={() => setShowRejectNote(true)}
+                      >
+                        Tolak
+                      </button>
+
+                      <button
+                        className="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2 rounded"
+                        onClick={() => alert("✅ Dokumen divalidasi")}
+                      >
+                        Validasi
+                      </button>
+                    </>
+                  )}
+
+                  {/* ✅ Setelah klik Tolak: Tolak + Batal */}
+                  {showRejectNote && (
+                    <>
+                      <button
+                        className="bg-red-600 hover:bg-red-700 text-white font-medium px-5 py-2 rounded"
+                        onClick={() => {
+                          alert(`❌ Dokumen ditolak.\nCatatan: ${rejectNote}`);
+                        }}
+                      >
+                        Tolak
+                      </button>
+
+                      <button
+                        className="bg-gray-500 hover:bg-gray-600 text-white font-medium px-5 py-2 rounded"
+                        onClick={() => {
+                          setShowRejectNote(false);
+                          setRejectNote("");
+                        }}
+                      >
+                        Batal
+                      </button>
+                    </>
+                  )}
+
+                </div>
+
+
+            </div>
+            {/* ✅ Data Barang FIX */}
+            <div className="px-6 py-4 border-t-4 border-t-gray-300 border-b-4 border-b-gray-300">
+              <h4 className="text-lg font-semibold mb-4 text-gray-400">
+                Data Barang 2
+              </h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="font-medium text-gray-400">Kategori Barang</label>
+                  <input
+                    type="text"
+                    value="Elektronik"
+                    disabled
+                    className="w-full border border-gray-300 text-gray-400 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-400">Nama Barang</label>
+                  <input
+                    type="text"
+                    value="Laptop Lenovo"
+                    disabled
+                    className="w-full border border-gray-400 text-gray-400 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-400">Satuan</label>
+                  <input
+                    type="text"
+                    value="Unit"
+                    disabled
+                    className="w-full border border-gray-300 text-gray-400 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-medium text-gray-400">Jumlah</label>
+                  <input
+                    type="text"
+                    value="2"
+                    disabled
+                    className="w-full border border-gray-300 text-gray-400 bg-gray-100 rounded px-3 py-2 mt-1"
+                  />
                 </div>
               </div>
 
-              {/* tombol selesai di kanan bawah kartu */}
-              <div className="flex justify-end mt-8 px-2">
-                <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded shadow">Selesai</button>
+              <div className="mt-4">
+                <label className="font-medium text-gray-400">Keterangan</label>
+                <textarea
+                  disabled
+                  value="Pengadaan untuk operasional"
+                  className="w-full border border-gray-300 text-gray-400 bg-gray-100 rounded px-3 py-2 mt-1"
+                  rows="3"
+                />
               </div>
             </div>
+            
 
+            
+            {/* tombol selesai di kanan bawah kartu */}
+              <div className="flex justify-end m-6 px-2">
+                <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded shadow">Simpan</button>
+              </div>
             {/* garis tosca bawah */}
             <div className="h-1 bg-teal-600 w-full"></div>
           </div>

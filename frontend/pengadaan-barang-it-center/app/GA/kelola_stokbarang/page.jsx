@@ -181,7 +181,7 @@ export default function DetailBarangPage() {
                   >
                     <option>Rim</option>
                     <option>Pack</option>
-                  </select>
+                  </select> 
                 </div>
 
                 {/* Stok */}
@@ -201,6 +201,9 @@ export default function DetailBarangPage() {
 
               {/* Tombol Simpan dan Ubah */}
               <div className="flex justify-end mt-8 gap-2">
+                <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded">
+                Ajukan Pembelian
+              </button>
                 <button
                   onClick={handleEditToggle}
                   className={`${
