@@ -1,0 +1,94 @@
+# 📖PANDUAN SETUP BACKEND (SERVER DAN DATA) WEB PENGADAAN ITCENTER MANADO📖
+
+============================================
+🎯 DAFTAR ISI YANG AKAN KITA LAKUKAN
+
+1. Persiapan Awal
+2. Install Node.js
+3. Install MySQL
+4. Download File Backend
+5. Setup Database
+6. Setup Aplikasi
+7. Menjalankan Server
+8. Testing Aplikasi
+============================================
+
+1. PERSIAPAN AWAL🛠️
+   A. Yang Diperlukan:
+   ✅ Komputer/laptop dengan Windows 10/11
+   ✅ Koneksi internet
+   ✅ Waktu luang sekitar 1-2 jam
+   ✅ Minuman hangat ☕ (opsional tapi recommended!)
+   B. Persiapan Folder:
+   1. Buka File Explorer (ikon folder di taskbar)
+   2. Buat folder baru dengan nama: PROYEK_PENGADAAN
+
+2. INSTALL NODE.JS🖥️
+   A. Download Node.js:
+      1. Buka browser (Chrome, Firefox, Edge)
+      2. Kunjungi situs resmi Node.js: https://nodejs.org/
+      3. Klik tombol "LTS" untuk mengunduh versi stabil terbaru
+   B. Install Node.js:
+      1. Buka file installer yang sudah diunduh
+      2. Ikuti petunjuk instalasi (klik "Next", "I Agree", "Install")
+      3. Setelah selesai, klik "Finish"
+   C. Verifikasi Instalasi:
+      1. Buka Command Prompt (tekan Win + R, ketik cmd, tekan Enter)
+      2. Ketik perintah: node -v dan npm -v atau node --version dan npm --version
+      3. Pastikan versi Node.js dan npm muncul di layar
+      4. Jika muncul, berarti instalasi berhasil!
+
+3. INSTALL MYSQL🗄️
+   A. Download MySQL:
+      1. Buka browser
+      2. Kunjungi situs resmi MySQL: https://dev.mysql.com/downloads/installer
+      3. Pilih MySQL Installer for Windows dan unduh Windows (x86, 32-bit), MSI Installer (mysql-installer-community-8.0.44.0.msi)
+   B. Install MySQL:
+      1. Pilih "Custom" installation type
+      2. Pilih MySQL Server dan MySQL Workbench untuk diinstal
+      3. Ikuti petunjuk instalasi hingga selesai (note: ingat username dan password root MySQL Anda)
+   C. Verifikasi Instalasi:
+      1. Buka MySQL Workbench
+      2. Coba buat koneksi baru dengan username "root" dan password yang sudah Anda buat
+      3. Jika berhasil terhubung, berarti instalasi MySQL berhasil!
+
+4. DOWNLOAD FILE BACKEND📂
+   A. Unduh File Backend:
+      1. Buka browser
+      2. Kunjungi repository GitHub proyek: https://github.com/Sub-Remi/pengadaan-barang-it-center.git
+      3. Klik tombol "Code" dan pilih "Download ZIP"
+   B. Ekstrak File:
+      1. Buka folder tempat file ZIP diunduh
+      2. Klik kanan pada file ZIP dan pilih "Extract All..."
+      3. Rename folder hasil ekstrak menjadi "backend"
+
+5. SETUP DATABASE🗃️
+   A. Buka MySQL Workbench
+   B. Buat Database Baru:
+      1. masukkan password mysql anda
+      2. cari file database_pengadaan_itcenter.sql di dalam folder backend yang sudah diekstrak
+      3. buka file tersebut dengan mysql workbench
+      4. klik icon petir (execute) untuk menjalankan script sql tersebut
+   C. Verifikasi Database:
+      1. Setelah script dijalankan, refresh schema di MySQL Workbench
+      2. Pastikan database "database_pengadaan_itcenter" muncul di daftar schema di bagian kiri
+6. SETUP APLIKASI⚙️
+   A. Buka Folder Backend:
+      1. Buka Command Prompt
+      2. Arahkan ke folder backend yang sudah diekstrak dengan perintah:
+         cd path\to\PROYEK_PENGADAAN\backend
+   B. Install Dependencies:
+      1. Di Command Prompt, ketik perintah:
+         npm install
+7. SETUP FILE ENVIRONMENT (.env)🔧
+   A. Cari File .env:
+      1. Di dalam folder backend, cari file baru dengan nama ".env"
+   B. Isi File .env:
+      1. Buka file .env dengan text editor (Notepad, VSCode)
+      2. Tambahkan konfigurasi berikut (sesuaikan dengan pengaturan MySQL Anda):
+         DB_HOST=localhost
+         DB_USER=root
+         DB_PASSWORD=your_mysql_password
+         DB_NAME=database_pengadaan_itcenter 
+
+dan seterusnya, masih mo lanjut dan revisi
