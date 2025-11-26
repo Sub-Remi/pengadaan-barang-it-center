@@ -150,8 +150,8 @@ export default function ListPemesananPage() {
                       <Link
                         href={
                           filter === "permintaan"
-                            ? `/GA/dokumen_pemesanan_perm?id=${row.idpb}`
-                            : `/GA/dokumen_pemesanan_indep?id=${row.idpb}`
+                            ? `/finance/dokumen_pemesanan_perm?id=${row.idpb}`
+                            : `/finance/dokumen_pemesanan_indep?id=${row.idpb}`
                         }
                       >
                         <button className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded">
