@@ -358,12 +358,7 @@ export default function FormPenerimaanBarangPage() {
                   Download PDF
                 </button>
 
-                <button
-                  onClick={handleSubmit}
-                  className="font-medium px-5 py-2 rounded text-white shadow bg-green-600 hover:bg-green-700"
-                >
-                  Kirim
-                </button>
+                
               </div>
             </div>
           </div>
