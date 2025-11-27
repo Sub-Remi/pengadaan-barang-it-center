@@ -365,17 +365,17 @@ export default function DetailPengadaanPage() {
                 </div>
 
                {/* Tombol Aksi */}
-            <div className="flex justify-end gap-3 px-2 py-5">
-              <button className="bg-red-600 hover:bg-red-700 text-white font-medium px-5 py-2 rounded">
-                Tolak
-              </button>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded">
-                Ajukan Pembelian
-              </button>
-              <button className="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2 rounded">
-                Validasi
-              </button>
-            </div>
+                <div className="flex justify-end gap-3 px-2 py-5">
+                  <button className="bg-red-600 hover:bg-red-700 text-white font-medium px-5 py-2 rounded">
+                    Tolak
+                  </button>
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded">
+                    Ajukan Pembelian
+                  </button>
+                  <button className="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2 rounded">
+                    Validasi
+                  </button>
+                </div>
             </div>
 
             {/* Data Barang 3 */}
