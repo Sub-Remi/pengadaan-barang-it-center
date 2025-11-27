@@ -10,7 +10,8 @@ export default function TambahUserPage() {
     confirmPassword: "",
     nama: "",
     email: "",
-    role: "Divisi",
+    divisi: "",
+    role: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -28,16 +29,17 @@ export default function TambahUserPage() {
       confirmPassword: "",
       nama: "",
       email: "",
-      role: "Divisi",
+      divisi: "",
+      role: "",
     });
   };
 
   return (
-    <div className="flex min-h-screen font-poppins bg-gray-100">
+    <div className="flex h-screen font-poppins bg-gray-100 overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-60 bg-blue-900 text-white flex flex-col fixed top-0 left-0 h-full">
+      <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1 fixed top-0 left-0 h-full">
         <div className="h-20 border-b border-white flex items-center justify-center bg-white">
-          <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
+          <img src="/logo/ItCenter.png" alt="IT Center" className="w-32 border-white" />
         </div>
         <nav className="flex-1 mt-6 overflow-y-auto">
           <ul className="space-y-1 pb-6">
@@ -47,8 +49,7 @@ export default function TambahUserPage() {
               </li>
             </Link>
             <hr className="border-t border-white/30 my-2" />
-            {/* DATA MASTER */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
                 DATA MASTER
               </li>
 
@@ -59,7 +60,7 @@ export default function TambahUserPage() {
               </Link>
 
               <Link href="/GA/data_barang">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Barang
                 </li>
               </Link>
@@ -77,6 +78,12 @@ export default function TambahUserPage() {
                 </li>
               </Link>
 
+              <Link href="/GA/data_stokbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Stok Barang
+                </li>
+              </Link>
+
               <Link href="/GA/data_divisi">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Divisi
@@ -84,7 +91,7 @@ export default function TambahUserPage() {
               </Link>
 
               <Link href="/GA/manajemen_user">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
                   Manajemen User
                 </li>
               </Link>
@@ -130,16 +137,17 @@ export default function TambahUserPage() {
         </nav>
       </aside>
 
-      {/* Main Wrapper */}
+      {/* Main Wrapper (Header + Content) */}
       <div className="flex flex-col flex-1 ml-60 h-full">
         {/* Header */}
         <header className="flex bg-white shadow-sm items-center h-20 fixed top-0 left-60 right-0 z-10">
-          <div className="flex-1 h-full flex items-center px-8"></div>
+          <div className="flex-1 h-full flex items-center px-8">
+
+          </div>
         </header>
 
-        {/* Main Content */}
-        <main className="flex-1 p-8 bg-gray-200 mt-20 overflow-y-auto">
-
+        {/* Main Content Scrollable */}
+        <main className="flex-1 mt-20 overflow-y-auto bg-gray-200 p-8">
           <h2 className="text-3xl font-semibold mb-6">Manajemen User</h2>
 
           <div className="bg-white rounded-lg shadow-md relative">
@@ -213,7 +221,7 @@ export default function TambahUserPage() {
                 </button>
               </div>
 
-              {/* Garis pemisah */}
+              {/* Garis Pemisah */}
               <hr className="border-b-2 border-gray-300 -mx-99" />
 
               {/* Nama */}
@@ -244,18 +252,65 @@ export default function TambahUserPage() {
                 />
               </div>
 
-              {/* Divisi */}
+              {/* Divisi (Dropdown) */}
               <div>
                 <label className="block font-semibold text-gray-800 mb-1">
                   Divisi
                 </label>
-                <input
-                  type="divisi"
+                <select
                   name="divisi"
                   value={formData.divisi}
                   onChange={handleChange}
                   className="w-full border rounded px-3 py-2 focus:outline-none"
-                />
+                >
+                  <option value="">Pilih Divisi</option>
+                  <option value="HR">HR</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Finance">Finance</option>
+                  <option value="IT">IT</option>
+                </select>
+              </div>
+
+              {/* Role (Radio Button) */}
+              <div>
+                <label className="block font-semibold text-gray-800 mb-2">
+                  Role
+                </label>
+
+                <div className="flex gap-6">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="role"
+                      value="Pemohon"
+                      checked={formData.role === "Pemohon"}
+                      onChange={handleChange}
+                    />
+                    Pemohon
+                  </label>
+
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="role"
+                      value="Admin"
+                      checked={formData.role === "Admin"}
+                      onChange={handleChange}
+                    />
+                    Admin
+                  </label>
+
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="role"
+                      value="Validator"
+                      checked={formData.role === "Validator"}
+                      onChange={handleChange}
+                    />
+                    Validator
+                  </label>
+                </div>
               </div>
 
               {/* Tombol */}
@@ -276,7 +331,7 @@ export default function TambahUserPage() {
               </div>
             </form>
 
-            {/* Garis bawah hijau tosca */}
+            {/* Garis bawah */}
             <div className="h-2 bg-[#00A99D] w-full rounded-b-lg"></div>
           </div>
         </main>

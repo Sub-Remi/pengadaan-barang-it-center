@@ -1,16 +1,26 @@
 "use client";
 import Link from "next/link";
-import { FileText } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
+import { FaEye } from "react-icons/fa";
 
-export default function PembelianFinancePage() {
-  const data = [
-    { no: 1, idpb: "10111", tanggal: "01/01/2025", divisi: "HR", status: "Diproses" },
-    { no: 2, idpb: "10777", tanggal: "02/06/2025", divisi: "Marketing", status: "Diproses" },
-    { no: 3, idpb: "10222", tanggal: "24/04/2025", divisi: "Finance", status: "Diproses" },
-    { no: 4, idpb: "115551", tanggal: "04/10/2025", divisi: "IT", status: "Diproses" },
-    { no: 5, idpb: "110110", tanggal: "05/05/2025", divisi: "Marketing", status: "Diproses" },
+export default function ListPemesananPage() {
+  // DATA PERMINTAAN
+  const dataPermintaan = [
+    { no: 1, idpb: "10111", tanggal: "01/01/2025", Divisi: "HR", status: "Selesai" },
+    { no: 2, idpb: "10777", tanggal: "02/06/2025", Divisi: "IT", status: "Diproses" },
   ];
+
+  // DATA INDEPENDEN
+  const dataIndependen = [
+    { no: 1, idpb: "9001", tanggal: "03/01/2025", barang: "Spidol", status: "Diproses" },
+    { no: 2, idpb: "9002", tanggal: "05/01/2025", barang: "Map Arsip", status: "Selesai" },
+  ];
+
+  // STATE FILTER AKTIF
+  const [filter, setFilter] = useState("permintaan");
+
+  // DATA YANG DITAMPILKAN
+  const displayedData = filter === "permintaan" ? dataPermintaan : dataIndependen;
 
   return (
     <div className="flex flex-col min-h-screen font-poppins bg-gray-100">
@@ -53,15 +63,18 @@ export default function PembelianFinancePage() {
         <main className="flex-1 p-8 bg-gray-200">
           <h2 className="text-3xl font-semibold mb-6">Pemesanan</h2>
 
-          {/* Card */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            {/* Header Atas */}
+            {/* Header */}
             <div className="flex justify-between items-center px-6 py-5 border-b">
-              <h3 className="text-xl font-semibold text-teal-600">Data Pemesanan</h3>
+              <h3 className="text-xl font-semibold text-teal-600">
+                Data Pemesanan
+              </h3>
             </div>
 
-            {/* Filter */}
-            <div className="flex flex-wrap items-center gap-3 px-6 py-4 border-b bg-white">
+            {/* FILTER BUTTONS */}
+            <div className="flex flex-wrap items-center justify-between px-6 py-4 border-b bg-white">
+              <div className="flex items-center gap-3 flex-wrap">
+
               <label className="font-medium text-gray-700">Dari Tanggal:</label>
                 <input
                   type="date"
@@ -74,30 +87,50 @@ export default function PembelianFinancePage() {
                   className="border border-gray-300 rounded px-2 py-1 text-x1"
                 />
 
-              <label className="font-medium text-gray-700">Divisi</label>
-              <select className="border border-gray-300 rounded px-2 py-1">
-                <option>Pilih</option>
-                <option>HR</option>
-                <option>Marketing</option>
-                <option>Finance</option>
-                <option>IT</option>
-              </select>
+              <button
+                onClick={() => setFilter("permintaan")}
+                className={`px-4 py-1 rounded font-medium border ${
+                  filter === "permintaan"
+                    ? "bg-teal-600 text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                Permintaan
+              </button>
+
+              <button
+                onClick={() => setFilter("independen")}
+                className={`px-4 py-1 rounded font-medium border ${
+                  filter === "independen"
+                    ? "bg-teal-600 text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                Independen
+              </button>
+              </div>
             </div>
 
-            {/* Tabel */}
+            {/* TABLE */}
             <table className="w-full border-collapse text-x1">
               <thead>
                 <tr className="bg-white text-left">
                   <th className="px-6 py-3 font-semibold">No</th>
                   <th className="px-6 py-3 font-semibold">ID PB</th>
                   <th className="px-6 py-3 font-semibold">Tanggal</th>
-                  <th className="px-6 py-3 font-semibold">Divisi</th>
+
+                  {/* Header dinamis */}
+                  <th className="px-6 py-3 font-semibold">
+                    {filter === "permintaan" ? "Divisi" : "Nama Barang"}
+                  </th>
+
                   <th className="px-6 py-3 font-semibold">Status</th>
                   <th className="px-6 py-3 font-semibold text-center">Aksi</th>
                 </tr>
               </thead>
+
               <tbody>
-                {data.map((row, index) => (
+                {displayedData.map((row, index) => (
                   <tr
                     key={index}
                     className={`${index % 2 === 0 ? "bg-gray-100" : "bg-white"}`}
@@ -105,13 +138,25 @@ export default function PembelianFinancePage() {
                     <td className="px-6 py-3">{row.no}</td>
                     <td className="px-6 py-3">{row.idpb}</td>
                     <td className="px-6 py-3">{row.tanggal}</td>
-                    <td className="px-6 py-3">{row.divisi}</td>
+
+                    {/* Isi kolom dinamis */}
+                    <td className="px-6 py-3 font-medium text-gray-800">
+                      {filter === "permintaan" ? row.Divisi : row.barang}
+                    </td>
+
                     <td className="px-6 py-3">{row.status}</td>
+
                     <td className="px-6 py-3 text-center">
-                      <Link href="/finance/dokumen_pemesanan">
-                      <button className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded">
-                        <FileText size={16} />
-                      </button>
+                      <Link
+                        href={
+                          filter === "permintaan"
+                            ? `/finance/dokumen_pemesanan_perm?id=${row.idpb}`
+                            : `/finance/dokumen_pemesanan_indep?id=${row.idpb}`
+                        }
+                      >
+                        <button className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded">
+                          <FaEye />
+                        </button>
                       </Link>
                     </td>
                   </tr>
@@ -119,28 +164,7 @@ export default function PembelianFinancePage() {
               </tbody>
             </table>
 
-            {/* Pagination */}
-            <div className="flex justify-end px-6 py-4 bg-white border-t">
-              <div className="inline-flex text-sm border rounded-md overflow-hidden">
-                <button className="px-3 py-1 bg-white hover:bg-gray-100 border-r">
-                  Previous
-                </button>
-                <button className="px-3 py-1 bg-teal-600 text-white border-r">
-                  1
-                </button>
-                <button className="px-3 py-1 bg-white hover:bg-gray-100 border-r">
-                  2
-                </button>
-                <button className="px-3 py-1 bg-white hover:bg-gray-100 border-r">
-                  3
-                </button>
-                <button className="px-3 py-1 bg-white hover:bg-gray-100">
-                  Next
-                </button>
-              </div>
-            </div>
-
-            {/* Garis bawah hijau */}
+            {/* Garis bawah */}
             <div className="h-1 bg-teal-600 w-full"></div>
           </div>
         </main>

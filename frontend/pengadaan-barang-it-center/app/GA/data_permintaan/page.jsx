@@ -65,6 +65,12 @@ export default function DataPermintaanPage() {
                 </li>
               </Link>
 
+              <Link href="/GA/data_stokbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Stok Barang
+                </li>
+              </Link>
+
               <Link href="/GA/data_divisi">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Divisi

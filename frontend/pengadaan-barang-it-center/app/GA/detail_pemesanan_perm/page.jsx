@@ -1,11 +1,60 @@
 "use client";
 import Link from "next/link";
-import React from "react";
+import { useState } from "react";
 
-export default function DetailPengadaanPage() {
+export default function DokumenPemesananPage() {
+  const [nota, setNota] = useState(null);
+  const [po, setPo] = useState(null);
+  const [formFilled, setFormFilled] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
+
+  const handleFileChange = (e, type) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (type === "nota") setNota(file);
+      if (type === "po") setPo(file);
+    }
+  };
+
+  const handleIsiForm = () => {
+    window.location.href = "/GA/form_pemesanan";
+  };
+
+  const handleSubmit = () => {
+    alert("Dokumen berhasil dikirim!");
+  };
+
+  const isReadyToSubmit = nota && po && formFilled;
+
+  const renderPreview = (file) => {
+    if (!file) return null;
+    const isImage = file.type.startsWith("image/");
+    const isPDF = file.type === "application/pdf";
+
+    return (
+      <div className="mt-2">
+        {isImage ? (
+          <img
+            src={URL.createObjectURL(file)}
+            alt="preview"
+            onClick={() => setPreviewImage(URL.createObjectURL(file))}
+            className="w-40 h-40 object-cover rounded border border-gray-300 shadow-sm cursor-pointer hover:opacity-80"
+          />
+        ) : isPDF ? (
+          <p className="text-sm text-gray-600">
+            File PDF dipilih: <span className="font-medium">{file.name}</span>
+          </p>
+        ) : (
+          <p className="text-sm text-red-500">Format file tidak didukung</p>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="flex h-screen font-poppins bg-gray-100 overflow-hidden">
-      {/* Sidebar */}
+      
+      {/* Sidebar TETAP */}
       <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1 fixed top-0 left-0 h-full">
         <div className="h-20 border-b border-white flex items-center justify-center bg-white">
           <img src="/logo/ItCenter.png" alt="IT Center" className="w-32 border-white" />
@@ -13,17 +62,16 @@ export default function DetailPengadaanPage() {
         <nav className="flex-1 mt-6 overflow-y-auto">
           <ul className="space-y-1 pb-6">
             <Link href="/GA/dashboard_ga">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Dashboard
-              </li>
+              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Dashboard</li>
             </Link>
             <hr className="border-t border-white/30 my-2" />
-            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
+            {/* DATA MASTER */}
+              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
                 DATA MASTER
               </li>
 
               <Link href="/GA/data_permintaan">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Permintaan
                 </li>
               </Link>
@@ -92,7 +140,7 @@ export default function DetailPengadaanPage() {
               </li>
 
               <Link href="/GA/list_pemesanan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
                   List Pemesanan
                 </li>
               </Link>
@@ -106,26 +154,21 @@ export default function DetailPengadaanPage() {
         </nav>
       </aside>
 
-      {/* Main Wrapper (Header + Content) */}
+      {/* KONTEN UTAMA */}
       <div className="flex flex-col flex-1 ml-60 h-full">
-        {/* Header */}
-        <header className="flex bg-white shadow-sm items-center h-20 fixed top-0 left-60 right-0 z-10">
-          <div className="flex-1 h-full flex items-center px-8">
+        
+        {/* Header tetap */}
+        <header className="flex bg-white shadow-sm items-center h-20 fixed top-0 left-60 right-0 z-10"></header>
 
-          </div>
-        </header>
-
-        {/* Main Content Scrollable */}
         <main className="flex-1 mt-20 overflow-y-auto bg-gray-200 p-8">
-          <h2 className="text-3xl font-semibold mb-6">Permintaan</h2>
+          <h2 className="text-3xl font-semibold mb-6">Pemesanan</h2>
 
-          {/* ---- Konten kamu dari sini ---- */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="flex justify-between items-center px-6 py-5 border-b-4 border-b-gray-300">
               <h3 className="text-xl font-semibold text-teal-600">
-                Detail Permintaan
+                Dokumen Pemesanan Permintaan
               </h3>
-              <Link href="/GA/data_permintaan">
+              <Link href="/GA/list_pemesanan">
                 <button className="bg-teal-600 hover:bg-green-600 text-white px-4 py-1.5 rounded">
                   &lt; Kembali
                 </button>
@@ -200,7 +243,7 @@ export default function DetailPengadaanPage() {
                   <label className="font-medium text-gray-700">Jumlah Barang Diminta</label>
                   <input
                     type="text"
-                    value="3"
+                    value="2"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -208,11 +251,12 @@ export default function DetailPengadaanPage() {
               </div>
             </div>
 
-            {/* Data Barang 1 */}
+            {/* ✅ Data Barang FIX */}
             <div className="px-6 py-4 border-b-4 border-b-gray-300">
               <h4 className="text-lg font-semibold mb-4 text-gray-800">
                 Data Barang 1
               </h4>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="font-medium text-gray-700">Kategori Barang</label>
@@ -228,7 +272,7 @@ export default function DetailPengadaanPage() {
                   <label className="font-medium text-gray-700">Nama Barang</label>
                   <input
                     type="text"
-                    value="Laptop"
+                    value="Laptop Lenovo"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
@@ -248,236 +292,159 @@ export default function DetailPengadaanPage() {
                   <label className="font-medium text-gray-700">Jumlah</label>
                   <input
                     type="text"
-                    value="3"
+                    value="2"
                     disabled
                     className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
-                  <p className="text-red-700 italic text-sm mt-1">
-                    Barang tidak tersedia (jumlah stok: 0)
-                  </p>
                 </div>
+              </div>
 
-                <div className="md:col-span-2">
-                  <label className="font-medium text-gray-700">Keterangan</label>
-                  <textarea
-                    value="Kebutuhan kantor"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                    rows="3"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-medium text-gray-700">Status</label>
-                  <input
-                    type="text"
-                    value="Menunggu Validasi"
-                    disabled
-                    className="w-full border border-gray-300 bg-yellow-500 text-white font-semibold rounded px-3 py-2 mt-1"
-                  />
-                </div>
-                </div>
-
-               {/* Tombol Aksi */}
-            <div className="flex justify-end gap-3 px-2 py-5">
-              <button className="bg-red-600 hover:bg-red-700 text-white font-medium px-5 py-2 rounded">
-                Tolak
-              </button>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded">
-                Ajukan Pembelian
-              </button>
-              <button className="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2 rounded">
-                Validasi
-              </button>
-            </div>
-            </div>
-
-
-            {/* Data Barang 1 */}
-            <div className="px-6 py-4 border-b-4 border-b-gray-300">
+              <div className="mt-4">
+                <label className="font-medium text-gray-700">Keterangan</label>
+                <textarea
+                  disabled
+                  value="Pengadaan untuk operasional"
+                  className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  rows="3"
+                />
+              </div>
+              {/* ✅ Upload Dokumen */}
+            <div className="py-6">
               <h4 className="text-lg font-semibold mb-4 text-gray-800">
-                Data Barang 1
+                Upload Dokumen
               </h4>
+
+              {/* NOTA */}
+              <div className="mb-6">
+                <label className="font-medium text-gray-700 block mb-1">Nota</label>
+                <input
+                  type="file"
+                  accept=".png,.jpg,.jpeg,.pdf"
+                  onChange={(e) => handleFileChange(e, "nota")}
+                  className="border border-gray-400 rounded-md px-3 py-2 text-sm w-40 bg-gray-100 hover:bg-gray-200"
+                />
+                {renderPreview(nota)}
+              </div>
+
+              {/* PO */}
+              <div className="mb-6">
+                <label className="font-medium text-gray-700 block mb-1">PO</label>
+                <input
+                  type="file"
+                  accept=".png,.jpg,.jpeg,.pdf"
+                  onChange={(e) => handleFileChange(e, "po")}
+                  className="border border-gray-400 rounded-md px-3 py-2 text-sm w-40 bg-gray-100 hover:bg-gray-200"
+                />
+                {renderPreview(po)}
+              </div>
+
+              {/* Form Permintaan */}
+              <div className="mb-6">
+                <label className="font-medium text-gray-700 block mb-1">Form Permintaan Barang</label>
+                <input
+                  type="file"
+                  accept=".png,.jpg,.jpeg,.pdf"
+                  onChange={(e) => handleFileChange(e, "po")}
+                  className="border border-gray-400 rounded-md px-3 py-2 text-sm w-40 bg-gray-100 hover:bg-gray-200"
+                />
+                {renderPreview(po)}
+              </div>
+            </div>
+            </div>
+
+            {/* ✅ Data Barang FIX */}
+            <div className="px-6 py-4 border-b-4 border-b-gray-300">
+              <h4 className="text-lg font-semibold mb-4 text-gray-400">
+                Data Barang 2
+              </h4>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-medium text-gray-700">Kategori Barang</label>
+                  <label className="font-medium text-gray-400">Kategori Barang</label>
                   <input
                     type="text"
-                    value="ATK"
+                    value="Elektronik"
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 text-gray-400 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Nama Barang</label>
+                  <label className="font-medium text-gray-400">Nama Barang</label>
                   <input
                     type="text"
-                    value="Pulpen"
+                    value="Laptop Lenovo"
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-400 text-gray-400 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Satuan</label>
+                  <label className="font-medium text-gray-400">Satuan</label>
                   <input
                     type="text"
-                    value="Pack"
+                    value="Unit"
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 text-gray-400 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Jumlah</label>
+                  <label className="font-medium text-gray-400">Jumlah</label>
                   <input
                     type="text"
-                    value="3"
+                    value="2"
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                  <p className="text-green-700 italic text-sm mt-1">
-                    Barang tersedia (jumlah stok: 20)
-                  </p>
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="font-medium text-gray-700">Keterangan</label>
-                  <textarea
-                    value="Kebutuhan meeting bulanan"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                    rows="3"
+                    className="w-full border border-gray-300 text-gray-400 bg-gray-100 rounded px-3 py-2 mt-1"
                   />
                 </div>
+              </div>
 
-                <div>
-                  <label className="font-medium text-gray-700">Status</label>
-                  <input
-                    type="text"
-                    value="Divalidasi"
-                    disabled
-                    className="w-full border border-gray-300 bg-green-500 text-white font-semibold rounded px-3 py-2 mt-1"
-                  />
-                </div>
-                
-                </div>
-
-               {/* Tombol Aksi */}
-            <div className="flex justify-end gap-3 px-2 py-5">
-              <button className="bg-red-600 hover:bg-red-700 text-white font-medium px-5 py-2 rounded">
-                Tolak
-              </button>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded">
-                Ajukan Pembelian
-              </button>
-              <button className="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2 rounded">
-                Validasi
-              </button>
+              <div className="mt-4">
+                <label className="font-medium text-gray-400">Keterangan</label>
+                <textarea
+                  disabled
+                  value="Pengadaan untuk operasional"
+                  className="w-full border border-gray-300 text-gray-400 bg-gray-100 rounded px-3 py-2 mt-1"
+                  rows="3"
+                />
+              </div>
+              
             </div>
-            </div>
-
-            {/* Data Barang 3 */}
-            <div className="px-6 py-4 border-b-4 border-b-gray-300">
-              <h4 className="text-lg font-semibold mb-4 text-gray-800">
-                Data Barang 3
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="font-medium text-gray-700">Kategori Barang</label>
-                  <input
-                    type="text"
-                    value="ATK"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-medium text-gray-700">Nama Barang</label>
-                  <input
-                    type="text"
-                    value="Sticky Notes"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-medium text-gray-700">Satuan</label>
-                  <input
-                    type="text"
-                    value="Pad"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-medium text-gray-700">Jumlah</label>
-                  <input
-                    type="text"
-                    value="3"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                  <p className="text-red-700 italic text-sm mt-1">
-                    Barang tidak tersedia (jumlah stok: 0)
-                  </p>
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="font-medium text-gray-700">Keterangan</label>
-                  <textarea
-                    value="Barang tidak tersedia"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                    rows="3"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-medium text-gray-700">Status</label>
-                  <input
-                    type="text"
-                    value="Ditolak"
-                    disabled
-                    className="w-full border border-gray-300 bg-red-500 text-white font-semibold rounded px-3 py-2 mt-1"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="font-medium text-gray-700">Keterangan ditolak</label>
-                  <textarea
-                    value="Barang belum ada"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                    rows="3"
-                  />
-                </div>
-            </div>
-
-               {/* Tombol Aksi */}
-            <div className="flex justify-end gap-3 px-2 py-5">
-              <button className="bg-red-600 hover:bg-red-700 text-white font-medium px-5 py-2 rounded">
-                Tolak
-              </button>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded">
-                Ajukan Pembelian
-              </button>
-              <button className="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2 rounded">
-                Validasi
-              </button>
-            </div>
-            </div>
-            <div className="flex justify-end px-8 py-5">
-                <button className="bg-lime-600 hover:bg-lime-700 text-white font-medium px-5 py-2 rounded">
-                Simpan
-              </button>
-            </div>
+            {/* ✅ Tombol Kirim */}
+              <div className="flex justify-end py-6 px-6">
+                <button
+                  onClick={handleSubmit}
+                  disabled={!isReadyToSubmit}
+                  className={`font-medium px-5 py-2 rounded text-white shadow ${
+                    isReadyToSubmit
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  Kirim
+                </button>
+              </div>
           </div>
         </main>
       </div>
+
+      {/* ✅ Popup Preview */}
+      {previewImage && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/40 flex justify-center items-center z-50">
+          <button
+            onClick={() => setPreviewImage(null)}
+            className="absolute top-5 left-5 bg-teal-600 hover:bg-teal-400 text-white font-semibold px-3 py-1.5 rounded-lg shadow-md transition"
+          >
+            ← Kembali
+          </button>
+          <img
+            src={previewImage}
+            alt="preview besar"
+            className="max-w-[90%] max-h-[90%] rounded-lg shadow-lg border-4 border-white"
+          />
+        </div>
+      )}
     </div>
   );
 }

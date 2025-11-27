@@ -9,7 +9,6 @@ export default function TambahBarangPage() {
     nama: "",
     spesifikasi: "",
     satuan: "",
-    stok: "",
   });
 
   const handleChange = (e) => {
@@ -67,6 +66,12 @@ export default function TambahBarangPage() {
               <Link href="/GA/data_satuanbarang">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Satuan Barang
+                </li>
+              </Link>
+
+              <Link href="/GA/data_stokbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Stok Barang
                 </li>
               </Link>
 
@@ -157,6 +162,20 @@ export default function TambahBarangPage() {
                   />
                 </div>
 
+                {/* Nama Barang */}
+                <div>
+                  <label className="font-medium text-gray-700">
+                    Nama Barang
+                  </label>
+                  <input
+                    type="text"
+                    name="nama"
+                    value={formData.nama}
+                    onChange={handleChange}
+                    className="w-full border border-gray-400 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
+
                 {/* Kategori Barang (Dropdown) */}
                 <div>
                   <label className="font-medium text-gray-700">
@@ -175,28 +194,15 @@ export default function TambahBarangPage() {
                   </select>
                 </div>
 
-                {/* Nama Barang */}
-                <div>
-                  <label className="font-medium text-gray-700">
-                    Nama Barang
-                  </label>
-                  <input
-                    type="text"
-                    name="nama"
-                    value={formData.nama}
-                    onChange={handleChange}
-                    className="w-full border border-gray-400 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                  />
-                </div>
 
                 {/* Satuan */}
                 <div>
                   <label className="font-medium text-gray-700">
-                    Kategori Barang
+                    Satuan
                   </label>
                   <select
                     name="kategori"
-                    value={formData.kategori}
+                    value={formData.satuan}
                     onChange={handleChange}
                     className="w-full border border-gray-400 rounded px-3 py-2 mt-1 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                   >
@@ -207,13 +213,15 @@ export default function TambahBarangPage() {
                   </select>
                 </div>
 
-                {/* Stok */}
+                {/* Nama Barang */}
                 <div>
-                  <label className="font-medium text-gray-700">Stok</label>
+                  <label className="font-medium text-gray-700">
+                    Spesifikasi
+                  </label>
                   <input
-                    type="number"
-                    name="stok"
-                    value={formData.stok}
+                    type="text"
+                    name="Spesifikasi"
+                    value={formData.spesifikasi}
                     onChange={handleChange}
                     className="w-full border border-gray-400 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-teal-500"
                   />

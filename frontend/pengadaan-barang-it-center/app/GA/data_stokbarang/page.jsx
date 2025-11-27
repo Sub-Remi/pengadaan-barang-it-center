@@ -5,11 +5,11 @@ import { FaPlus, FaPen, FaTrash } from "react-icons/fa";
 
 export default function DataDivisiPage() {
   const data = [
-    { no: 1, nama: "Pack" },
-    { no: 2, nama: "Unit" },
-    { no: 3, nama: "Rim" },
-    { no: 4, nama: "Pcs" },
-    { no: 5, nama: "Pad" },
+    { no: 1, kode: 101, nama:"Laptop", satuan: "Unit", stok: 10 },
+    { no: 2, kode: 102, nama:"Kertas HVS", satuan: "Pack", stok: 10 },
+    { no: 3, kode: 103, nama:"Sticky Notes", satuan: "Pad", stok: 10 },
+    { no: 4, kode: 104, nama:"Map biru", satuan: "Pack", stok: 10 },
+    { no: 5, kode: 105, nama:"Map Coklat", satuan: "Pack", stok: 10},
   ];
 
   return (
@@ -60,13 +60,13 @@ export default function DataDivisiPage() {
 
 
               <Link href="/GA/data_satuanbarang">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Satuan Barang
                 </li>
               </Link>
 
               <Link href="/GA/data_stokbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
                   Stok Barang
                 </li>
               </Link>
@@ -126,20 +126,15 @@ export default function DataDivisiPage() {
 
         {/* Main Content */}
         <main className="flex-1 p-8 bg-gray-200">
-          <h2 className="text-3xl font-semibold mb-6">Satuan Barang</h2>
+          <h2 className="text-3xl font-semibold mb-6">Stok Barang</h2>
 
           {/* Card container */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             {/* Header atas */}
             <div className="flex justify-between items-center px-6 py-4 border-b">
               <h3 className="text-xl font-semibold text-teal-600">
-                Data Satuan Barang
+                Data Stok Barang
               </h3>
-              <Link href="/GA/tambah_satuanbarang"> 
-              <button className="flex items-center bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition">
-                <FaPlus className="mr-2" /> Tambah Satuan
-              </button>
-              </Link>
             </div>
 
             {/* Search */}
@@ -159,7 +154,10 @@ export default function DataDivisiPage() {
               <thead>
                 <tr className="bg-white text-left">
                   <th className="px-6 py-3 font-semibold">No</th>
-                  <th className="px-6 py-3 font-semibold">Nama Satuan Barang</th>
+                  <th className="px-6 py-3 font-semibold">Kode Barang</th>
+                  <th className="px-6 py-3 font-semibold">Nama Barang</th>
+                  <th className="px-6 py-3 font-semibold">Satuan</th>
+                  <th className="px-6 py-3 font-semibold">Stok</th>
                   <th className="px-6 py-3 font-semibold text-center">Aksi</th>
                 </tr>
               </thead>
@@ -172,11 +170,23 @@ export default function DataDivisiPage() {
                     }`}
                   >
                     <td className="px-6 py-3">{row.no}</td>
+                     <td className="px-6 py-3">{row.kode}</td>
                     <td className="px-6 py-3 font-medium text-gray-800">
                       {row.nama}
                     </td>
+                    <td className="px-6 py-3 font-medium text-gray-800">
+                      {row.satuan}
+                    </td>
+                    <td className="px-6 py-3 font-medium text-gray-800">
+                      {row.stok}
+                    </td>
                     <td className="px-6 py-3 text-center">
                       <div className="flex justify-center gap-2">
+                        <Link href="/GA/kelola_stokbarang">
+                      <button className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded">
+                        <FaPen />
+                      </button>
+                      </Link>
                         <button className="bg-red-600 hover:bg-red-700 text-white p-2 rounded">
                           <FaTrash />
                         </button>

@@ -22,9 +22,9 @@ export default function PilihPeran() {
                        focus:outline-none focus:ring-2 focus:ring-blue-300 backdrop-blur-sm"
           >
             <option value="" disabled hidden>Pilih Peran</option>
-            <option value="kepala-ga" className="text-black">Kepala General Affair</option>
-            <option value="kepala-subdiv" className="text-black">Divisi</option>
-            <option value="staf-finance" className="text-black">Finance</option>
+            <option value="kepala-ga" className="text-black">Admin</option>
+            <option value="kepala-subdiv" className="text-black">Pemohon</option>
+            <option value="staf-finance" className="text-black">Validator</option>
           </select>
 
           {/* Tombol Submit */}

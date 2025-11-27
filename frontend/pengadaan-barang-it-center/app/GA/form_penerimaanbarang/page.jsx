@@ -156,6 +156,12 @@ export default function FormPenerimaanBarangPage() {
                 </li>
               </Link>
 
+              <Link href="/GA/data_stokbarang">
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Stok Barang
+                </li>
+              </Link>
+
               <Link href="/GA/data_divisi">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Divisi
@@ -336,7 +342,7 @@ export default function FormPenerimaanBarangPage() {
                   />
 
                   <small className="text-gray-500 text-xs mt-1 block">
-                    * Maksimal 3 gambar
+                    *.png, .jpg, .jpeg
                   </small>
 
                   {renderPreview(fotoBukti)}
@@ -352,12 +358,7 @@ export default function FormPenerimaanBarangPage() {
                   Download PDF
                 </button>
 
-                <button
-                  onClick={handleSubmit}
-                  className="font-medium px-5 py-2 rounded text-white shadow bg-green-600 hover:bg-green-700"
-                >
-                  Kirim
-                </button>
+                
               </div>
             </div>
           </div>
