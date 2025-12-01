@@ -146,7 +146,7 @@ function DashboardGA() {
             <Link href="/GA/list_pemesanan">
               <div className="bg-white w-64 h-28 rounded-lg shadow-md p-4 border-l-8 border-teal-500 text-xl">
                 <h3 className="text-teal-600 font-medium mb-2">Pemesanan</h3>
-                <p className="text-2xl font-semibold">12</p>
+                <p className="text-2xl font-semibold">11</p>
               </div>
             </Link>
 

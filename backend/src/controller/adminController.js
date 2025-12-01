@@ -55,7 +55,6 @@ export const getPermintaanDetail = async (req, res) => {
       WHERE p.id = ?
     `;
 
-    // We'll need to execute this manually since we don't have this function in model yet
     const [permintaanRows] = await dbPool.execute(query, [id]);
     const permintaan = permintaanRows[0];
 

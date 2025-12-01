@@ -77,7 +77,7 @@ export const login = async (req, res) => {
   } catch (error) {
     console.error("💥 Login error:", error);
     res.status(500).json({
-      error: "Terjadi kesalahan server. Silakan coba lagi.",
+      error: "Terjadi kesalahan server. Silahkan coba lagi.",
     });
   }
 };

@@ -15,7 +15,7 @@ export const uploadDokumenPembelian = async (req, res) => {
       uploaded_by,
     });
 
-    // Validasi input - HANYA 2 FIELD WAJIB
+    // Validasi input
     if (!barang_permintaan_id || !jenis_dokumen) {
       return res.status(400).json({
         error: "Barang permintaan ID dan jenis dokumen harus diisi.",
