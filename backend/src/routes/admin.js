@@ -1,4 +1,6 @@
 import express from "express";
+import kategoriRouter from "./kategori.js";
+import satuanRouter from "./satuan.js";
 import {
   getAllPermintaan,
   getPermintaanDetail,
@@ -12,6 +14,7 @@ import {
   createStok,
   updateStok,
   deleteStok,
+  tambahStok,
 } from "../controller/stokController.js";
 
 import {
@@ -51,6 +54,8 @@ import {
   uploadDokumenPembelian as uploadDokumenMiddleware,
   handleUploadError,
 } from "../middleware/upload.js";
+
+
 
 const router = express.Router();
 
@@ -171,4 +176,19 @@ router.get(
   requireAdmin,
   downloadDokumen
 );
+
+// ===== KATEGORI BARANG =====
+router.use("/kategori", kategoriRouter);
+
+// ===== SATUAN BARANG =====  
+router.use("/satuan", satuanRouter);
+
+// ===== STOK BARANG =====
+// Update existing routes
+router.get("/stok", authenticate, requireAdmin, getAllStok);
+router.get("/stok/:id", authenticate, requireAdmin, getStokDetail);
+router.post("/stok", authenticate, requireAdmin, createStok);
+router.put("/stok/:id", authenticate, requireAdmin, updateStok);
+router.put("/stok/:id/tambah", authenticate, requireAdmin, tambahStok);
+router.delete("/stok/:id", authenticate, requireAdmin, deleteStok);
 export default router;
