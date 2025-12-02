@@ -1,8 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import React from "react";
-
+import ProtectedRoute from "../../../app/components/ProtectedRoute";
 function App() {
   return (
+    <ProtectedRoute allowedRoles={['admin']}>
+      <div className="flex flex-col min-h-screen font-poppins bg-gray-100">
     <div className="flex flex-col min-h-screen font-poppins bg-gray-100">
       {/* Header */}
       <header className="flex bg-white shadow-sm items-center">
@@ -90,6 +94,9 @@ function App() {
         </main>
       </div>
     </div>
+      </div>
+    </ProtectedRoute>
+
   );
 }
 

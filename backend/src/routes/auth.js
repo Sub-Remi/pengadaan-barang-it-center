@@ -11,10 +11,5 @@ router.post("/login", login);
 router.get("/profile", authenticate);
 router.put("/change-password", authenticate);
 
-export default router;
 
-/*
-POST /api/auth/login
-POST /api/auth/login
-GET /api.auth.me
-*/
+export default router;
