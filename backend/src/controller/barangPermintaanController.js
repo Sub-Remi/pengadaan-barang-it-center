@@ -32,6 +32,8 @@ export const addBarangToPermintaan = async (req, res) => {
         .json({ error: "Kategori, nama barang, dan jumlah harus diisi." });
     }
 
+
+
     // Tambah barang ke permintaan
     const barangId = await BarangPermintaan.create({
       permintaan_id: id,
@@ -40,6 +42,7 @@ export const addBarangToPermintaan = async (req, res) => {
       spesifikasi: spesifikasi || "",
       jumlah,
       keterangan: keterangan || "",
+      stok_barang_id: stok_barang_id // Link ke stok jika berhasil      
     });
 
     console.log("✅ Barang added with ID:", barangId);
@@ -47,6 +50,8 @@ export const addBarangToPermintaan = async (req, res) => {
     res.status(201).json({
       message: "Barang berhasil ditambahkan ke permintaan.",
       data: { id: barangId },
+      stok_barang_id: stok_barang_id,
+      stok_created: stok_barang_id ? true : false
     });
   } catch (error) {
     console.error("💥 Add barang to permintaan error:", error);

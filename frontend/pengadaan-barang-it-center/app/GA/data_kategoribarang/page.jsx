@@ -23,7 +23,7 @@ export default function DataSatuanPage() {
       const token = localStorage.getItem("token");
       
       const response = await fetch(
-        `http://localhost:3306/api/kategori?page=${page}&limit=10&search=${searchTerm}`,
+        `http://localhost:3200/api/kategori?page=${page}&limit=10&search=${searchTerm}`,
         {
           headers: {
             "Authorization": `Bearer ${token}`,

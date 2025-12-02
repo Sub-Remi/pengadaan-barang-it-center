@@ -77,10 +77,10 @@ findAllWithPagination: async (page = 1, limit = 10, search = "") => {
 
   // Find by nama (untuk validasi)
   findByNama: async (nama_kategori) => {
-    const query = "SELECT * FROM kategori_barang WHERE nama_kategori = ?";
-    const [rows] = await dbPool.execute(query, [nama_kategori]);
-    return rows[0];
-  },
+  const query = "SELECT * FROM kategori_barang WHERE LOWER(nama_kategori) = LOWER(?)";
+  const [rows] = await dbPool.execute(query, [nama_kategori]);
+  return rows[0];
+},
 
   // Create new kategori
   create: async (nama_kategori) => {
