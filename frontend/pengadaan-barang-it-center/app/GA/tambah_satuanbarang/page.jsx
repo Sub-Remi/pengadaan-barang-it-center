@@ -1,20 +1,59 @@
 "use client";
 import Link from "next/link";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function TambahBarangPage() {
+export default function TambahSatuanBarangPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
-    kode: "",
-    kategori: "",
-    nama: "",
-    spesifikasi: "",
-    satuan: "",
-    stok: "",
+    nama_satuan: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.nama_satuan.trim()) {
+      setError("Nama satuan harus diisi");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+      
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:3200/api/satuan", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nama_satuan: formData.nama_satuan.trim()
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (response.ok) {
+        alert("Satuan berhasil ditambahkan");
+        router.push("/GA/data_satuanbarang");
+      } else {
+        setError(result.error || "Gagal menambahkan satuan");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setError("Terjadi kesalahan saat menambahkan satuan");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -62,7 +101,6 @@ export default function TambahBarangPage() {
                   Kategori Barang
                 </li>
               </Link>
-
 
               <Link href="/GA/data_satuanbarang">
                 <li className="bg-blue-500 px-5 py-2 cursor-pointer">
@@ -148,28 +186,44 @@ export default function TambahBarangPage() {
 
             {/* Form Input */}
             <div className="px-8 py-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Nama Kategori */}
-                <div>
-                  <label className="font-medium text-gray-700">
-                    Nama Satuan
-                  </label>
-                  <input
-                    type="text"
-                    name="nama"
-                    value={formData.nama}
-                    onChange={handleChange}
-                    className="w-full border border-gray-400 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                  />
+              <form onSubmit={handleSubmit}>
+                {error && (
+                  <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+                    {error}
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Nama Satuan */}
+                  <div>
+                    <label className="font-medium text-gray-700">
+                      Nama Satuan *
+                    </label>
+                    <input
+                      type="text"
+                      name="nama_satuan"
+                      value={formData.nama_satuan}
+                      onChange={handleChange}
+                      className="w-full border border-gray-400 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      placeholder="Contoh: Pack, Unit, Rim"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Tombol Tambah */}
-              <div className="flex justify-end mt-8">
-                <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded">
-                  Tambah
-                </button>
-              </div>
+                {/* Tombol Tambah */}
+                <div className="flex justify-end mt-8">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className={`bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded ${
+                      loading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    {loading ? "Menyimpan..." : "Tambah"}
+                  </button>
+                </div>
+              </form>
             </div>
 
             {/* Garis bawah hijau */}
