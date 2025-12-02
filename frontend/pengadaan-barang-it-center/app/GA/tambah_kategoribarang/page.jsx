@@ -22,7 +22,7 @@ export default function TambahBarangPage() {
     try {
       const token = localStorage.getItem("token");
       
-      const response = await fetch("http://localhost:3306/api/kategori", {
+      const response = await fetch("http://localhost:3200/api/kategori", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

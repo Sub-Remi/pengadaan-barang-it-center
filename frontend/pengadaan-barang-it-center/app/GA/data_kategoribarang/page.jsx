@@ -13,7 +13,7 @@ export default function DataSatuanPage() {
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
-    itemsPerPage: 10,
+    itemsPerPage: 5,
   });
 
   // Fetch data kategori
@@ -23,7 +23,7 @@ export default function DataSatuanPage() {
       const token = localStorage.getItem("token");
       
       const response = await fetch(
-        `http://localhost:3306/api/kategori?page=${page}&limit=10&search=${searchTerm}`,
+        `http://localhost:3200/api/kategori?page=${page}&limit=5&search=${searchTerm}`,
         {
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -53,7 +53,7 @@ export default function DataSatuanPage() {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:3306/api/kategori/${id}`, {
+      const response = await fetch(`http://localhost:3200/api/kategori/${id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -238,7 +238,7 @@ export default function DataSatuanPage() {
                 value={search}
                 onChange={handleSearch}
                 placeholder="Cari kategori..."
-                className="border border-gray-300 rounded px-3 py-1.5 text-sm w-64"
+                className="border border-gray-300 rounded px-3 py-1.5 text-x1 w-64"
               />
             </div>
 
@@ -250,7 +250,7 @@ export default function DataSatuanPage() {
               </div>
             ) : (
               <>
-                <table className="w-full border-collapse text-sm">
+                <table className="w-full border-collapse text-x1">
                   <thead>
                     <tr className="bg-gray-50 text-left">
                       <th className="px-6 py-3 font-semibold">No</th>
@@ -297,7 +297,7 @@ export default function DataSatuanPage() {
                   <div className="text-sm text-gray-600">
                     Menampilkan {data.length} dari {pagination.totalItems} data
                   </div>
-                  <div className="inline-flex text-sm border rounded-md overflow-hidden">
+                  <div className="inline-flex text-x1 border rounded-md overflow-hidden">
                     <button
                       onClick={() => handlePageChange(pagination.currentPage - 1)}
                       disabled={pagination.currentPage === 1}
