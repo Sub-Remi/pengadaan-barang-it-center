@@ -11,10 +11,11 @@ import authRoutes from './src/routes/auth.js';
 import pemohonRoutes from './src/routes/pemohon.js';
 import adminRoutes from './src/routes/admin.js';
 import validatorRoutes from './src/routes/validator.js';
-
+import kategoriRoutes from './src/routes/kategori.js'; // ✅ TAMBAHKAN INI
+import satuanRoutes from './src/routes/satuan.js';
 
 const app = express()
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 3306
 
 //middleware
 app.use(cors())
@@ -38,6 +39,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/pemohon', pemohonRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/validator', validatorRoutes);
+app.use('/api/kategori', kategoriRoutes); // ✅ TAMBAHKAN INI
+app.use('/api/satuan', satuanRoutes);
 
 // Test route
 app.get('/api', (req, res) => {

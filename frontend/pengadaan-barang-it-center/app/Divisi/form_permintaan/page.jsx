@@ -38,7 +38,7 @@ export default function FormPermintaanBarangPage() {
     };
 
     setBarangList([...barangList, newBarang]);
-    
+     
     // Reset form barang
     setFormData(prev => ({
       ...prev,
