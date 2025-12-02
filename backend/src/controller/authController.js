@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import { generateToken } from "../config/auth.js";
+import bcrypt from "bcryptjs";
 
 export const login = async (req, res) => {
   try {
@@ -29,10 +30,11 @@ export const login = async (req, res) => {
     console.log("🔑 Password verification...");
     console.log("   Input password:", password);
     console.log("   Stored password:", user.password);
+    console.log("   Password length:", user.password.length);    
     console.log("   User active status:", user.is_active);
 
     // === PERUBAHAN PENTING: Gunakan plain text comparison ===
-    const isPasswordValid = password === user.password;
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     // const isPasswordValid = await User.verifyPassword(password, user.password); // COMMENT BARIS INI
 
     console.log("✅ Password valid:", isPasswordValid);
