@@ -102,50 +102,73 @@ const StokBarang = {
     return rows[0];
   },
 
-// GANTI fungsi create di stok_barang.js:
+  create: async (stokData) => {
+    const {
+      kode_barang, // ✅ Terima dari input
+      kategori_barang_id,
+      nama_barang,
+      spesifikasi,
+      satuan_barang_id,
+      stok,
+      stok_minimum,
+    } = stokData;
 
-create: async (stokData) => {
-  const {
-    kode_barang, // ✅ Terima dari input
-    kategori_barang_id,
-    nama_barang,
-    spesifikasi,
-    satuan_barang_id,
-    stok,
-    stok_minimum,
-  } = stokData;
+    // Validasi kode unik
+    const existingKode = await StokBarang.findByKode(kode_barang);
+    if (existingKode) {
+      throw new Error("Kode barang sudah digunakan.");
+    }
 
-  // Validasi kode unik
-  const existingKode = await StokBarang.findByKode(kode_barang);
-  if (existingKode) {
-    throw new Error("Kode barang sudah digunakan.");
-  }
-
-  const query = `
+    const query = `
     INSERT INTO stok_barang 
     (kode_barang, kategori_barang_id, nama_barang, spesifikasi, satuan_barang_id, stok, stok_minimum) 
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
-  
-  const [result] = await dbPool.execute(query, [
-    kode_barang, // ✅ Gunakan dari input
-    kategori_barang_id,
-    nama_barang,
-    spesifikasi || "",
-    satuan_barang_id,
-    stok || 0,
-    stok_minimum || 0,
-  ]);
-  
-  return result.insertId;
-},
 
-// Tambahkan fungsi baru untuk cek kode
-findByKode: async (kode_barang) => {
-  const query = "SELECT * FROM stok_barang WHERE kode_barang = ?";
-  const [rows] = await dbPool.execute(query, [kode_barang]);
-  return rows[0];
-},
+    const [result] = await dbPool.execute(query, [
+      kode_barang, // ✅ Gunakan dari input
+      kategori_barang_id,
+      nama_barang,
+      spesifikasi || "",
+      satuan_barang_id,
+      stok || 0,
+      stok_minimum || 0,
+    ]);
+
+    return result.insertId;
+  },
+
+  // Cek apakah kode barang sudah ada
+  findByKode: async (kode_barang) => {
+    const query = "SELECT * FROM stok_barang WHERE kode_barang = ?";
+    const [rows] = await dbPool.execute(query, [kode_barang]);
+    return rows[0];
+  },
+
+  // Cari berdasarkan nama dan spesifikasi untuk mencegah duplikat
+  findByNamaAndSpesifikasi: async (nama_barang, spesifikasi = "") => {
+    const query = `
+    SELECT * FROM stok_barang 
+    WHERE LOWER(nama_barang) = LOWER(?) 
+    AND LOWER(spesifikasi) = LOWER(?)
+  `;
+    const [rows] = await dbPool.execute(query, [
+      nama_barang.trim(),
+      spesifikasi.trim(),
+    ]);
+    return rows[0];
+  },
+
+  // Get all barang untuk dropdown (tanpa pagination, hanya untuk frontend)
+  findAllForDropdown: async () => {
+    const query = `
+    SELECT sb.id, sb.kode_barang, sb.nama_barang, sb.spesifikasi
+    FROM stok_barang sb
+    ORDER BY sb.nama_barang ASC
+  `;
+    const [rows] = await dbPool.execute(query);
+    return rows;
+  },
 
   // Update stok (kode_barang tidak bisa diubah)
   update: async (id, stokData) => {

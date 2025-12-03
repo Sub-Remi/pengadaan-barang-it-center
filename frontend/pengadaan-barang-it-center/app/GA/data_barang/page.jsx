@@ -1,16 +1,112 @@
 "use client";
 import Link from "next/link";
-import React from "react";
-import { FaPlus, FaPen } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { FaPlus, FaPen, FaSync } from "react-icons/fa";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3200/api";
 
 export default function DataBarangPage() {
-  const data = [
-    { no: 1, kode: "101", kategori: "ATK", nama: "Kertas HVS A4", satuan: "Pack", stok: 10 },
-    { no: 2, kode: "107", kategori: "ATK", nama: "Map Coklat A4", satuan: "Pack", stok: 50 },
-    { no: 3, kode: "102", kategori: "ATK", nama: "Kertas Cover Biru", satuan: "Pack", stok: 35 },
-    { no: 4, kode: "115", kategori: "ATK", nama: "Sticky Notes", satuan: "Pad", stok: 20 },
-    { no: 5, kode: "110", kategori: "ATK", nama: "Bolpoin Hitam", satuan: "Pack", stok: 65 },
-  ];
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [search, setSearch] = useState("");
+  const [kategoriFilter, setKategoriFilter] = useState("");
+  const [kategoriList, setKategoriList] = useState([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    totalPages: 1,
+    totalItems: 0,
+  });
+
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  // Fetch data barang
+  const fetchBarang = async (
+    page = 1,
+    limit = 10,
+    search = "",
+    kategori_id = ""
+  ) => {
+    try {
+      setLoading(true);
+      let url = `${API_URL}/admin/barang?page=${page}&limit=${limit}`;
+      if (search) url += `&search=${search}`;
+      if (kategori_id) url += `&kategori_id=${kategori_id}`;
+
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Gagal mengambil data");
+
+      const result = await response.json();
+      if (result.success) {
+        setData(result.data);
+        setPagination({
+          page: result.pagination.currentPage,
+          limit: result.pagination.itemsPerPage,
+          totalPages: result.pagination.totalPages,
+          totalItems: result.pagination.totalItems,
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch kategori untuk filter
+  const fetchKategori = async () => {
+    try {
+      const response = await fetch(`${API_URL}/admin/kategori/dropdown`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (result.success) {
+        setKategoriList(result.data);
+      }
+    } catch (err) {
+      console.error("Gagal mengambil kategori:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchBarang();
+    fetchKategori();
+  }, []);
+
+  // Handle search
+  const handleSearch = (e) => {
+    e.preventDefault();
+    fetchBarang(1, pagination.limit, search, kategoriFilter);
+  };
+
+  // Handle pagination
+  const handlePageChange = (newPage) => {
+    fetchBarang(newPage, pagination.limit, search, kategoriFilter);
+  };
+
+  // Refresh data
+  const handleRefresh = () => {
+    fetchBarang(pagination.page, pagination.limit, search, kategoriFilter);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-xl">Loading data barang...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen font-poppins bg-gray-100">
@@ -28,7 +124,9 @@ export default function DataBarangPage() {
           <nav className="flex-1 mt-6">
             <ul className="space-y-1">
               <Link href="/GA/dashboard_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Dashboard</li>
+                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
+                  Dashboard
+                </li>
               </Link>
 
               <hr className="border-t border-white/30 my-2" />
@@ -45,9 +143,7 @@ export default function DataBarangPage() {
               </Link>
 
               <Link href="/GA/data_barang">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
-                  Barang
-                </li>
+                <li className="bg-blue-500 px-5 py-2 cursor-pointer">Barang</li>
               </Link>
 
               <Link href="/GA/data_kategoribarang">
@@ -55,7 +151,6 @@ export default function DataBarangPage() {
                   Kategori Barang
                 </li>
               </Link>
-
 
               <Link href="/GA/data_satuanbarang">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
@@ -133,30 +228,63 @@ export default function DataBarangPage() {
               <h3 className="text-xl font-semibold text-teal-600">
                 Data Barang
               </h3>
-              <Link href="/GA/tambah_barang">
-              <button className="flex items-center bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition">
-                <FaPlus className="mr-2" /> Tambah Barang
-              </button>
-              </Link>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleRefresh}
+                  className="flex items-center bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition"
+                  title="Refresh data"
+                >
+                  <FaSync className="mr-2" /> Refresh
+                </button>
+                <Link href="/GA/tambah_barang">
+                  <button className="flex items-center bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition">
+                    <FaPlus className="mr-2" /> Tambah Barang
+                  </button>
+                </Link>
+              </div>
             </div>
 
             {/* Filter */}
             <div className="flex items-center gap-3 px-6 py-4 border-b bg-white">
-              <label htmlFor="search" className="text-gray-700 font-medium">
-                Search
-              </label>
-              <input
-                id="search"
-                type="text"
-                className="border border-gray-300 rounded px-2 py-1 text-x1"
-              />
-              <select className="border border-gray-300 rounded px-2 py-1 text-x1">
-                <option>Kategori</option>
-                <option>ATK</option>
-                <option>Elektronik</option>
-                <option>Lainnya</option>
-              </select>
+              <form onSubmit={handleSearch} className="flex items-center gap-3">
+                <label htmlFor="search" className="text-gray-700 font-medium">
+                  Search
+                </label>
+                <input
+                  id="search"
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="border border-gray-300 rounded px-2 py-1 text-x1"
+                  placeholder="Cari nama barang..."
+                />
+                <select
+                  value={kategoriFilter}
+                  onChange={(e) => setKategoriFilter(e.target.value)}
+                  className="border border-gray-300 rounded px-2 py-1 text-x1"
+                >
+                  <option value="">Semua Kategori</option>
+                  {kategoriList.map((kategori) => (
+                    <option key={kategori.id} value={kategori.id}>
+                      {kategori.nama_kategori}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="submit"
+                  className="bg-teal-600 text-white px-4 py-1 rounded"
+                >
+                  Cari
+                </button>
+              </form>
             </div>
+
+            {/* Error message */}
+            {error && (
+              <div className="px-6 py-4 bg-red-100 text-red-700">
+                <strong>Error:</strong> {error}
+              </div>
+            )}
 
             {/* Tabel */}
             <table className="w-full border-collapse text-x1">
@@ -174,22 +302,24 @@ export default function DataBarangPage() {
               <tbody>
                 {data.map((row, index) => (
                   <tr
-                    key={index}
-                    className={`${
-                      index % 2 === 0 ? "bg-gray-100" : "bg-white"
-                    }`}
+                    key={row.id}
+                    className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
                   >
-                    <td className="px-6 py-3">{row.no}</td>
-                    <td className="px-6 py-3">{row.kode}</td>
-                    <td className="px-6 py-3">{row.kategori}</td>
-                    <td className="px-6 py-3 font-medium text-gray-800">{row.nama}</td>
-                    <td className="px-6 py-3">{row.satuan}</td>
+                    <td className="px-6 py-3">
+                      {(pagination.page - 1) * pagination.limit + index + 1}
+                    </td>
+                    <td className="px-6 py-3">{row.kode_barang}</td>
+                    <td className="px-6 py-3">{row.nama_kategori}</td>
+                    <td className="px-6 py-3 font-medium text-gray-800">
+                      {row.nama_barang}
+                    </td>
+                    <td className="px-6 py-3">{row.nama_satuan}</td>
                     <td className="px-6 py-3">{row.stok}</td>
                     <td className="px-6 py-3 text-center">
-                    <Link href="/GA/kelola_barang">
-                      <button className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded">
-                        <FaPen />
-                      </button>
+                      <Link href={`/GA/kelola_barang?id=${row.id}`}>
+                        <button className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded">
+                          <FaPen />
+                        </button>
                       </Link>
                     </td>
                   </tr>
@@ -200,19 +330,31 @@ export default function DataBarangPage() {
             {/* Pagination */}
             <div className="flex justify-end px-6 py-4 bg-white border-t">
               <div className="inline-flex text-sm border rounded-md overflow-hidden">
-                <button className="px-3 py-1 bg-white hover:bg-gray-100 border-r">
+                <button
+                  onClick={() => handlePageChange(pagination.page - 1)}
+                  disabled={pagination.page === 1}
+                  className="px-3 py-1 bg-white hover:bg-gray-100 border-r disabled:bg-gray-200"
+                >
                   Previous
                 </button>
-                <button className="px-3 py-1 bg-teal-600 text-white border-r">
-                  1
-                </button>
-                <button className="px-3 py-1 bg-white hover:bg-gray-100 border-r">
-                  2
-                </button>
-                <button className="px-3 py-1 bg-white hover:bg-gray-100 border-r">
-                  3
-                </button>
-                <button className="px-3 py-1 bg-white hover:bg-gray-100">
+                {[...Array(pagination.totalPages)].map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i + 1)}
+                    className={`px-3 py-1 ${
+                      pagination.page === i + 1
+                        ? "bg-teal-600 text-white"
+                        : "bg-white hover:bg-gray-100"
+                    } border-r`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => handlePageChange(pagination.page + 1)}
+                  disabled={pagination.page === pagination.totalPages}
+                  className="px-3 py-1 bg-white hover:bg-gray-100 disabled:bg-gray-200"
+                >
                   Next
                 </button>
               </div>

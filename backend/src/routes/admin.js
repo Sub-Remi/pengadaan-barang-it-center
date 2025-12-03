@@ -15,6 +15,8 @@ import {
   updateStok,
   deleteStok,
   tambahStok,
+  getAllBarang,
+  getBarangDropdown,
 } from "../controller/stokController.js";
 
 import {
@@ -54,8 +56,6 @@ import {
   uploadDokumenPembelian as uploadDokumenMiddleware,
   handleUploadError,
 } from "../middleware/upload.js";
-
-
 
 const router = express.Router();
 
@@ -180,7 +180,7 @@ router.get(
 // ===== KATEGORI BARANG =====
 router.use("/kategori", kategoriRouter);
 
-// ===== SATUAN BARANG =====  
+// ===== SATUAN BARANG =====
 router.use("/satuan", satuanRouter);
 
 // ===== STOK BARANG =====
@@ -191,4 +191,26 @@ router.post("/stok", authenticate, requireAdmin, createStok);
 router.put("/stok/:id", authenticate, requireAdmin, updateStok);
 router.put("/stok/:id/tambah", authenticate, requireAdmin, tambahStok);
 router.delete("/stok/:id", authenticate, requireAdmin, deleteStok);
+
+// Di file admin.js, tambahkan routes untuk Data Barang:
+
+// ===== DATA BARANG =====
+// Get all barang untuk halaman Data Barang
+router.get("/barang", authenticate, requireAdmin, getAllBarang);
+
+// Get barang untuk dropdown
+router.get("/barang/dropdown", authenticate, requireAdmin, getBarangDropdown);
+
+// Get detail barang
+router.get("/barang/:id", authenticate, requireAdmin, getStokDetail); // Reuse dari stokController
+
+// Create barang (dari halaman Data Barang)
+router.post("/barang", authenticate, requireAdmin, createStok); // Reuse dari stokController
+
+// Update barang (dari halaman Data Barang)
+router.put("/barang/:id", authenticate, requireAdmin, updateStok); // Reuse dari stokController
+
+// Delete barang
+router.delete("/barang/:id", authenticate, requireAdmin, deleteStok); // Reuse dari stokController
+
 export default router;
