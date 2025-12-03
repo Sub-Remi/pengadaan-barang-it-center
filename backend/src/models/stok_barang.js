@@ -102,47 +102,50 @@ const StokBarang = {
     return rows[0];
   },
 
-  // Create new stok - AUTO GENERATE KODE BARANG
-  create: async (stokData) => {
-    const {
-      kategori_barang_id,
-      nama_barang,
-      spesifikasi,
-      satuan_barang_id,
-      stok,
-      stok_minimum,
-    } = stokData;
+// GANTI fungsi create di stok_barang.js:
 
-    // Cek duplikat dulu
-    const existing = await StokBarang.findByNamaAndSpesifikasi(
-      nama_barang,
-      spesifikasi
-    );
-    if (existing) {
-      throw new Error(
-        "Barang dengan nama dan spesifikasi yang sama sudah ada."
-      );
-    }
+create: async (stokData) => {
+  const {
+    kode_barang, // ✅ Terima dari input
+    kategori_barang_id,
+    nama_barang,
+    spesifikasi,
+    satuan_barang_id,
+    stok,
+    stok_minimum,
+  } = stokData;
 
-    // Generate kode barang: BRG-{timestamp}
-    const kode_barang = `BRG-${Date.now()}`;
+  // Validasi kode unik
+  const existingKode = await StokBarang.findByKode(kode_barang);
+  if (existingKode) {
+    throw new Error("Kode barang sudah digunakan.");
+  }
 
-    const query = `
-      INSERT INTO stok_barang 
-      (kode_barang, kategori_barang_id, nama_barang, spesifikasi, satuan_barang_id, stok, stok_minimum) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-    const [result] = await dbPool.execute(query, [
-      kode_barang,
-      kategori_barang_id,
-      nama_barang,
-      spesifikasi || "",
-      satuan_barang_id,
-      stok || 0,
-      stok_minimum || 0,
-    ]);
-    return result.insertId;
-  },
+  const query = `
+    INSERT INTO stok_barang 
+    (kode_barang, kategori_barang_id, nama_barang, spesifikasi, satuan_barang_id, stok, stok_minimum) 
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `;
+  
+  const [result] = await dbPool.execute(query, [
+    kode_barang, // ✅ Gunakan dari input
+    kategori_barang_id,
+    nama_barang,
+    spesifikasi || "",
+    satuan_barang_id,
+    stok || 0,
+    stok_minimum || 0,
+  ]);
+  
+  return result.insertId;
+},
+
+// Tambahkan fungsi baru untuk cek kode
+findByKode: async (kode_barang) => {
+  const query = "SELECT * FROM stok_barang WHERE kode_barang = ?";
+  const [rows] = await dbPool.execute(query, [kode_barang]);
+  return rows[0];
+},
 
   // Update stok (kode_barang tidak bisa diubah)
   update: async (id, stokData) => {

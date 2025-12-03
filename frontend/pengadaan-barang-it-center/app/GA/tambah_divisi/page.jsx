@@ -1,20 +1,66 @@
 "use client";
 import Link from "next/link";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function TambahBarangPage() {
+export default function TambahDivisiPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
-    kode: "",
-    kategori: "",
-    nama: "",
-    spesifikasi: "",
-    satuan: "",
-    stok: "",
+    nama_divisi: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.nama_divisi.trim()) {
+      setError("Nama divisi harus diisi");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+      setSuccess("");
+      
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:3200/api/admin/divisi", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nama_divisi: formData.nama_divisi.trim(),
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (response.ok) {
+        setSuccess("Divisi berhasil ditambahkan!");
+        setFormData({ nama_divisi: "" });
+        
+        // Redirect setelah 2 detik
+        setTimeout(() => {
+          router.push("/GA/data_divisi");
+        }, 2000);
+      } else {
+        setError(result.error || "Gagal menambahkan divisi");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setError("Terjadi kesalahan saat menambahkan divisi");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -62,7 +108,6 @@ export default function TambahBarangPage() {
                   Kategori Barang
                 </li>
               </Link>
-
 
               <Link href="/GA/data_satuanbarang">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
@@ -146,31 +191,59 @@ export default function TambahBarangPage() {
               </Link>
             </div>
 
+            {/* Notifikasi */}
+            {(error || success) && (
+              <div className={`px-6 py-4 ${error ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                {error || success}
+              </div>
+            )}
+
             {/* Form Input */}
-            <div className="px-8 py-6">
+            <form onSubmit={handleSubmit} className="px-8 py-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Nama Divisi */}
-                <div>
+                <div className="md:col-span-2">
                   <label className="font-medium text-gray-700">
-                    Nama Divisi
+                    Nama Divisi <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    name="nama"
-                    value={formData.nama}
+                    name="nama_divisi"
+                    value={formData.nama_divisi}
                     onChange={handleChange}
                     className="w-full border border-gray-400 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    placeholder="Masukkan nama divisi"
+                    required
                   />
+                  <p className="text-sm text-gray-500 mt-1">
+                    Contoh: IT, HRD, Finance, Marketing, etc.
+                  </p>
                 </div>
               </div>
 
               {/* Tombol Tambah */}
-              <div className="flex justify-end mt-8">
-                <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded">
-                  Tambah
+              <div className="flex justify-end gap-3 mt-8">
+                <Link href="/GA/data_divisi">
+                  <button
+                    type="button"
+                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded"
+                  >
+                    Batal
+                  </button>
+                </Link>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`px-5 py-2 rounded text-white ${
+                    loading
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-green-600 hover:bg-green-700"
+                  }`}
+                >
+                  {loading ? "Menyimpan..." : "Tambah Divisi"}
                 </button>
               </div>
-            </div>
+            </form>
 
             {/* Garis bawah hijau */}
             <div className="h-1 bg-teal-600 w-full"></div>

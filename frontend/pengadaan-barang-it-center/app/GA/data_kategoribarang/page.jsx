@@ -13,7 +13,7 @@ export default function DataSatuanPage() {
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
-    itemsPerPage: 5,
+    itemsPerPage: 5, // Tetap 5
   });
 
   // Fetch data kategori
@@ -21,21 +21,34 @@ export default function DataSatuanPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-
+      
+      // Ubah limit menjadi 5 (bukan 10)
       const response = await fetch(
-        `http://localhost:3306/api/kategori?page=${page}&limit=10&search=${searchTerm}`,
+        `http://localhost:3200/api/kategori?page=${page}&limit=${pagination.itemsPerPage}&search=${searchTerm}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            "Authorization": `Bearer ${token}`,
           },
         }
       );
-
+      
       const result = await response.json();
-
+      
       if (response.ok) {
-        setData(result.data);
-        setPagination(result.pagination);
+        // Pastikan hanya mengambil maksimal 5 data
+        const limitedData = result.data.slice(0, pagination.itemsPerPage);
+        setData(limitedData);
+        
+        // Hitung ulang pagination berdasarkan data yang terbatas
+        const totalItems = result.pagination.totalItems;
+        const totalPages = Math.ceil(totalItems / pagination.itemsPerPage);
+        
+        setPagination({
+          ...pagination,
+          currentPage: page,
+          totalPages: totalPages,
+          totalItems: totalItems
+        });
       } else {
         alert("Gagal mengambil data");
       }
@@ -56,12 +69,12 @@ export default function DataSatuanPage() {
       const response = await fetch(`http://localhost:3200/api/kategori/${id}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${token}`,
+          "Authorization": `Bearer ${token}`,
         },
       });
 
       const result = await response.json();
-
+      
       if (response.ok) {
         alert("Kategori berhasil dihapus");
         fetchKategori(pagination.currentPage, search);
@@ -77,12 +90,12 @@ export default function DataSatuanPage() {
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearch(value);
-
+    
     // Debounce search
     const timeoutId = setTimeout(() => {
       fetchKategori(1, value);
     }, 500);
-
+    
     return () => clearTimeout(timeoutId);
   };
 
@@ -142,6 +155,7 @@ export default function DataSatuanPage() {
                   Kategori Barang
                 </li>
               </Link>
+
 
               <Link href="/GA/data_satuanbarang">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
@@ -219,7 +233,7 @@ export default function DataSatuanPage() {
               <h3 className="text-xl font-semibold text-teal-600">
                 Data Kategori
               </h3>
-              <Link href="/GA/tambah_kategoribarang">
+              <Link href="/GA/tambah_kategoribarang"> 
                 <button className="flex items-center bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition">
                   <FaPlus className="mr-2" /> Tambah Kategori
                 </button>
@@ -254,22 +268,17 @@ export default function DataSatuanPage() {
                     <tr className="bg-gray-50 text-left">
                       <th className="px-6 py-3 font-semibold">No</th>
                       <th className="px-6 py-3 font-semibold">Nama Kategori</th>
-                      <th className="px-6 py-3 font-semibold text-center">
-                        Aksi
-                      </th>
+                      <th className="px-6 py-3 font-semibold text-center">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {data.map((row, index) => (
+                    {data.slice(0, 5).map((row, index) => ( // Pastikan hanya 5 data yang ditampilkan
                       <tr
                         key={row.id}
                         className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
                       >
                         <td className="px-6 py-3">
-                          {(pagination.currentPage - 1) *
-                            pagination.itemsPerPage +
-                            index +
-                            1}
+                          {(pagination.currentPage - 1) * pagination.itemsPerPage + index + 1}
                         </td>
                         <td className="px-6 py-3 font-medium text-gray-800">
                           {row.nama_kategori}
@@ -288,10 +297,7 @@ export default function DataSatuanPage() {
                     ))}
                     {data.length === 0 && (
                       <tr>
-                        <td
-                          colSpan="3"
-                          className="px-6 py-8 text-center text-gray-500"
-                        >
+                        <td colSpan="3" className="px-6 py-8 text-center text-gray-500">
                           Tidak ada data kategori
                         </td>
                       </tr>
@@ -302,13 +308,11 @@ export default function DataSatuanPage() {
                 {/* Pagination */}
                 <div className="flex justify-between items-center px-6 py-4 bg-white border-t">
                   <div className="text-sm text-gray-600">
-                    Menampilkan {data.length} dari {pagination.totalItems} data
+                    Menampilkan {Math.min(data.length, 5)} dari {pagination.totalItems} data
                   </div>
                   <div className="inline-flex text-x1 border rounded-md overflow-hidden">
                     <button
-                      onClick={() =>
-                        handlePageChange(pagination.currentPage - 1)
-                      }
+                      onClick={() => handlePageChange(pagination.currentPage - 1)}
                       disabled={pagination.currentPage === 1}
                       className={`px-3 py-1 border-r ${
                         pagination.currentPage === 1
@@ -318,15 +322,14 @@ export default function DataSatuanPage() {
                     >
                       Previous
                     </button>
-
+                    
                     {[...Array(pagination.totalPages)].map((_, i) => {
                       const pageNum = i + 1;
                       // Show only current page, first, last, and neighbors
                       if (
                         pageNum === 1 ||
                         pageNum === pagination.totalPages ||
-                        (pageNum >= pagination.currentPage - 1 &&
-                          pageNum <= pagination.currentPage + 1)
+                        (pageNum >= pagination.currentPage - 1 && pageNum <= pagination.currentPage + 1)
                       ) {
                         return (
                           <button
@@ -344,14 +347,10 @@ export default function DataSatuanPage() {
                       }
                       return null;
                     })}
-
+                    
                     <button
-                      onClick={() =>
-                        handlePageChange(pagination.currentPage + 1)
-                      }
-                      disabled={
-                        pagination.currentPage === pagination.totalPages
-                      }
+                      onClick={() => handlePageChange(pagination.currentPage + 1)}
+                      disabled={pagination.currentPage === pagination.totalPages}
                       className={`px-3 py-1 ${
                         pagination.currentPage === pagination.totalPages
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
