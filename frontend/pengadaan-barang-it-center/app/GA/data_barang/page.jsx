@@ -14,7 +14,7 @@ export default function DataBarangPage() {
   const [kategoriList, setKategoriList] = useState([]);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 10,
+    limit: 5,
     totalPages: 1,
     totalItems: 0,
   });
@@ -25,7 +25,7 @@ export default function DataBarangPage() {
   // Fetch data barang
   const fetchBarang = async (
     page = 1,
-    limit = 10,
+    limit = 5,
     search = "",
     kategori_id = ""
   ) => {
@@ -219,7 +219,7 @@ export default function DataBarangPage() {
 
         {/* Main Content */}
         <main className="flex-1 p-8 bg-gray-200">
-          <h2 className="text-3xl font-semibold mb-6">Barang</h2>
+          <h2 className="text-3xl text-black font-semibold mb-6">Barang</h2>
 
           {/* Card container */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -247,7 +247,7 @@ export default function DataBarangPage() {
             {/* Filter */}
             <div className="flex items-center gap-3 px-6 py-4 border-b bg-white">
               <form onSubmit={handleSearch} className="flex items-center gap-3">
-                <label htmlFor="search" className="text-gray-700 font-medium">
+                <label htmlFor="search" className="text-gray-800 font-medium">
                   Search
                 </label>
                 <input
@@ -287,7 +287,7 @@ export default function DataBarangPage() {
             )}
 
             {/* Tabel */}
-            <table className="w-full border-collapse text-x1">
+            <table className="w-full border-collapse text-black text-x1">
               <thead>
                 <tr className="bg-white text-left">
                   <th className="px-6 py-3 font-semibold">No</th>
