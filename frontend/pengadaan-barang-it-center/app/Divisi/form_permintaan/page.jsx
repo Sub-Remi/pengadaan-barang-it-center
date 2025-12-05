@@ -40,7 +40,7 @@ export default function FormPermintaanBarangPage() {
 
   const [formData, setFormData] = useState({
     tanggal_kebutuhan: "",
-    catatan: "",
+    judul_permintaan: "", // Changed from catatan to judul_permintaan
   });
 
   const [barangForm, setBarangForm] = useState({
@@ -131,7 +131,7 @@ export default function FormPermintaanBarangPage() {
 
         setFormData({
           tanggal_kebutuhan: permintaan.tanggal_kebutuhan,
-          catatan: permintaan.catatan || "",
+          judul_permintaan: permintaan.judul_permintaan || permintaan.catatan || "", // Handle both fields
         });
 
         // LOGGING: Cek struktur data
@@ -381,6 +381,12 @@ export default function FormPermintaanBarangPage() {
         ...prev,
         kategori_barang: kategori.nama_kategori,
         kategori_barang_id: kategori.id,
+        stok_barang_id: null, // Reset stok_barang_id when kategori changes
+        nama_barang: "",
+        spesifikasi: "",
+        satuan: "",
+        satuan_barang_id: null,
+        stok_available: 0,
       }));
       setKategoriSearch("");
       setShowKategoriDropdown(false);
@@ -516,8 +522,10 @@ export default function FormPermintaanBarangPage() {
       // 1. Update data permintaan
       const updateData = {
         tanggal_kebutuhan: formData.tanggal_kebutuhan,
-        catatan: formData.catatan,
+        judul_permintaan: formData.judul_permintaan, // Changed from catatan
       };
+
+      
 
       // 2. Kita perlu handle update barang
       // Untuk simplifikasi, kita hapus semua barang lama dan tambah yang baru
@@ -542,6 +550,11 @@ export default function FormPermintaanBarangPage() {
       return;
     }
 
+    if (!formData.judul_permintaan) {
+      alert("Judul Permintaan harus diisi!");
+      return;
+    }
+
     setIsSaving(true);
     setError(null);
 
@@ -554,7 +567,7 @@ export default function FormPermintaanBarangPage() {
         // Buat draft baru
         const permintaanData = {
           tanggal_kebutuhan: formData.tanggal_kebutuhan,
-          catatan: formData.catatan || "",
+          judul_permintaan: formData.judul_permintaan // Changed from catatan
         };
 
         const createResponse = await permintaanService.createPermintaan(
@@ -594,6 +607,11 @@ export default function FormPermintaanBarangPage() {
       return;
     }
 
+    if (!formData.judul_permintaan) {
+      alert("Judul Permintaan harus diisi!");
+      return;
+    }
+
     if (!confirm("Apakah Anda yakin ingin mengirim permintaan ini?")) {
       return;
     }
@@ -611,7 +629,7 @@ export default function FormPermintaanBarangPage() {
         // Buat permintaan baru langsung submit
         const permintaanData = {
           tanggal_kebutuhan: formData.tanggal_kebutuhan,
-          catatan: formData.catatan || "",
+          judul_permintaan: formData.judul_permintaan// Changed from catatan
         };
 
         const createResponse = await permintaanService.createPermintaan(
@@ -784,15 +802,16 @@ export default function FormPermintaanBarangPage() {
 
                   <div className="md:col-span-2">
                     <label className="font-medium text-gray-700">
-                      Catatan/Keterangan
+                      Judul Permintaan *
                     </label>
-                    <textarea
-                      name="catatan"
-                      value={formData.catatan}
+                    <input
+                      type="text"
+                      name="judul_permintaan"
+                      value={formData.judul_permintaan}
                       onChange={handleInputChange}
                       className="w-full border border-gray-300 rounded px-3 py-2 mt-1 text-gray-700"
-                      placeholder="Masukkan catatan atau keterangan tambahan"
-                      rows="3"
+                      placeholder="Masukkan judul permintaan"
+                      required
                     />
                   </div>
                 </div>
@@ -805,26 +824,39 @@ export default function FormPermintaanBarangPage() {
                 </h4>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Kategori Barang */}
                   <div className="relative dropdown-container">
-                    <label className="font-medium text-gray-700">
-                      Kategori Barang *
-                    </label>
+                    <label className="font-medium text-gray-700">Kategori Barang *</label>
                     <input
                       type="text"
                       name="kategori_barang"
                       value={barangForm.kategori_barang}
                       onChange={handleBarangInputChange}
-                      className="w-full border border-gray-300 rounded px-3 py-2 mt-1 text-gray-700"
-                      placeholder="Cari atau ketik kategori"
+                      onFocus={() => {
+                        if (barangForm.stok_barang_id === null) {
+                          if (kategoriOptions.length === 0) {
+                            loadInitialKategori();
+                          } else {
+                            setShowKategoriDropdown(true);
+                          }
+                        }
+                      }}
+                      disabled={barangForm.stok_barang_id !== null}
+                      className={`w-full border border-gray-300 rounded px-3 py-2 mt-1 text-gray-700 ${
+                        barangForm.stok_barang_id !== null
+                          ? 'bg-gray-100 cursor-not-allowed'
+                          : ''
+                      }`}
+                      placeholder={
+                        barangForm.stok_barang_id !== null
+                          ? 'Kategori terkunci karena barang sudah dipilih'
+                          : 'Cari atau ketik kategori'
+                      }
                       required
                     />
-                    {showKategoriDropdown && (
+                    {showKategoriDropdown && barangForm.stok_barang_id === null && (
                       <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
                         {loadingDropdown ? (
-                          <div className="p-2 text-center text-gray-500">
-                            Memuat...
-                          </div>
+                          <div className="p-2 text-center text-gray-500">Memuat...</div>
                         ) : kategoriOptions.length > 0 ? (
                           kategoriOptions.map((kategori) => (
                             <div
@@ -836,9 +868,7 @@ export default function FormPermintaanBarangPage() {
                             </div>
                           ))
                         ) : (
-                          <div className="p-2 text-center text-gray-500">
-                            Tidak ditemukan
-                          </div>
+                          <div className="p-2 text-center text-gray-500">Tidak ditemukan</div>
                         )}
                       </div>
                     )}
@@ -849,65 +879,82 @@ export default function FormPermintaanBarangPage() {
                     <label className="font-medium text-gray-700">
                       Nama Barang *
                     </label>
-                    <input
-                      type="text"
-                      name="nama_barang"
-                      value={barangForm.nama_barang}
-                      onChange={handleBarangInputChange}
-                      className="w-full border border-gray-300 rounded px-3 py-2 mt-1 text-gray-700"
-                      placeholder={
-                        barangForm.kategori_barang_id
-                          ? "Cari atau ketik nama barang"
-                          : "Pilih kategori terlebih dahulu"
-                      }
-                      disabled={!barangForm.kategori_barang_id}
-                      required
-                    />
-                    {showStokDropdown && barangForm.kategori_barang_id && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
-                        {loadingDropdown ? (
-                          <div className="p-2 text-center text-gray-500">
-                            Memuat...
-                          </div>
-                        ) : stokBarangOptions.length > 0 ? (
-                          stokBarangOptions.map((barang) => (
-                            <div
-                              key={barang.id}
-                              className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 border-b border-gray-100"
-                              onClick={() => handleSelectStokBarang(barang)}
-                            >
-                              <div className="font-medium">
-                                {barang.nama_barang}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                Kode: {barang.kode_barang} | Stok: {barang.stok}
-                              </div>
-                              {barang.spesifikasi && (
-                                <div className="text-xs text-gray-400 mt-1">
-                                  {barang.spesifikasi}
-                                </div>
-                              )}
+                    <div className="relative">
+                      <input
+                        type="text"
+                        name="nama_barang"
+                        value={barangForm.nama_barang}
+                        onChange={handleBarangInputChange}
+                        className="w-full border border-gray-300 rounded px-3 py-2 mt-1 text-gray-700"
+                        placeholder={
+                          barangForm.kategori_barang_id
+                            ? "Cari atau ketik nama barang"
+                            : "Pilih kategori terlebih dahulu"
+                        }
+                        disabled={!barangForm.kategori_barang_id}
+                        required
+                      />
+                      {barangForm.kategori_barang_id && (
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          <span className="text-xs text-gray-500">
+                            🔍 Search
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    {showStokDropdown &&
+                      barangForm.kategori_barang_id &&
+                      barangForm.stok_barang_id === null && (
+                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
+                          {loadingDropdown ? (
+                            <div className="p-2 text-center text-gray-500">
+                              Memuat...
                             </div>
-                          ))
-                        ) : (
-                          <div className="p-2 text-center text-gray-500">
-                            Tidak ditemukan
-                          </div>
-                        )}
-                      </div>
-                    )}
+                          ) : stokBarangOptions.length > 0 ? (
+                            stokBarangOptions.map((barang) => (
+                              <div
+                                key={barang.id}
+                                className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 border-b border-gray-100"
+                                onClick={() => handleSelectStokBarang(barang)}
+                              >
+                                <div className="font-medium">
+                                  {barang.nama_barang}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  Kode: {barang.kode_barang} | Stok:{" "}
+                                  {barang.stok}
+                                </div>
+                                {barang.spesifikasi && (
+                                  <div className="text-xs text-gray-400 mt-1">
+                                    {barang.spesifikasi}
+                                  </div>
+                                )}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="p-2 text-center text-gray-500">
+                              Tidak ditemukan
+                            </div>
+                          )}
+                        </div>
+                      )}
                   </div>
 
                   {/* Satuan */}
                   <div className="relative dropdown-container">
-                    <label className="font-medium text-gray-700">
-                      Satuan *
-                    </label>
+                    <label className="font-medium text-gray-700">Satuan *</label>
                     <input
                       type="text"
                       name="satuan"
                       value={barangForm.satuan}
                       onChange={handleBarangInputChange}
+                      onFocus={() => {
+                        if (satuanOptions.length === 0) {
+                          loadInitialSatuan();
+                        } else {
+                          setShowSatuanDropdown(true);
+                        }
+                      }}
                       className="w-full border border-gray-300 rounded px-3 py-2 mt-1 text-gray-700"
                       placeholder="Cari atau ketik satuan"
                       required
@@ -915,9 +962,7 @@ export default function FormPermintaanBarangPage() {
                     {showSatuanDropdown && (
                       <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
                         {loadingDropdown ? (
-                          <div className="p-2 text-center text-gray-500">
-                            Memuat...
-                          </div>
+                          <div className="p-2 text-center text-gray-500">Memuat...</div>
                         ) : satuanOptions.length > 0 ? (
                           satuanOptions.map((satuan) => (
                             <div
@@ -929,9 +974,7 @@ export default function FormPermintaanBarangPage() {
                             </div>
                           ))
                         ) : (
-                          <div className="p-2 text-center text-gray-500">
-                            Tidak ditemukan
-                          </div>
+                          <div className="p-2 text-center text-gray-500">Tidak ditemukan</div>
                         )}
                       </div>
                     )}
