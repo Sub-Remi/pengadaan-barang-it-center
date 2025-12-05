@@ -94,49 +94,60 @@ const Permintaan = {
     });
 
     let query = `
-      SELECT p.*, u.nama_lengkap, d.nama_divisi 
-      FROM permintaan p 
-      JOIN users u ON p.user_id = u.id 
-      JOIN divisi d ON u.divisi_id = d.id 
-      WHERE p.user_id = ?
-    `;
+    SELECT p.*, u.nama_lengkap, d.nama_divisi 
+    FROM permintaan p 
+    JOIN users u ON p.user_id = u.id 
+    JOIN divisi d ON u.divisi_id = d.id 
+    WHERE p.user_id = ?
+  `;
 
     let countQuery = `
-      SELECT COUNT(*) as total 
-      FROM permintaan p 
-      JOIN users u ON p.user_id = u.id 
-      WHERE p.user_id = ?
-    `;
+    SELECT COUNT(*) as total 
+    FROM permintaan p 
+    JOIN users u ON p.user_id = u.id 
+    WHERE p.user_id = ?
+  `;
 
     const values = [userId];
     const countValues = [userId];
 
+    // ✅ PERBAIKAN: Default exclude status draft untuk halaman permintaan
+    // Jika tidak ada filter status atau status adalah "semua", exclude draft
+    let shouldExcludeDraft = true;
+
     // Filter by status
-    if (filters.status && filters.status !== "semua") {
+    if (filters.status && filters.status !== "" && filters.status !== "semua") {
       query += " AND p.status = ?";
       countQuery += " AND p.status = ?";
       values.push(filters.status);
       countValues.push(filters.status);
+      shouldExcludeDraft = false; // Jika ada filter status spesifik, jangan exclude draft
+    }
+
+    // Exclude draft jika tidak ada filter status atau filter "semua"
+    if (shouldExcludeDraft) {
+      query += " AND p.status != 'draft'";
+      countQuery += " AND p.status != 'draft'";
     }
 
     // Search by nomor permintaan atau nama barang
     if (filters.search) {
       query += ` AND (
-        p.nomor_permintaan LIKE ? OR 
-        p.id IN (
-          SELECT DISTINCT bp.permintaan_id 
-          FROM barang_permintaan bp 
-          WHERE bp.nama_barang LIKE ? OR bp.kategori_barang LIKE ?
-        )
-      )`;
+      p.nomor_permintaan LIKE ? OR 
+      p.id IN (
+        SELECT DISTINCT bp.permintaan_id 
+        FROM barang_permintaan bp 
+        WHERE bp.nama_barang LIKE ? OR bp.kategori_barang LIKE ?
+      )
+    )`;
       countQuery += ` AND (
-        p.nomor_permintaan LIKE ? OR 
-        p.id IN (
-          SELECT DISTINCT bp.permintaan_id 
-          FROM barang_permintaan bp 
-          WHERE bp.nama_barang LIKE ? OR bp.kategori_barang LIKE ?
-        )
-      )`;
+      p.nomor_permintaan LIKE ? OR 
+      p.id IN (
+        SELECT DISTINCT bp.permintaan_id 
+        FROM barang_permintaan bp 
+        WHERE bp.nama_barang LIKE ? OR bp.kategori_barang LIKE ?
+      )
+    )`;
       const searchTerm = `%${filters.search}%`;
       values.push(searchTerm, searchTerm, searchTerm);
       countValues.push(searchTerm, searchTerm, searchTerm);
@@ -186,32 +197,32 @@ const Permintaan = {
   // Get count permintaan by status untuk dashboard
   getCountByStatus: async (userId) => {
     const query = `
-      SELECT 
-        status,
-        COUNT(*) as count
-      FROM permintaan 
-      WHERE user_id = ?
-      GROUP BY status
-      ORDER BY 
-        CASE status 
-          WHEN 'menunggu' THEN 1
-          WHEN 'diproses' THEN 2
-          WHEN 'selesai' THEN 3
-          WHEN 'ditolak' THEN 4
-          WHEN 'draft' THEN 5
-          ELSE 6
-        END
-    `;
+    SELECT 
+      status,
+      COUNT(*) as count
+    FROM permintaan 
+    WHERE user_id = ?
+    GROUP BY status
+    ORDER BY 
+      CASE status 
+        WHEN 'draft' THEN 1
+        WHEN 'menunggu' THEN 2
+        WHEN 'diproses' THEN 3
+        WHEN 'selesai' THEN 4
+        WHEN 'ditolak' THEN 5
+        ELSE 6
+      END
+  `;
 
     const [rows] = await dbPool.execute(query, [userId]);
 
     // Format result untuk frontend
     const result = {
+      draft: 0,
       menunggu: 0,
       diproses: 0,
       selesai: 0,
       ditolak: 0,
-      draft: 0,
       total: 0,
     };
 
@@ -313,6 +324,94 @@ const Permintaan = {
       "UPDATE permintaan SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
     const [result] = await dbPool.execute(query, [status, id]);
     return result.affectedRows;
+  },
+
+  // Get draft permintaan by user ID (untuk halaman draft)
+  findDraftByUserIdWithPagination: async (
+    userId,
+    page = 1,
+    limit = 5,
+    filters = {}
+  ) => {
+    const offset = (page - 1) * limit;
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const offsetNum = parseInt(offset);
+
+    console.log("📝 Getting draft permintaan:", {
+      userId,
+      pageNum,
+      limitNum,
+      offsetNum,
+      filters,
+    });
+
+    let query = `
+    SELECT p.*, u.nama_lengkap, d.nama_divisi 
+    FROM permintaan p 
+    JOIN users u ON p.user_id = u.id 
+    JOIN divisi d ON u.divisi_id = d.id 
+    WHERE p.user_id = ? AND p.status = 'draft'
+  `;
+
+    let countQuery = `
+    SELECT COUNT(*) as total 
+    FROM permintaan p 
+    JOIN users u ON p.user_id = u.id 
+    WHERE p.user_id = ? AND p.status = 'draft'
+  `;
+
+    const values = [userId];
+    const countValues = [userId];
+
+    // Search by nomor permintaan atau catatan
+    if (filters.search) {
+      query += ` AND (p.nomor_permintaan LIKE ? OR p.catatan LIKE ?)`;
+      countQuery += ` AND (p.nomor_permintaan LIKE ? OR p.catatan LIKE ?)`;
+      const searchTerm = `%${filters.search}%`;
+      values.push(searchTerm, searchTerm);
+      countValues.push(searchTerm, searchTerm);
+    }
+
+    // Filter by date range
+    if (filters.start_date && filters.end_date) {
+      query += " AND DATE(p.created_at) BETWEEN ? AND ?";
+      countQuery += " AND DATE(p.created_at) BETWEEN ? AND ?";
+      values.push(filters.start_date, filters.end_date);
+      countValues.push(filters.start_date, filters.end_date);
+    }
+
+    query += " ORDER BY p.created_at DESC";
+    query += ` LIMIT ${limitNum} OFFSET ${offsetNum}`;
+
+    console.log("🔍 Draft query:", query);
+    console.log("📊 Draft query values:", values);
+
+    try {
+      const [rows] = await dbPool.execute(query, values);
+      const [countRows] = await dbPool.execute(countQuery, countValues);
+
+      const total = countRows[0].total;
+      const totalPages = Math.ceil(total / limitNum);
+
+      console.log(
+        "✅ Draft query successful. Total:",
+        total,
+        "Total pages:",
+        totalPages
+      );
+
+      return {
+        data: rows,
+        total: total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: totalPages,
+      };
+    } catch (error) {
+      console.error("💥 Draft database query error:", error);
+      throw error;
+    }
   },
 };
 

@@ -15,6 +15,7 @@ import adminRoutes from "./src/routes/admin.js";
 import validatorRoutes from "./src/routes/validator.js";
 import kategoriRoutes from "./src/routes/kategori.js"; // ✅ TAMBAHKAN INI
 import satuanRoutes from "./src/routes/satuan.js";
+import stokRoutes from "./src/routes/stok.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,6 +27,8 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000", // NextJS dev server
+      "http://localhost:5000", // Backend server
+      "https://pengadaan-barang-it-center.vercel.app", // Deployed frontend
     ],
     credentials: true, // Izinkan cookies/auth headers
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -53,8 +56,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/pemohon", pemohonRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/validator", validatorRoutes);
-app.use("/api/kategori", kategoriRoutes); // ✅ TAMBAHKAN INI
+app.use("/api/kategori", kategoriRoutes);
 app.use("/api/satuan", satuanRoutes);
+app.use("/api/stok", stokRoutes);
 
 // Test endpoint
 app.get("/api/health", (req, res) => {

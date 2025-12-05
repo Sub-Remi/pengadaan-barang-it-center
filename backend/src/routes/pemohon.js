@@ -9,6 +9,9 @@ import {
   submitPermintaan,
   getPermintaanCountByStatus,
   getPermintaanWithStatusUpdate,
+  updateDraftPermintaan,
+  deletePermintaan,
+  getDraftPermintaan,
 } from "../controller/permintaanController.js";
 import {
   addBarangToPermintaan,
@@ -23,7 +26,8 @@ router.use(authenticate, requirePemohon);
 
 // Routes untuk permintaan
 router.get("/permintaan", getPermintaanByUser);
-router.get("/permintaan/count", getPermintaanCountByStatus);
+router.get("/permintaan/draft", getDraftPermintaan);
+router.get("/permintaan/count-by-status", getPermintaanCountByStatus);
 router.get("/permintaan/updates", getPermintaanWithStatusUpdate);
 router.get("/permintaan/:id", getPermintaanDetail);
 router.post("/permintaan", createPermintaan);
@@ -34,5 +38,9 @@ router.put("/permintaan/:id/submit", submitPermintaan);
 router.post("/permintaan/:id/barang", addBarangToPermintaan);
 router.put("/permintaan/:id/barang/:barangId", updateBarangInPermintaan);
 router.delete("/permintaan/:id/barang/:barangId", deleteBarangFromPermintaan);
+
+// Route untuk operasi pada draft
+router.put("/permintaan/:id/draft", updateDraftPermintaan);
+router.delete("/permintaan/:id", deletePermintaan);
 
 export default router;

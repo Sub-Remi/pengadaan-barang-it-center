@@ -5,8 +5,14 @@ export const addBarangToPermintaan = async (req, res) => {
   try {
     const { id } = req.params;
     const user_id = req.user.id;
-    const { kategori_barang, nama_barang, spesifikasi, jumlah, keterangan } =
-      req.body;
+    const {
+      kategori_barang,
+      nama_barang,
+      spesifikasi,
+      jumlah,
+      keterangan,
+      stok_barang_id,
+    } = req.body;
 
     console.log("📦 Adding barang to permintaan:", { id, user_id });
 
@@ -17,12 +23,10 @@ export const addBarangToPermintaan = async (req, res) => {
     }
 
     if (permintaan.status !== "draft") {
-      return res
-        .status(400)
-        .json({
-          error:
-            "Hanya permintaan dengan status draft yang bisa ditambah barang.",
-        });
+      return res.status(400).json({
+        error:
+          "Hanya permintaan dengan status draft yang bisa ditambah barang.",
+      });
     }
 
     // Validasi input
@@ -32,8 +36,6 @@ export const addBarangToPermintaan = async (req, res) => {
         .json({ error: "Kategori, nama barang, dan jumlah harus diisi." });
     }
 
-
-
     // Tambah barang ke permintaan
     const barangId = await BarangPermintaan.create({
       permintaan_id: id,
@@ -42,7 +44,7 @@ export const addBarangToPermintaan = async (req, res) => {
       spesifikasi: spesifikasi || "",
       jumlah,
       keterangan: keterangan || "",
-      stok_barang_id: stok_barang_id // Link ke stok jika berhasil      
+      stok_barang_id: stok_barang_id, // Link ke stok jika berhasil
     });
 
     console.log("✅ Barang added with ID:", barangId);
@@ -51,7 +53,7 @@ export const addBarangToPermintaan = async (req, res) => {
       message: "Barang berhasil ditambahkan ke permintaan.",
       data: { id: barangId },
       stok_barang_id: stok_barang_id,
-      stok_created: stok_barang_id ? true : false
+      stok_created: stok_barang_id ? true : false,
     });
   } catch (error) {
     console.error("💥 Add barang to permintaan error:", error);
@@ -75,12 +77,10 @@ export const updateBarangInPermintaan = async (req, res) => {
     }
 
     if (permintaan.status !== "draft") {
-      return res
-        .status(400)
-        .json({
-          error:
-            "Hanya permintaan dengan status draft yang bisa diupdate barangnya.",
-        });
+      return res.status(400).json({
+        error:
+          "Hanya permintaan dengan status draft yang bisa diupdate barangnya.",
+      });
     }
 
     // Cek apakah barang ada dalam permintaan
@@ -129,12 +129,10 @@ export const deleteBarangFromPermintaan = async (req, res) => {
     }
 
     if (permintaan.status !== "draft") {
-      return res
-        .status(400)
-        .json({
-          error:
-            "Hanya permintaan dengan status draft yang bisa dihapus barangnya.",
-        });
+      return res.status(400).json({
+        error:
+          "Hanya permintaan dengan status draft yang bisa dihapus barangnya.",
+      });
     }
 
     // Cek apakah barang ada dalam permintaan
