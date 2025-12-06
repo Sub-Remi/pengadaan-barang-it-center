@@ -245,6 +245,46 @@ const BarangPermintaan = {
     const [rows] = await dbPool.execute(query, [barang_permintaan_id]);
     return rows[0];
   },
+
+  
+
+    // Fungsi untuk menghapus semua barang berdasarkan permintaan_id
+  deleteAllByPermintaanId: async (permintaanId) => {
+    const query = "DELETE FROM barang_permintaan WHERE permintaan_id = ?";
+    const [result] = await dbPool.execute(query, [permintaanId]);
+    return result.affectedRows;
+  },
+  
+  // Fungsi untuk membuat barang dengan koneksi transaction
+  createWithTransaction: async (connection, barangData) => {
+    const { 
+      permintaan_id, 
+      kategori_barang, 
+      nama_barang, 
+      spesifikasi, 
+      jumlah, 
+      keterangan, 
+      stok_barang_id 
+    } = barangData;
+    
+    const query = `
+      INSERT INTO barang_permintaan 
+      (permintaan_id, kategori_barang, nama_barang, spesifikasi, jumlah, keterangan, stok_barang_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    
+    const [result] = await connection.execute(query, [
+      permintaan_id,
+      kategori_barang,
+      nama_barang,
+      spesifikasi || "",
+      jumlah,
+      keterangan || "",
+      stok_barang_id || null
+    ]);
+    
+    return result.insertId;
+  }
 };
 
 export default BarangPermintaan;

@@ -102,6 +102,7 @@ const permintaanService = {
     }
   },
 
+  // Update draft permintaan
   updateDraftPermintaan: async (permintaanId, data) => {
     try {
       const response = await apiClient.put(
@@ -114,17 +115,17 @@ const permintaanService = {
     }
   },
 
+  // Menghapus permintaan (draft)
   deletePermintaan: async (permintaanId) => {
     try {
-      const response = await apiClient.delete(
-        `/pemohon/permintaan/${permintaanId}`
-      );
+      const response = await apiClient.delete(`/pemohon/permintaan/${permintaanId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: "Terjadi kesalahan" };
     }
   },
 
+  // Mengambil daftar draft permintaan
   getDraftPermintaan: async (filters = {}) => {
     try {
       const params = new URLSearchParams();
@@ -142,10 +143,30 @@ const permintaanService = {
     }
   },
 
-  // Menghapus permintaan (draft)
-  deletePermintaan: async (id) => {
+  // Menghapus semua barang dari permintaan (untuk keperluan update draft)
+  deleteAllBarangFromPermintaan: async (permintaanId) => {
     try {
-      const response = await apiClient.delete(`/pemohon/permintaan/${id}`);
+      const response = await apiClient.delete(`/pemohon/permintaan/${permintaanId}/barang/all`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Terjadi kesalahan" };
+    }
+  },
+
+  // Update permintaan (bukan draft)
+  updatePermintaan: async (id, data) => {
+    try {
+      const response = await apiClient.put(`/pemohon/permintaan/${id}`, data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Terjadi kesalahan" };
+    }
+  },
+
+  // Delete barang dari permintaan
+  deleteBarangPermintaan: async (permintaanId, barangId) => {
+    try {
+      const response = await apiClient.delete(`/pemohon/permintaan/${permintaanId}/barang/${barangId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: "Terjadi kesalahan" };
@@ -153,4 +174,5 @@ const permintaanService = {
   },
 };
 
+// ✅ KOREKSI: Ekspor langsung objek service, bukan object yang berisi permintaanService
 export default permintaanService;

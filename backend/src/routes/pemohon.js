@@ -9,7 +9,7 @@ import {
   submitPermintaan,
   getPermintaanCountByStatus,
   getPermintaanWithStatusUpdate,
-  updateDraftPermintaan,
+  updateDraftPermintaan, // ← Pastikan ini ada
   deletePermintaan,
   getDraftPermintaan,
 } from "../controller/permintaanController.js";
@@ -17,6 +17,7 @@ import {
   addBarangToPermintaan,
   updateBarangInPermintaan,
   deleteBarangFromPermintaan,
+  deleteAllBarangFromPermintaan
 } from "../controller/barangPermintaanController.js";
 
 const router = express.Router();
@@ -38,6 +39,7 @@ router.put("/permintaan/:id/submit", submitPermintaan);
 router.post("/permintaan/:id/barang", addBarangToPermintaan);
 router.put("/permintaan/:id/barang/:barangId", updateBarangInPermintaan);
 router.delete("/permintaan/:id/barang/:barangId", deleteBarangFromPermintaan);
+router.delete("/permintaan/:id/barang/all", deleteAllBarangFromPermintaan);
 
 // Route untuk operasi pada draft
 router.put("/permintaan/:id/draft", updateDraftPermintaan);

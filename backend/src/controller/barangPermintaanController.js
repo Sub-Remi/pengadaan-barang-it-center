@@ -111,6 +111,39 @@ export const updateBarangInPermintaan = async (req, res) => {
   }
 };
 
+// Di barangPermintaanController.js, tambahkan:
+export const deleteAllBarangFromPermintaan = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user_id = req.user.id;
+
+    console.log("🗑️ Deleting all barang from permintaan:", { id, user_id });
+
+    // Cek apakah permintaan milik user dan status draft
+    const permintaan = await Permintaan.findByIdAndUserId(id, user_id);
+    if (!permintaan) {
+      return res.status(404).json({ error: "Permintaan tidak ditemukan." });
+    }
+
+    if (permintaan.status !== "draft") {
+      return res.status(400).json({
+        error: "Hanya permintaan dengan status draft yang bisa dihapus barangnya.",
+      });
+    }
+
+    // Hapus semua barang dari permintaan
+    const affectedRows = await BarangPermintaan.deleteAllByPermintaanId(id);
+
+    res.json({ 
+      message: "Semua barang berhasil dihapus dari permintaan.",
+      affectedRows
+    });
+  } catch (error) {
+    console.error("💥 Delete all barang from permintaan error:", error);
+    res.status(500).json({ error: "Terjadi kesalahan server." });
+  }
+};
+
 export const deleteBarangFromPermintaan = async (req, res) => {
   try {
     const { id, barangId } = req.params;

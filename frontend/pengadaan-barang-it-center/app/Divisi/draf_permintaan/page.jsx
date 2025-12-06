@@ -204,6 +204,7 @@ export default function DrafPermintaanPage() {
               </div>
 
               {/* Tabel */}
+              {/* Tabel */}
               {loading ? (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto"></div>
@@ -227,7 +228,7 @@ export default function DrafPermintaanPage() {
                           Tanggal Dibuat
                         </th>
                         <th className="px-6 py-3 font-semibold">
-                          Jumlah Barang
+                          Jumlah Jenis Barang
                         </th>
                         <th className="px-6 py-3 font-semibold text-center">
                           Aksi
@@ -251,16 +252,14 @@ export default function DrafPermintaanPage() {
                           <td className="px-6 py-3 font-medium text-gray-800">
                             {row.nomor_permintaan}
                           </td>
-                          <td className="px-6 py-3">
-                            {row.catatan || "Tanpa judul"}
-                          </td>
+                          <td className="px-6 py-3">{row.catatan}</td>
                           <td className="px-6 py-3">
                             {new Date(row.created_at).toLocaleDateString(
                               "id-ID"
                             )}
                           </td>
                           <td className="px-6 py-3">
-                            {/* Jumlah barang perlu diambil dari API detail */}-
+                            {row.jumlah_item || 0} jenis
                           </td>
                           <td className="px-6 py-3 text-center">
                             <div className="flex justify-center gap-2">
