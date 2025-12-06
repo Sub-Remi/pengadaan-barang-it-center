@@ -64,46 +64,47 @@ const User = {
     const offsetNum = parseInt(offset);
 
     let query = `
-      SELECT 
-        u.id, u.username, u.nama_lengkap, u.email, u.role, 
-        u.divisi_id, u.is_active, u.created_at, u.last_login,
-        d.nama_divisi
-      FROM users u 
-      LEFT JOIN divisi d ON u.divisi_id = d.id 
-      WHERE 1=1
-    `;
+    SELECT 
+      u.id, u.username, u.nama_lengkap, u.email, u.role, 
+      u.divisi_id, u.is_active, u.created_at, u.last_login,
+      d.nama_divisi
+    FROM users u 
+    LEFT JOIN divisi d ON u.divisi_id = d.id 
+    WHERE 1=1
+  `;
 
     let countQuery = `
-      SELECT COUNT(*) as total 
-      FROM users u 
-      WHERE 1=1
-    `;
+    SELECT COUNT(*) as total 
+    FROM users u 
+    WHERE 1=1
+  `;
 
     const values = [];
     const countValues = [];
 
-    // Filter by role
-    if (filters.role && filters.role !== "semua") {
+    // Filter by role - hanya jika ada nilai
+    if (filters.role) {
       query += " AND u.role = ?";
       countQuery += " AND u.role = ?";
       values.push(filters.role);
       countValues.push(filters.role);
     }
 
-    // Filter by divisi
-    if (filters.divisi_id && filters.divisi_id !== "semua") {
+    // Filter by divisi - hanya jika ada nilai
+    if (filters.divisi_id) {
       query += " AND u.divisi_id = ?";
       countQuery += " AND u.divisi_id = ?";
       values.push(filters.divisi_id);
       countValues.push(filters.divisi_id);
     }
 
-    // Filter by status aktif
-    if (filters.is_active !== undefined && filters.is_active !== "semua") {
+    // DIPERBAIKI: Filter by status aktif - hanya jika ada nilai spesifik
+    if (filters.is_active !== undefined) {
       query += " AND u.is_active = ?";
       countQuery += " AND u.is_active = ?";
-      values.push(filters.is_active === "true" ? 1 : 0);
-      countValues.push(filters.is_active === "true" ? 1 : 0);
+      const isActiveValue = filters.is_active === "true" ? 1 : 0;
+      values.push(isActiveValue);
+      countValues.push(isActiveValue);
     }
 
     // Search by username, nama_lengkap, atau email
@@ -117,8 +118,18 @@ const User = {
       countValues.push(searchTerm, searchTerm, searchTerm);
     }
 
+    // DIPERBAIKI: Default filter untuk menampilkan user aktif saja
+    // Jika tidak ada filter is_active, tampilkan semua user
+    if (filters.is_active === undefined) {
+      query += " AND u.is_active = 1";
+      countQuery += " AND u.is_active = 1";
+    }
+
     query += " ORDER BY u.nama_lengkap ASC";
     query += ` LIMIT ${limitNum} OFFSET ${offsetNum}`;
+
+    console.log("🔍 SQL Query:", query);
+    console.log("🔍 Values:", values);
 
     try {
       const [rows] = await dbPool.execute(query, values);
@@ -126,6 +137,8 @@ const User = {
 
       const total = countRows[0].total;
       const totalPages = Math.ceil(total / limitNum);
+
+      console.log("📊 Found", rows.length, "users, total:", total);
 
       return {
         data: rows,

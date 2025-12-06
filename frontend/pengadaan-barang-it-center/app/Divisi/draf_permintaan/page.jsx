@@ -222,9 +222,7 @@ export default function DrafPermintaanPage() {
                         <th className="px-6 py-3 font-semibold">
                           Nomor Permintaan
                         </th>
-                        <th className="px-6 py-3 font-semibold">
-                          Judul/Catatan
-                        </th>
+                        <th className="px-6 py-3 font-semibold">Judul</th>
                         <th className="px-6 py-3 font-semibold">
                           Tanggal Dibuat
                         </th>

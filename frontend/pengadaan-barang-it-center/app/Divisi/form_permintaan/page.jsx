@@ -40,7 +40,7 @@ export default function FormPermintaanBarangPage() {
 
   const [formData, setFormData] = useState({
     tanggal_kebutuhan: "",
-    judul_permintaan: "", // Changed from catatan to judul_permintaan
+    catatan: "", // Changed from catatan to judul_permintaan
   });
 
   // State untuk form barang - DIPERBARUI
@@ -161,8 +161,7 @@ export default function FormPermintaanBarangPage() {
 
         setFormData({
           tanggal_kebutuhan: permintaan.tanggal_kebutuhan,
-          judul_permintaan:
-            permintaan.judul_permintaan || permintaan.catatan || "",
+          catatan: permintaan.catatan,
         });
 
         let barangData = [];
@@ -484,7 +483,7 @@ export default function FormPermintaanBarangPage() {
       // 1. Update data permintaan
       const updateData = {
         tanggal_kebutuhan: formData.tanggal_kebutuhan,
-        judul_permintaan: formData.judul_permintaan, // Changed from catatan
+        catatan: formData.catatan, // Changed from catatan
       };
 
       // 2. Kita perlu handle update barang
@@ -510,7 +509,7 @@ export default function FormPermintaanBarangPage() {
       return;
     }
 
-    if (!formData.judul_permintaan) {
+    if (!formData.catatan) {
       alert("Judul Permintaan harus diisi!");
       return;
     }
@@ -527,7 +526,7 @@ export default function FormPermintaanBarangPage() {
         // Buat draft baru
         const permintaanData = {
           tanggal_kebutuhan: formData.tanggal_kebutuhan,
-          judul_permintaan: formData.judul_permintaan, // Changed from catatan
+          catatan: formData.catatan, // Changed from catatan
         };
 
         const createResponse = await permintaanService.createPermintaan(
@@ -567,7 +566,7 @@ export default function FormPermintaanBarangPage() {
       return;
     }
 
-    if (!formData.judul_permintaan) {
+    if (!formData.catatan) {
       alert("Judul Permintaan harus diisi!");
       return;
     }
@@ -589,7 +588,7 @@ export default function FormPermintaanBarangPage() {
         // Buat permintaan baru langsung submit
         const permintaanData = {
           tanggal_kebutuhan: formData.tanggal_kebutuhan,
-          judul_permintaan: formData.judul_permintaan, // Changed from catatan
+          catatan: formData.catatan, // Changed from catatan
         };
 
         const createResponse = await permintaanService.createPermintaan(
@@ -608,7 +607,7 @@ export default function FormPermintaanBarangPage() {
         await permintaanService.submitPermintaan(newPermintaanId);
 
         alert("Permintaan berhasil dikirim!");
-        router.push(`/Divisi/detail_permintaan?id=${newPermintaanId}`);
+        router.push(`/Divisi/permintaan_divisi?id=${newPermintaanId}`);
       }
     } catch (error) {
       console.error("Error sending permintaan:", error);
@@ -766,8 +765,8 @@ export default function FormPermintaanBarangPage() {
                     </label>
                     <input
                       type="text"
-                      name="judul_permintaan"
-                      value={formData.judul_permintaan}
+                      name="catatan"
+                      value={formData.catatan}
                       onChange={handleInputChange}
                       className="w-full border border-gray-300 rounded px-3 py-2 mt-1 text-gray-700"
                       placeholder="Masukkan judul permintaan"

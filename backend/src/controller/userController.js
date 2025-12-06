@@ -1,18 +1,32 @@
 import User from "../models/user.js";
 
 // Get all users dengan pagination dan filter untuk admin
+// Get all users dengan pagination dan filter untuk admin
 export const getAllUsers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
-    // Filters
-    const filters = {
-      role: req.query.role || "",
-      divisi_id: req.query.divisi_id || "",
-      is_active: req.query.is_active || "",
-      search: req.query.search || "",
-    };
+    // Filters - DIPERBAIKI: Hanya tambahkan filter jika ada nilai
+    const filters = {};
+
+    // Hanya tambahkan filter jika nilainya valid
+    if (req.query.role && req.query.role !== "semua") {
+      filters.role = req.query.role;
+    }
+
+    if (req.query.divisi_id && req.query.divisi_id !== "semua") {
+      filters.divisi_id = req.query.divisi_id;
+    }
+
+    // DIPERBAIKI: Filter is_active hanya jika ada nilai "true" atau "false"
+    if (req.query.is_active === "true" || req.query.is_active === "false") {
+      filters.is_active = req.query.is_active;
+    }
+
+    if (req.query.search && req.query.search.trim() !== "") {
+      filters.search = req.query.search.trim();
+    }
 
     console.log("👥 Admin getting all users with filters:", filters);
 
