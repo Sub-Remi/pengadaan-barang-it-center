@@ -69,9 +69,15 @@ export const getPermintaanByUser = async (req, res) => {
       filters
     );
 
+    // ✅ Format data untuk frontend - tambah jumlah_item
+    const formattedData = result.data.map(item => ({
+      ...item,
+      jumlah_item: item.jumlah_barang || 0, // Jumlah jenis barang
+    }));
+
     res.json({
       message: "Daftar permintaan berhasil diambil.",
-      data: result.data,
+      data: formattedData,
       pagination: {
         currentPage: result.page,
         totalPages: result.totalPages,
@@ -395,44 +401,110 @@ export const deletePermintaan = async (req, res) => {
   }
 };
 
-// Fungsi untuk update permintaan (draft)
+// Tambahkan fungsi ini di permintaanController.js
 export const updateDraftPermintaan = async (req, res) => {
+  const session = await dbPool.getConnection();
   try {
+    await session.beginTransaction();
+
     const { id } = req.params;
     const user_id = req.user.id;
-    const { tanggal_kebutuhan, catatan } = req.body;
+    let { tanggal_kebutuhan, catatan, barang_list } = req.body;
 
-    console.log("✏️ Updating draft permintaan:", { id, user_id });
+    console.log("✏️ Updating draft permintaan:", { 
+      id, 
+      user_id,
+      tanggal_kebutuhan // Log nilai asli
+    });
+
+    // ✅ KONVERSI TANGGAL: Ubah format ISO ke YYYY-MM-DD
+    if (tanggal_kebutuhan && tanggal_kebutuhan.includes('T')) {
+      const dateObj = new Date(tanggal_kebutuhan);
+      tanggal_kebutuhan = dateObj.toISOString().split('T')[0];
+      console.log("📅 Tanggal dikonversi ke:", tanggal_kebutuhan);
+    }
 
     // Cek apakah permintaan milik user dan status draft
     const permintaan = await Permintaan.findByIdAndUserId(id, user_id);
     if (!permintaan) {
+      await session.rollback();
       return res.status(404).json({ error: "Permintaan tidak ditemukan." });
     }
 
     if (permintaan.status !== "draft") {
+      await session.rollback();
       return res.status(400).json({
         error: "Hanya permintaan dengan status draft yang bisa diupdate.",
       });
     }
 
-    // Update permintaan
+    // 1. Update data permintaan
     const affectedRows = await Permintaan.update(id, {
       tanggal_kebutuhan,
       catatan,
+      status: "draft", // tetap draft
     });
 
     if (affectedRows === 0) {
+      await session.rollback();
       return res.status(400).json({ error: "Gagal mengupdate permintaan." });
     }
 
-    res.json({ message: "Permintaan berhasil diupdate." });
+    // 2. Hapus semua barang lama yang terkait dengan permintaan ini
+    const deleteQuery = "DELETE FROM barang_permintaan WHERE permintaan_id = ?";
+    await session.execute(deleteQuery, [id]);
+
+    // 3. Tambahkan barang baru jika ada
+    if (barang_list && Array.isArray(barang_list) && barang_list.length > 0) {
+      for (const barang of barang_list) {
+        const {
+          kategori_barang,
+          nama_barang,
+          spesifikasi,
+          jumlah,
+          keterangan,
+          stok_barang_id,
+          kategori_barang_id,
+          satuan_barang_id
+        } = barang;
+
+        const insertQuery = `
+          INSERT INTO barang_permintaan 
+          (permintaan_id, kategori_barang, nama_barang, spesifikasi, jumlah, keterangan, stok_barang_id)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+        
+        await session.execute(insertQuery, [
+          id,
+          kategori_barang,
+          nama_barang,
+          spesifikasi || "",
+          jumlah,
+          keterangan || "",
+          stok_barang_id || null
+        ]);
+      }
+    }
+
+    await session.commit();
+    session.release();
+
+    res.json({ 
+      message: "Draft permintaan berhasil diupdate.",
+      data: { id }
+    });
   } catch (error) {
+    await session.rollback();
+    if (session) session.release();
     console.error("💥 Update draft permintaan error:", error);
-    res.status(500).json({ error: "Terjadi kesalahan server." });
+    res.status(500).json({ 
+      error: "Terjadi kesalahan server.",
+      details: error.message 
+    });
   }
 };
 
+// Get draft permintaan (untuk halaman draft)
 // Get draft permintaan (untuk halaman draft)
 export const getDraftPermintaan = async (req, res) => {
   try {
@@ -470,9 +542,15 @@ export const getDraftPermintaan = async (req, res) => {
       filters
     );
 
+    // Format data untuk frontend
+    const formattedData = result.data.map(item => ({
+      ...item,
+      jumlah_item: item.jumlah_item_barang || 0,    // Jumlah jenis barang
+    }));
+
     res.json({
       message: "Daftar draft permintaan berhasil diambil.",
-      data: result.data,
+      data: formattedData,
       pagination: {
         currentPage: result.page,
         totalPages: result.totalPages,

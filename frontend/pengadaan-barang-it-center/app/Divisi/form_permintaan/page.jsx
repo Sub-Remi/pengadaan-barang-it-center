@@ -40,26 +40,28 @@ export default function FormPermintaanBarangPage() {
 
   const [formData, setFormData] = useState({
     tanggal_kebutuhan: "",
-    judul_permintaan: "", // Changed from catatan to judul_permintaan
+    catatan: "", // Changed from catatan to judul_permintaan
   });
 
   // State untuk form barang - DIPERBARUI
-  const [barangForm, setBarangForm] = useState({
-    nama_barang: "",
-    nama_barang_display: "", // Untuk display di input
-    spesifikasi: "",
-    jumlah: "",
-    keterangan: "",
-    // Data otomatis dari stok
-    stok_barang_id: null,
-    stok_available: 0,
-    kategori_barang: "",
-    kategori_barang_id: null,
-    satuan: "",
-    satuan_barang_id: null,
-    // Flag untuk menandai apakah data sudah diambil dari stok
-    isFromStok: false,
-  });
+const [barangForm, setBarangForm] = useState({
+  nama_barang: "",
+  nama_barang_display: "", // Untuk display di input
+  spesifikasi: "",
+  jumlah: "",
+  keterangan: "",
+  // Data otomatis dari stok
+  stok_barang_id: null,
+  stok_available: 0,
+  kategori_barang: "",
+  kategori_barang_id: null,
+  satuan: "",
+  satuan_barang_id: null,
+  // Flag untuk menandai apakah data sudah diambil dari stok
+  isFromStok: false,
+  // Tambahkan state untuk error
+  jumlahError: "",
+});
 
   // Debounced search untuk nama barang
   const debouncedSearchNamaBarang = useCallback(
@@ -159,11 +161,13 @@ export default function FormPermintaanBarangPage() {
         );
         const permintaan = permintaanResponse.data;
 
-        setFormData({
-          tanggal_kebutuhan: permintaan.tanggal_kebutuhan,
-          judul_permintaan:
-            permintaan.judul_permintaan || permintaan.catatan || "",
-        });
+setFormData({
+  tanggal_kebutuhan: permintaan.tanggal_kebutuhan 
+    ? new Date(permintaan.tanggal_kebutuhan).toISOString().split('T')[0] 
+    : "",
+  catatan: permintaan.catatan,
+});
+
 
         let barangData = [];
         if (permintaan.barang && permintaan.barang.data) {
@@ -306,32 +310,50 @@ export default function FormPermintaanBarangPage() {
     }));
   };
 
-  // Handle barang input change - DIPERBARUI
-  const handleBarangInputChange = (e) => {
-    const { name, value } = e.target;
+// Handle barang input change - DIPERBARUI dengan validasi
+const handleBarangInputChange = (e) => {
+  const { name, value } = e.target;
 
-    if (name === "nama_barang_display") {
-      // Reset semua data terkait barang jika mengubah nama
-      setBarangForm((prev) => ({
-        ...prev,
-        nama_barang_display: value,
-        nama_barang: "",
-        stok_barang_id: null,
-        stok_available: 0,
-        kategori_barang: "",
-        kategori_barang_id: null,
-        satuan: "",
-        satuan_barang_id: null,
-        isFromStok: false,
-      }));
-      setNamaBarangSearch(value);
-    } else {
-      setBarangForm((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+  if (name === "nama_barang_display") {
+    // Reset semua data terkait barang jika mengubah nama
+    setBarangForm((prev) => ({
+      ...prev,
+      nama_barang_display: value,
+      nama_barang: "",
+      stok_barang_id: null,
+      stok_available: 0,
+      kategori_barang: "",
+      kategori_barang_id: null,
+      satuan: "",
+      satuan_barang_id: null,
+      isFromStok: false,
+      jumlahError: "", // Reset error
+    }));
+    setNamaBarangSearch(value);
+  } else if (name === "jumlah") {
+    const jumlahValue = parseInt(value) || 0;
+    const stokTersedia = barangForm.stok_available || 0;
+    
+    let jumlahError = "";
+    
+    if (jumlahValue <= 0) {
+      jumlahError = "Jumlah harus lebih dari 0!";
+    } else if (stokTersedia > 0 && jumlahValue > stokTersedia) {
+      jumlahError = `Jumlah melebihi stok tersedia (${stokTersedia} ${barangForm.satuan})!`;
     }
-  };
+    
+    setBarangForm((prev) => ({
+      ...prev,
+      [name]: value,
+      jumlahError: jumlahError,
+    }));
+  } else {
+    setBarangForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+};
 
   const handleSelectKategori = (kategori) => {
     if (kategori) {
@@ -368,25 +390,27 @@ export default function FormPermintaanBarangPage() {
   };
 
   // Handle select stok barang - DIPERBARUI
-  const handleSelectStokBarang = (stokBarang) => {
-    if (stokBarang) {
-      setBarangForm((prev) => ({
-        ...prev,
-        nama_barang: stokBarang.nama_barang,
-        nama_barang_display: stokBarang.nama_barang,
-        spesifikasi: stokBarang.spesifikasi || "",
-        kategori_barang: stokBarang.nama_kategori,
-        kategori_barang_id: stokBarang.kategori_barang_id,
-        satuan: stokBarang.nama_satuan,
-        satuan_barang_id: stokBarang.satuan_barang_id,
-        stok_barang_id: stokBarang.id,
-        stok_available: stokBarang.stok,
-        isFromStok: true, // Tandai berasal dari stok
-      }));
-      setNamaBarangSearch("");
-      setShowStokDropdown(false);
-    }
-  };
+// Handle select stok barang - DIPERBARUI
+const handleSelectStokBarang = (stokBarang) => {
+  if (stokBarang) {
+    setBarangForm((prev) => ({
+      ...prev,
+      nama_barang: stokBarang.nama_barang,
+      nama_barang_display: stokBarang.nama_barang,
+      spesifikasi: stokBarang.spesifikasi || "",
+      kategori_barang: stokBarang.nama_kategori,
+      kategori_barang_id: stokBarang.kategori_barang_id,
+      satuan: stokBarang.nama_satuan,
+      satuan_barang_id: stokBarang.satuan_barang_id,
+      stok_barang_id: stokBarang.id,
+      stok_available: stokBarang.stok,
+      isFromStok: true, // Tandai berasal dari stok
+      jumlahError: "", // Reset error
+    }));
+    setNamaBarangSearch("");
+    setShowStokDropdown(false);
+  }
+};
 
   // Reset form barang
   const resetBarangForm = () => {
@@ -410,21 +434,56 @@ export default function FormPermintaanBarangPage() {
 
   //==================================
 
-  const validateBarangForm = () => {
-    if (!barangForm.nama_barang.trim()) {
-      alert("Nama barang harus diisi! Silakan pilih dari dropdown.");
+const validateBarangForm = () => {
+  if (!barangForm.nama_barang.trim()) {
+    alert("Nama barang harus diisi! Silakan pilih dari dropdown.");
+    return false;
+  }
+  
+  if (!barangForm.jumlah || parseInt(barangForm.jumlah) <= 0) {
+    alert("Jumlah harus lebih dari 0!");
+    return false;
+  }
+  
+  if (!barangForm.isFromStok) {
+    alert("Barang harus dipilih dari daftar stok yang tersedia!");
+    return false;
+  }
+  
+  const jumlahValue = parseInt(barangForm.jumlah);
+  const stokTersedia = barangForm.stok_available || 0;
+  
+  if (stokTersedia > 0 && jumlahValue > stokTersedia) {
+    alert(`Jumlah melebihi stok tersedia! Stok tersedia: ${stokTersedia} ${barangForm.satuan}`);
+    return false;
+  }
+  
+  // Jika ada error dari real-time validation
+  if (barangForm.jumlahError) {
+    alert(barangForm.jumlahError);
+    return false;
+  }
+  
+  return true;
+};
+
+// Fungsi untuk validasi semua barang di daftar
+const validateAllBarang = () => {
+  if (barangList.length === 0) {
+    alert("Tambahkan minimal 1 barang sebelum menyimpan!");
+    return false;
+  }
+  
+  // Cek setiap barang apakah melebihi stok
+  for (const barang of barangList) {
+    if (barang.stok_available > 0 && barang.jumlah > barang.stok_available) {
+      alert(`Barang "${barang.nama_barang}" melebihi stok tersedia!\nDiminta: ${barang.jumlah}, Stok tersedia: ${barang.stok_available}`);
       return false;
     }
-    if (!barangForm.jumlah || parseInt(barangForm.jumlah) <= 0) {
-      alert("Jumlah harus lebih dari 0!");
-      return false;
-    }
-    if (!barangForm.isFromStok) {
-      alert("Barang harus dipilih dari daftar stok yang tersedia!");
-      return false;
-    }
-    return true;
-  };
+  }
+  
+  return true;
+};
 
   const handleTambahBarang = () => {
     if (!validateBarangForm()) return;
@@ -479,145 +538,161 @@ export default function FormPermintaanBarangPage() {
 
   //==================================
 
-  const updateDraftPermintaan = async () => {
-    try {
-      // 1. Update data permintaan
-      const updateData = {
+const updateDraftPermintaan = async () => {
+  try {
+    // 1. Update data permintaan
+    const updateData = {
+      tanggal_kebutuhan: formData.tanggal_kebutuhan,
+      catatan: formData.catatan,
+      barang_list: barangList.map(barang => ({
+        kategori_barang: barang.kategori_barang,
+        nama_barang: barang.nama_barang,
+        spesifikasi: barang.spesifikasi,
+        jumlah: barang.jumlah,
+        keterangan: barang.keterangan,
+        stok_barang_id: barang.stok_barang_id,
+        kategori_barang_id: barang.kategori_barang_id,
+        satuan_barang_id: barang.satuan_barang_id
+      }))
+    };
+
+    // 2. Panggil API update draft
+    const response = await permintaanService.updateDraftPermintaan(
+      permintaanId,
+      updateData
+    );
+
+    console.log("✅ Draft updated successfully:", response);
+    return true;
+  } catch (error) {
+    console.error("❌ Error updating draft:", error);
+    throw error;
+  }
+};
+
+const handleSimpanDraft = async () => {
+  // Validasi form utama
+  if (!formData.tanggal_kebutuhan) {
+    alert("Tanggal kebutuhan harus diisi!");
+    return;
+  }
+
+  if (!formData.catatan) {
+    alert("Judul Permintaan harus diisi!");
+    return;
+  }
+
+  // Validasi semua barang tidak melebihi stok
+  if (!validateAllBarang()) {
+    return;
+  }
+
+  setIsSaving(true);
+  setError(null);
+
+  try {
+    if (isEditMode) {
+      // Update draft yang sudah ada
+      await updateDraftPermintaan();
+      alert("Draft berhasil diperbarui!");
+    } else {
+      // Buat draft baru
+      const permintaanData = {
         tanggal_kebutuhan: formData.tanggal_kebutuhan,
-        judul_permintaan: formData.judul_permintaan, // Changed from catatan
+        catatan: formData.catatan,
       };
 
-      // 2. Kita perlu handle update barang
-      // Untuk simplifikasi, kita hapus semua barang lama dan tambah yang baru
-      // Atau kita bisa implementasi logic yang lebih kompleks: update yang ada, hapus yang dihapus, tambah yang baru
+      const createResponse = await permintaanService.createPermintaan(
+        permintaanData
+      );
+      const newPermintaanId = createResponse.data.id;
+      setPermintaanId(newPermintaanId);
 
-      alert("Fitur update draft akan diimplementasikan nanti");
-      return false;
-    } catch (error) {
-      console.error("Error updating draft:", error);
-      throw error;
-    }
-  };
+      // Tambahkan semua barang ke permintaan
+      const barangPromises = barangList.map((barang) =>
+        tambahBarangKePermintaan(newPermintaanId, barang)
+      );
 
-  const handleSimpanDraft = async () => {
-    if (barangList.length === 0) {
-      alert("Tambahkan minimal 1 barang sebelum menyimpan!");
-      return;
+      await Promise.all(barangPromises);
+      alert("Permintaan berhasil disimpan sebagai draft!");
     }
 
-    if (!formData.tanggal_kebutuhan) {
-      alert("Tanggal kebutuhan harus diisi!");
-      return;
+    router.push("/Divisi/draf_permintaan");
+  } catch (error) {
+    console.error("Error saving draft:", error);
+    setError(error.error || "Gagal menyimpan draft");
+    alert(error.error || "Gagal menyimpan draft");
+  } finally {
+    setIsSaving(false);
+  }
+};
+
+const handleKirim = async () => {
+  // Validasi form utama
+  if (!formData.tanggal_kebutuhan) {
+    alert("Tanggal kebutuhan harus diisi!");
+    return;
+  }
+
+  if (!formData.catatan) {
+    alert("Judul Permintaan harus diisi!");
+    return;
+  }
+
+  // Validasi semua barang tidak melebihi stok
+  if (!validateAllBarang()) {
+    return;
+  }
+
+  if (!confirm("Apakah Anda yakin ingin mengirim permintaan ini?")) {
+    return;
+  }
+
+  setIsSaving(true);
+  setError(null);
+
+  try {
+    if (isEditMode) {
+      // 1. Update dulu draftnya
+      await updateDraftPermintaan();
+      
+      // 2. Submit draft yang sudah diupdate
+      await permintaanService.submitPermintaan(permintaanId);
+      alert("Permintaan berhasil dikirim!");
+      router.push("/Divisi/permintaan_divisi");
+    } else {
+      // Buat permintaan baru langsung submit
+      const permintaanData = {
+        tanggal_kebutuhan: formData.tanggal_kebutuhan,
+        catatan: formData.catatan,
+      };
+
+      const createResponse = await permintaanService.createPermintaan(
+        permintaanData
+      );
+      const newPermintaanId = createResponse.data.id;
+
+      // Tambahkan semua barang ke permintaan
+      const barangPromises = barangList.map((barang) =>
+        tambahBarangKePermintaan(newPermintaanId, barang)
+      );
+
+      await Promise.all(barangPromises);
+
+      // Submit permintaan (ubah status dari draft menjadi menunggu)
+      await permintaanService.submitPermintaan(newPermintaanId);
+
+      alert("Permintaan berhasil dikirim!");
+      router.push(`/Divisi/permintaan_divisi`);
     }
-
-    if (!formData.judul_permintaan) {
-      alert("Judul Permintaan harus diisi!");
-      return;
-    }
-
-    setIsSaving(true);
-    setError(null);
-
-    try {
-      if (isEditMode) {
-        // Update draft yang sudah ada
-        await updateDraftPermintaan();
-        alert("Draft berhasil diperbarui!");
-      } else {
-        // Buat draft baru
-        const permintaanData = {
-          tanggal_kebutuhan: formData.tanggal_kebutuhan,
-          judul_permintaan: formData.judul_permintaan, // Changed from catatan
-        };
-
-        const createResponse = await permintaanService.createPermintaan(
-          permintaanData
-        );
-        const newPermintaanId = createResponse.data.id;
-        setPermintaanId(newPermintaanId);
-
-        // Tambahkan semua barang ke permintaan
-        const barangPromises = barangList.map((barang) =>
-          tambahBarangKePermintaan(newPermintaanId, barang)
-        );
-
-        await Promise.all(barangPromises);
-
-        alert("Permintaan berhasil disimpan sebagai draft!");
-      }
-
-      router.push("/Divisi/draf_permintaan");
-    } catch (error) {
-      console.error("Error saving draft:", error);
-      setError(error.error || "Gagal menyimpan draft");
-      alert(error.error || "Gagal menyimpan draft");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleKirim = async () => {
-    if (barangList.length === 0) {
-      alert("Tambahkan minimal 1 barang sebelum mengirim!");
-      return;
-    }
-
-    if (!formData.tanggal_kebutuhan) {
-      alert("Tanggal kebutuhan harus diisi!");
-      return;
-    }
-
-    if (!formData.judul_permintaan) {
-      alert("Judul Permintaan harus diisi!");
-      return;
-    }
-
-    if (!confirm("Apakah Anda yakin ingin mengirim permintaan ini?")) {
-      return;
-    }
-
-    setIsSaving(true);
-    setError(null);
-
-    try {
-      if (isEditMode) {
-        // Untuk draft yang sudah ada, kita submit saja
-        await permintaanService.submitPermintaan(permintaanId);
-        alert("Permintaan berhasil dikirim!");
-        router.push("/Divisi/permintaan_divisi");
-      } else {
-        // Buat permintaan baru langsung submit
-        const permintaanData = {
-          tanggal_kebutuhan: formData.tanggal_kebutuhan,
-          judul_permintaan: formData.judul_permintaan, // Changed from catatan
-        };
-
-        const createResponse = await permintaanService.createPermintaan(
-          permintaanData
-        );
-        const newPermintaanId = createResponse.data.id;
-
-        // Tambahkan semua barang ke permintaan
-        const barangPromises = barangList.map((barang) =>
-          tambahBarangKePermintaan(newPermintaanId, barang)
-        );
-
-        await Promise.all(barangPromises);
-
-        // Submit permintaan (ubah status dari draft menjadi menunggu)
-        await permintaanService.submitPermintaan(newPermintaanId);
-
-        alert("Permintaan berhasil dikirim!");
-        router.push(`/Divisi/detail_permintaan?id=${newPermintaanId}`);
-      }
-    } catch (error) {
-      console.error("Error sending permintaan:", error);
-      setError(error.error || "Gagal mengirim permintaan");
-      alert(error.error || "Gagal mengirim permintaan");
-    } finally {
-      setIsSaving(false);
-    }
-  };
+  } catch (error) {
+    console.error("Error sending permintaan:", error);
+    setError(error.error || "Gagal mengirim permintaan");
+    alert(error.error || "Gagal mengirim permintaan");
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   return (
     <ProtectedRoute allowedRoles={["pemohon"]}>
@@ -766,8 +841,8 @@ export default function FormPermintaanBarangPage() {
                     </label>
                     <input
                       type="text"
-                      name="judul_permintaan"
-                      value={formData.judul_permintaan}
+                      name="catatan"
+                      value={formData.catatan}
                       onChange={handleInputChange}
                       className="w-full border border-gray-300 rounded px-3 py-2 mt-1 text-gray-700"
                       placeholder="Masukkan judul permintaan"
@@ -908,45 +983,62 @@ export default function FormPermintaanBarangPage() {
                   </div>
 
                   {/* Jumlah */}
-                  <div>
-                    <label className="font-medium text-gray-700">
-                      Jumlah *
-                    </label>
-                    <input
-                      type="number"
-                      name="jumlah"
-                      value={barangForm.jumlah}
-                      onChange={handleBarangInputChange}
-                      className="w-full border border-gray-300 rounded px-3 py-2 mt-1 text-gray-700"
-                      placeholder="0"
-                      min="1"
-                      required
-                      disabled={!barangForm.nama_barang}
-                    />
-                    {!barangForm.nama_barang && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        Isi nama barang terlebih dahulu
-                      </p>
-                    )}
-                  </div>
+<div>
+  <label className="font-medium text-gray-700">
+    Jumlah *
+  </label>
+  <input
+    type="number"
+    name="jumlah"
+    value={barangForm.jumlah}
+    onChange={handleBarangInputChange}
+    className={`w-full border ${
+      barangForm.jumlahError 
+        ? 'border-red-500 bg-red-50' 
+        : 'border-gray-300'
+    } rounded px-3 py-2 mt-1 text-gray-700`}
+    placeholder="0"
+    min="1"
+    required
+    disabled={!barangForm.nama_barang}
+  />
+  {!barangForm.nama_barang && (
+    <p className="text-xs text-gray-500 mt-1">
+      Isi nama barang terlebih dahulu
+    </p>
+  )}
+  {barangForm.jumlahError && (
+    <p className="text-xs text-red-600 mt-1">
+      ⚠️ {barangForm.jumlahError}
+    </p>
+  )}
+</div>
 
                   {/* Info Stok */}
-                  {barangForm.stok_available > 0 && (
-                    <div>
-                      <label className="font-medium text-gray-700">
-                        Stok Tersedia
-                      </label>
-                      <div className="p-2 bg-green-50 text-green-700 rounded border border-green-200 mt-1">
-                        <div className="flex items-center">
-                          <span className="font-medium mr-2">📦</span>
-                          <span>
-                            Tersedia: {barangForm.stok_available}{" "}
-                            {barangForm.satuan}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+{barangForm.stok_available > 0 && (
+  <div>
+    <label className="font-medium text-gray-700">
+      Stok Tersedia
+    </label>
+    <div className={`p-2 rounded border mt-1 ${
+      barangForm.jumlah && parseInt(barangForm.jumlah) > barangForm.stok_available
+        ? 'bg-red-50 text-red-700 border-red-200'
+        : 'bg-green-50 text-green-700 border-green-200'
+    }`}>
+      <div className="flex items-center">
+        <span className="font-medium mr-2">📦</span>
+        <span>
+          Tersedia: {barangForm.stok_available} {barangForm.satuan}
+        </span>
+        {barangForm.jumlah && parseInt(barangForm.jumlah) > barangForm.stok_available && (
+          <span className="ml-2 text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded">
+            ⚠️ Melebihi Stok
+          </span>
+        )}
+      </div>
+    </div>
+  </div>
+)}
 
                   {/* Spesifikasi (BEBAS) */}
                   <div>
@@ -1091,14 +1183,34 @@ export default function FormPermintaanBarangPage() {
                                 {barang.keterangan || "-"}
                               </td>
                               <td className="px-4 py-3 border text-center">
-                                {barang.stok_available > 0 ? (
-                                  <span className="text-green-600 font-medium">
-                                    {barang.stok_available}
-                                  </span>
-                                ) : (
-                                  <span className="text-gray-400">-</span>
-                                )}
-                              </td>
+  <div className="flex flex-col items-center">
+    <span className="font-medium">{barang.jumlah}</span>
+    {barang.stok_available > 0 && barang.jumlah > barang.stok_available && (
+      <span className="text-xs text-red-600 mt-1">
+        ⚠️ Melebihi stok ({barang.stok_available})
+      </span>
+    )}
+  </div>
+</td>
+
+<td className="px-4 py-3 border text-center">
+  {barang.stok_available > 0 ? (
+    <div className="flex flex-col items-center">
+      <span className={`font-medium ${
+        barang.jumlah > barang.stok_available ? 'text-red-600' : 'text-green-600'
+      }`}>
+        {barang.stok_available}
+      </span>
+      {barang.jumlah > barang.stok_available && (
+        <span className="text-xs text-red-600">
+          ❌ Melebihi
+        </span>
+      )}
+    </div>
+  ) : (
+    <span className="text-gray-400">-</span>
+  )}
+</td>
                               <td className="px-4 py-3 border text-center">
                                 <button
                                   onClick={() => handleHapusBarang(index)}
@@ -1125,22 +1237,49 @@ export default function FormPermintaanBarangPage() {
                 )}
 
                 {/* Tombol Simpan & Kirim */}
-                <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-                  <button
-                    onClick={handleSimpanDraft}
-                    disabled={isSaving || barangList.length === 0}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSaving ? "⏳ Menyimpan..." : "💾 Simpan Draft"}
-                  </button>
-                  <button
-                    onClick={handleKirim}
-                    disabled={isSaving || barangList.length === 0}
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSaving ? "⏳ Mengirim..." : "📤 Kirim Permintaan"}
-                  </button>
-                </div>
+{/* Tombol Simpan & Kirim */}
+<div className="flex justify-end gap-3 mt-6 pt-4 border-t">
+  <button
+    onClick={handleSimpanDraft}
+    disabled={
+      isSaving || 
+      barangList.length === 0 ||
+      barangList.some(barang => barang.stok_available > 0 && barang.jumlah > barang.stok_available)
+    }
+    className={`px-6 py-2.5 rounded font-medium ${
+      barangList.some(barang => barang.stok_available > 0 && barang.jumlah > barang.stok_available)
+        ? 'bg-gray-400 cursor-not-allowed text-white'
+        : 'bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed'
+    }`}
+    title={
+      barangList.some(barang => barang.stok_available > 0 && barang.jumlah > barang.stok_available)
+        ? "Ada barang yang melebihi stok tersedia"
+        : "Simpan permintaan sebagai draft"
+    }
+  >
+    {isSaving ? "⏳ Menyimpan..." : "💾 Simpan Draft"}
+  </button>
+  <button
+    onClick={handleKirim}
+    disabled={
+      isSaving || 
+      barangList.length === 0 ||
+      barangList.some(barang => barang.stok_available > 0 && barang.jumlah > barang.stok_available)
+    }
+    className={`px-6 py-2.5 rounded font-medium ${
+      barangList.some(barang => barang.stok_available > 0 && barang.jumlah > barang.stok_available)
+        ? 'bg-gray-400 cursor-not-allowed text-white'
+        : 'bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed'
+    }`}
+    title={
+      barangList.some(barang => barang.stok_available > 0 && barang.jumlah > barang.stok_available)
+        ? "Ada barang yang melebihi stok tersedia"
+        : "Kirim permintaan untuk diverifikasi"
+    }
+  >
+    {isSaving ? "⏳ Mengirim..." : "📤 Kirim Permintaan"}
+  </button>
+</div>
               </div>
 
               {/* Garis bawah hijau */}

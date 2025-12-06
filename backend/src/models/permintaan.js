@@ -2,24 +2,32 @@ import dbPool from "../config/database.js";
 
 const Permintaan = {
   // Create new permintaan
-  create: async (permintaanData) => {
-    const { user_id, tanggal_kebutuhan, catatan } = permintaanData;
+// Create new permintaan
+create: async (permintaanData) => {
+  let { user_id, tanggal_kebutuhan, catatan } = permintaanData;
 
-    // Generate nomor_permintaan unik menggunakan timestamp
-    const nomor_permintaan = `REQ-${Date.now()}`;
+  // ✅ KONVERSI TANGGAL: Ubah format ISO ke YYYY-MM-DD jika perlu
+  if (tanggal_kebutuhan && typeof tanggal_kebutuhan === 'string' && tanggal_kebutuhan.includes('T')) {
+    const dateObj = new Date(tanggal_kebutuhan);
+    tanggal_kebutuhan = dateObj.toISOString().split('T')[0];
+    console.log("📅 Model Create - Tanggal dikonversi ke:", tanggal_kebutuhan);
+  }
 
-    const query = `
-      INSERT INTO permintaan (nomor_permintaan, user_id, tanggal_kebutuhan, catatan, status) 
-      VALUES (?, ?, ?, ?, 'draft')
-    `;
-    const [result] = await dbPool.execute(query, [
-      nomor_permintaan,
-      user_id,
-      tanggal_kebutuhan,
-      catatan,
-    ]);
-    return result.insertId;
-  },
+  // Generate nomor_permintaan unik menggunakan timestamp
+  const nomor_permintaan = `REQ-${Date.now()}`;
+
+  const query = `
+    INSERT INTO permintaan (nomor_permintaan, user_id, tanggal_kebutuhan, catatan, status) 
+    VALUES (?, ?, ?, ?, 'draft')
+  `;
+  const [result] = await dbPool.execute(query, [
+    nomor_permintaan,
+    user_id,
+    tanggal_kebutuhan,
+    catatan,
+  ]);
+  return result.insertId;
+},
 
   // Get permintaan by user ID
   findByUserId: async (userId) => {
@@ -74,65 +82,72 @@ const Permintaan = {
   },
 
   // Get permintaan by user ID dengan pagination, filter, dan search - UPDATE
-  findByUserIdWithPagination: async (
+// Get permintaan by user ID dengan pagination, filter, dan search - UPDATE
+findByUserIdWithPagination: async (
+  userId,
+  page = 1,
+  limit = 5,
+  filters = {}
+) => {
+  const offset = (page - 1) * limit;
+  const pageNum = parseInt(page);
+  const limitNum = parseInt(limit);
+  const offsetNum = parseInt(offset);
+
+  console.log("📊 Pagination params dengan filter:", {
     userId,
-    page = 1,
-    limit = 5,
-    filters = {}
-  ) => {
-    const offset = (page - 1) * limit;
-    const pageNum = parseInt(page);
-    const limitNum = parseInt(limit);
-    const offsetNum = parseInt(offset);
+    pageNum,
+    limitNum,
+    offsetNum,
+    filters,
+  });
 
-    console.log("📊 Pagination params dengan filter:", {
-      userId,
-      pageNum,
-      limitNum,
-      offsetNum,
-      filters,
-    });
-
-    let query = `
-    SELECT p.*, u.nama_lengkap, d.nama_divisi 
+  let query = `
+    SELECT 
+      p.*, 
+      u.nama_lengkap, 
+      d.nama_divisi,
+      (SELECT COUNT(*) 
+       FROM barang_permintaan bp 
+       WHERE bp.permintaan_id = p.id) as jumlah_barang
     FROM permintaan p 
     JOIN users u ON p.user_id = u.id 
     JOIN divisi d ON u.divisi_id = d.id 
     WHERE p.user_id = ?
   `;
 
-    let countQuery = `
+  let countQuery = `
     SELECT COUNT(*) as total 
     FROM permintaan p 
     JOIN users u ON p.user_id = u.id 
     WHERE p.user_id = ?
   `;
 
-    const values = [userId];
-    const countValues = [userId];
+  const values = [userId];
+  const countValues = [userId];
 
-    // ✅ PERBAIKAN: Default exclude status draft untuk halaman permintaan
-    // Jika tidak ada filter status atau status adalah "semua", exclude draft
-    let shouldExcludeDraft = true;
+  // ✅ PERBAIKAN: Default exclude status draft untuk halaman permintaan
+  // Jika tidak ada filter status atau status adalah "semua", exclude draft
+  let shouldExcludeDraft = true;
 
-    // Filter by status
-    if (filters.status && filters.status !== "" && filters.status !== "semua") {
-      query += " AND p.status = ?";
-      countQuery += " AND p.status = ?";
-      values.push(filters.status);
-      countValues.push(filters.status);
-      shouldExcludeDraft = false; // Jika ada filter status spesifik, jangan exclude draft
-    }
+  // Filter by status
+  if (filters.status && filters.status !== "" && filters.status !== "semua") {
+    query += " AND p.status = ?";
+    countQuery += " AND p.status = ?";
+    values.push(filters.status);
+    countValues.push(filters.status);
+    shouldExcludeDraft = false; // Jika ada filter status spesifik, jangan exclude draft
+  }
 
-    // Exclude draft jika tidak ada filter status atau filter "semua"
-    if (shouldExcludeDraft) {
-      query += " AND p.status != 'draft'";
-      countQuery += " AND p.status != 'draft'";
-    }
+  // Exclude draft jika tidak ada filter status atau filter "semua"
+  if (shouldExcludeDraft) {
+    query += " AND p.status != 'draft'";
+    countQuery += " AND p.status != 'draft'";
+  }
 
-    // Search by nomor permintaan atau nama barang
-    if (filters.search) {
-      query += ` AND (
+  // Search by nomor permintaan atau nama barang
+  if (filters.search) {
+    query += ` AND (
       p.nomor_permintaan LIKE ? OR 
       p.id IN (
         SELECT DISTINCT bp.permintaan_id 
@@ -140,7 +155,7 @@ const Permintaan = {
         WHERE bp.nama_barang LIKE ? OR bp.kategori_barang LIKE ?
       )
     )`;
-      countQuery += ` AND (
+    countQuery += ` AND (
       p.nomor_permintaan LIKE ? OR 
       p.id IN (
         SELECT DISTINCT bp.permintaan_id 
@@ -148,51 +163,51 @@ const Permintaan = {
         WHERE bp.nama_barang LIKE ? OR bp.kategori_barang LIKE ?
       )
     )`;
-      const searchTerm = `%${filters.search}%`;
-      values.push(searchTerm, searchTerm, searchTerm);
-      countValues.push(searchTerm, searchTerm, searchTerm);
-    }
+    const searchTerm = `%${filters.search}%`;
+    values.push(searchTerm, searchTerm, searchTerm);
+    countValues.push(searchTerm, searchTerm, searchTerm);
+  }
 
-    // Filter by date range
-    if (filters.start_date && filters.end_date) {
-      query += " AND DATE(p.created_at) BETWEEN ? AND ?";
-      countQuery += " AND DATE(p.created_at) BETWEEN ? AND ?";
-      values.push(filters.start_date, filters.end_date);
-      countValues.push(filters.start_date, filters.end_date);
-    }
+  // Filter by date range
+  if (filters.start_date && filters.end_date) {
+    query += " AND DATE(p.created_at) BETWEEN ? AND ?";
+    countQuery += " AND DATE(p.created_at) BETWEEN ? AND ?";
+    values.push(filters.start_date, filters.end_date);
+    countValues.push(filters.start_date, filters.end_date);
+  }
 
-    query += " ORDER BY p.created_at DESC";
-    query += ` LIMIT ${limitNum} OFFSET ${offsetNum}`;
+  query += " ORDER BY p.created_at DESC";
+  query += ` LIMIT ${limitNum} OFFSET ${offsetNum}`;
 
-    console.log("🔍 Query dengan filter:", query);
-    console.log("📊 Values dengan filter:", values);
+  console.log("🔍 Query dengan filter:", query);
+  console.log("📊 Values dengan filter:", values);
 
-    try {
-      const [rows] = await dbPool.execute(query, values);
-      const [countRows] = await dbPool.execute(countQuery, countValues);
+  try {
+    const [rows] = await dbPool.execute(query, values);
+    const [countRows] = await dbPool.execute(countQuery, countValues);
 
-      const total = countRows[0].total;
-      const totalPages = Math.ceil(total / limitNum);
+    const total = countRows[0].total;
+    const totalPages = Math.ceil(total / limitNum);
 
-      console.log(
-        "✅ Query dengan filter successful. Total:",
-        total,
-        "Total pages:",
-        totalPages
-      );
+    console.log(
+      "✅ Query dengan filter successful. Total:",
+      total,
+      "Total pages:",
+      totalPages
+    );
 
-      return {
-        data: rows,
-        total: total,
-        page: pageNum,
-        limit: limitNum,
-        totalPages: totalPages,
-      };
-    } catch (error) {
-      console.error("💥 Database query dengan filter error:", error);
-      throw error;
-    }
-  },
+    return {
+      data: rows,
+      total: total,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: totalPages,
+    };
+  } catch (error) {
+    console.error("💥 Database query dengan filter error:", error);
+    throw error;
+  }
+},
 
   // Get count permintaan by status untuk dashboard
   getCountByStatus: async (userId) => {
@@ -327,92 +342,135 @@ const Permintaan = {
   },
 
   // Get draft permintaan by user ID (untuk halaman draft)
-  findDraftByUserIdWithPagination: async (
+  // Get draft permintaan by user ID (untuk halaman draft)
+findDraftByUserIdWithPagination: async (
+  userId,
+  page = 1,
+  limit = 5,
+  filters = {}
+) => {
+  const offset = (page - 1) * limit;
+  const pageNum = parseInt(page);
+  const limitNum = parseInt(limit);
+  const offsetNum = parseInt(offset);
+
+  console.log("📝 Getting draft permintaan:", {
     userId,
-    page = 1,
-    limit = 5,
-    filters = {}
-  ) => {
-    const offset = (page - 1) * limit;
-    const pageNum = parseInt(page);
-    const limitNum = parseInt(limit);
-    const offsetNum = parseInt(offset);
+    pageNum,
+    limitNum,
+    offsetNum,
+    filters,
+  });
 
-    console.log("📝 Getting draft permintaan:", {
-      userId,
-      pageNum,
-      limitNum,
-      offsetNum,
-      filters,
-    });
-
-    let query = `
-    SELECT p.*, u.nama_lengkap, d.nama_divisi 
+  let query = `
+    SELECT 
+      p.*, 
+      u.nama_lengkap, 
+      d.nama_divisi,
+      (SELECT SUM(bp.jumlah) 
+       FROM barang_permintaan bp 
+       WHERE bp.permintaan_id = p.id) as jumlah_barang_total,
+      (SELECT COUNT(*) 
+       FROM barang_permintaan bp 
+       WHERE bp.permintaan_id = p.id) as jumlah_item_barang
     FROM permintaan p 
     JOIN users u ON p.user_id = u.id 
     JOIN divisi d ON u.divisi_id = d.id 
     WHERE p.user_id = ? AND p.status = 'draft'
   `;
 
-    let countQuery = `
+  let countQuery = `
     SELECT COUNT(*) as total 
     FROM permintaan p 
     JOIN users u ON p.user_id = u.id 
     WHERE p.user_id = ? AND p.status = 'draft'
   `;
 
-    const values = [userId];
-    const countValues = [userId];
+  const values = [userId];
+  const countValues = [userId];
 
-    // Search by nomor permintaan atau catatan
-    if (filters.search) {
-      query += ` AND (p.nomor_permintaan LIKE ? OR p.catatan LIKE ?)`;
-      countQuery += ` AND (p.nomor_permintaan LIKE ? OR p.catatan LIKE ?)`;
-      const searchTerm = `%${filters.search}%`;
-      values.push(searchTerm, searchTerm);
-      countValues.push(searchTerm, searchTerm);
-    }
+  // Search by nomor permintaan atau catatan
+  if (filters.search) {
+    query += ` AND (p.nomor_permintaan LIKE ? OR p.catatan LIKE ?)`;
+    countQuery += ` AND (p.nomor_permintaan LIKE ? OR p.catatan LIKE ?)`;
+    const searchTerm = `%${filters.search}%`;
+    values.push(searchTerm, searchTerm);
+    countValues.push(searchTerm, searchTerm);
+  }
 
-    // Filter by date range
-    if (filters.start_date && filters.end_date) {
-      query += " AND DATE(p.created_at) BETWEEN ? AND ?";
-      countQuery += " AND DATE(p.created_at) BETWEEN ? AND ?";
-      values.push(filters.start_date, filters.end_date);
-      countValues.push(filters.start_date, filters.end_date);
-    }
+  // Filter by date range
+  if (filters.start_date && filters.end_date) {
+    query += " AND DATE(p.created_at) BETWEEN ? AND ?";
+    countQuery += " AND DATE(p.created_at) BETWEEN ? AND ?";
+    values.push(filters.start_date, filters.end_date);
+    countValues.push(filters.start_date, filters.end_date);
+  }
 
-    query += " ORDER BY p.created_at DESC";
-    query += ` LIMIT ${limitNum} OFFSET ${offsetNum}`;
+  query += " ORDER BY p.created_at DESC";
+  query += ` LIMIT ${limitNum} OFFSET ${offsetNum}`;
 
-    console.log("🔍 Draft query:", query);
-    console.log("📊 Draft query values:", values);
+  console.log("🔍 Draft query:", query);
+  console.log("📊 Draft query values:", values);
 
-    try {
-      const [rows] = await dbPool.execute(query, values);
-      const [countRows] = await dbPool.execute(countQuery, countValues);
+  try {
+    const [rows] = await dbPool.execute(query, values);
+    const [countRows] = await dbPool.execute(countQuery, countValues);
 
-      const total = countRows[0].total;
-      const totalPages = Math.ceil(total / limitNum);
+    const total = countRows[0].total;
+    const totalPages = Math.ceil(total / limitNum);
 
-      console.log(
-        "✅ Draft query successful. Total:",
-        total,
-        "Total pages:",
-        totalPages
-      );
+    console.log(
+      "✅ Draft query successful. Total:",
+      total,
+      "Total pages:",
+      totalPages
+    );
 
-      return {
-        data: rows,
-        total: total,
-        page: pageNum,
-        limit: limitNum,
-        totalPages: totalPages,
-      };
-    } catch (error) {
-      console.error("💥 Draft database query error:", error);
-      throw error;
-    }
-  },
+    // Format jumlah barang
+    const formattedRows = rows.map(row => ({
+      ...row,
+      
+      jumlah_item_barang: row.jumlah_item_barang || 0
+    }));
+
+    return {
+      data: formattedRows,
+      total: total,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: totalPages,
+    };
+  } catch (error) {
+    console.error("💥 Draft database query error:", error);
+    throw error;
+  }
+},
+
+// Update permintaan
+// Update permintaan
+update: async (id, permintaanData) => {
+  let { tanggal_kebutuhan, catatan, status } = permintaanData;
+  
+  // ✅ KONVERSI TANGGAL: Ubah format ISO ke YYYY-MM-DD jika perlu
+  if (tanggal_kebutuhan && typeof tanggal_kebutuhan === 'string' && tanggal_kebutuhan.includes('T')) {
+    const dateObj = new Date(tanggal_kebutuhan);
+    tanggal_kebutuhan = dateObj.toISOString().split('T')[0];
+    console.log("📅 Model - Tanggal dikonversi ke:", tanggal_kebutuhan);
+  }
+
+  const query = `
+    UPDATE permintaan 
+    SET tanggal_kebutuhan = ?, catatan = ?, status = ?, updated_at = CURRENT_TIMESTAMP 
+    WHERE id = ?
+  `;
+  const [result] = await dbPool.execute(query, [
+    tanggal_kebutuhan,
+    catatan,
+    status,
+    id,
+  ]);
+  return result.affectedRows;
+},
 };
 
 export default Permintaan;

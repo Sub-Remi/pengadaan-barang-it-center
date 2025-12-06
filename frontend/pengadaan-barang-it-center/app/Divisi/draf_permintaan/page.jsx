@@ -204,87 +204,87 @@ export default function DrafPermintaanPage() {
               </div>
 
               {/* Tabel */}
-              {loading ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto"></div>
-                  <p className="mt-2 text-gray-600">Memuat data...</p>
-                </div>
-              ) : data.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  Tidak ada draf permintaan ditemukan
-                </div>
-              ) : (
-                <>
-                  <table className="w-full border-collapse text-black text-x1">
-                    <thead>
-                      <tr className="bg-white text-left border-b">
-                        <th className="px-6 py-3 font-semibold">No</th>
-                        <th className="px-6 py-3 font-semibold">
-                          Nomor Permintaan
-                        </th>
-                        <th className="px-6 py-3 font-semibold">
-                          Judul/Catatan
-                        </th>
-                        <th className="px-6 py-3 font-semibold">
-                          Tanggal Dibuat
-                        </th>
-                        <th className="px-6 py-3 font-semibold">
-                          Jumlah Barang
-                        </th>
-                        <th className="px-6 py-3 font-semibold text-center">
-                          Aksi
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data.map((row, index) => (
-                        <tr
-                          key={index}
-                          className={`${
-                            index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                          } hover:bg-gray-100`}
-                        >
-                          <td className="px-6 py-3">
-                            {(pagination.currentPage - 1) *
-                              pagination.itemsPerPage +
-                              index +
-                              1}
-                          </td>
-                          <td className="px-6 py-3 font-medium text-gray-800">
-                            {row.nomor_permintaan}
-                          </td>
-                          <td className="px-6 py-3">
-                            {row.catatan || "Tanpa judul"}
-                          </td>
-                          <td className="px-6 py-3">
-                            {new Date(row.created_at).toLocaleDateString(
-                              "id-ID"
-                            )}
-                          </td>
-                          <td className="px-6 py-3">
-                            {/* Jumlah barang perlu diambil dari API detail */}-
-                          </td>
-                          <td className="px-6 py-3 text-center">
-                            <div className="flex justify-center gap-2">
-                              <Link
-                                href={`/Divisi/form_permintaan?edit=${row.id}`}
-                              >
-                                <button className="bg-green-600 hover:bg-green-700 text-white p-2 rounded">
-                                  <FaPen />
-                                </button>
-                              </Link>
-                              <button
-                                onClick={() => handleDeleteDraft(row.id)}
-                                className="bg-red-600 hover:bg-red-700 text-white p-2 rounded"
-                              >
-                                <FaTrash />
-                              </button>
-                            </div>
-                          </td>
+              {/* Tabel */}
+                {loading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto"></div>
+                    <p className="mt-2 text-gray-600">Memuat data...</p>
+                  </div>
+                ) : data.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    Tidak ada draf permintaan ditemukan
+                  </div>
+                ) : (
+                  <>
+                    <table className="w-full border-collapse text-black text-x1">
+                      <thead>
+                        <tr className="bg-white text-left border-b">
+                          <th className="px-6 py-3 font-semibold">No</th>
+                          <th className="px-6 py-3 font-semibold">
+                            Nomor Permintaan
+                          </th>
+                          <th className="px-6 py-3 font-semibold">
+                            Judul
+                          </th>
+                          <th className="px-6 py-3 font-semibold">
+                            Tanggal Dibuat
+                          </th>
+                          <th className="px-6 py-3 font-semibold">
+                            Jumlah Jenis Barang
+                          </th>
+                          <th className="px-6 py-3 font-semibold text-center">
+                            Aksi
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {data.map((row, index) => (
+                          <tr
+                            key={index}
+                            className={`${
+                              index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                            } hover:bg-gray-100`}
+                          >
+                            <td className="px-6 py-3">
+                              {(pagination.currentPage - 1) *
+                                pagination.itemsPerPage +
+                                index + 1}
+                            </td>
+                            <td className="px-6 py-3 font-medium text-gray-800">
+                              {row.nomor_permintaan}
+                            </td>
+                            <td className="px-6 py-3">
+                              {row.catatan}
+                            </td>
+                            <td className="px-6 py-3">
+                              {new Date(row.created_at).toLocaleDateString(
+                                "id-ID"
+                              )}
+                            </td>
+                            <td className="px-6 py-3">
+                              {row.jumlah_item || 0} jenis
+                            </td>
+                            <td className="px-6 py-3 text-center">
+                              <div className="flex justify-center gap-2">
+                                <Link
+                                  href={`/Divisi/form_permintaan?edit=${row.id}`}
+                                >
+                                  <button className="bg-green-600 hover:bg-green-700 text-white p-2 rounded">
+                                    <FaPen />
+                                  </button>
+                                </Link>
+                                <button
+                                  onClick={() => handleDeleteDraft(row.id)}
+                                  className="bg-red-600 hover:bg-red-700 text-white p-2 rounded"
+                                >
+                                  <FaTrash />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
 
                   {/* Pagination */}
                   <div className="flex justify-between items-center px-6 py-4 bg-white border-t">
