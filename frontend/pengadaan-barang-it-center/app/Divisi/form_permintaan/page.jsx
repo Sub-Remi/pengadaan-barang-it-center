@@ -20,7 +20,6 @@ export default function FormPermintaanBarangPage() {
   const [loadingDropdown, setLoadingDropdown] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
-
   const [originalBarangIds, setOriginalBarangIds] = useState([]);
 
   // Data dropdown
@@ -32,6 +31,7 @@ export default function FormPermintaanBarangPage() {
   const [kategoriSearch, setKategoriSearch] = useState("");
   const [satuanSearch, setSatuanSearch] = useState("");
   const [stokSearch, setStokSearch] = useState("");
+  const [namaBarangSearch, setNamaBarangSearch] = useState("");
 
   // UI states
   const [showKategoriDropdown, setShowKategoriDropdown] = useState(false);
@@ -43,18 +43,52 @@ export default function FormPermintaanBarangPage() {
     judul_permintaan: "", // Changed from catatan to judul_permintaan
   });
 
+  // State untuk form barang - DIPERBARUI
   const [barangForm, setBarangForm] = useState({
-    kategori_barang: "",
-    kategori_barang_id: null,
     nama_barang: "",
+    nama_barang_display: "", // Untuk display di input
     spesifikasi: "",
-    satuan: "",
-    satuan_barang_id: null,
     jumlah: "",
     keterangan: "",
+    // Data otomatis dari stok
     stok_barang_id: null,
     stok_available: 0,
+    kategori_barang: "",
+    kategori_barang_id: null,
+    satuan: "",
+    satuan_barang_id: null,
+    // Flag untuk menandai apakah data sudah diambil dari stok
+    isFromStok: false,
   });
+
+  // Debounced search untuk nama barang
+  const debouncedSearchNamaBarang = useCallback(
+    debounce(async (search) => {
+      try {
+        setLoadingDropdown(true);
+        // Cari semua barang tanpa filter kategori
+        const data = await dropdownService.getStokBarang(search, null);
+        setStokBarangOptions(data);
+        setShowStokDropdown(true);
+      } catch (error) {
+        console.error("Error searching barang:", error);
+        setError("Gagal memuat data barang");
+      } finally {
+        setLoadingDropdown(false);
+      }
+    }, 300),
+    []
+  );
+
+  // Handle search nama barang
+  useEffect(() => {
+    if (namaBarangSearch !== undefined && namaBarangSearch.trim() !== "") {
+      debouncedSearchNamaBarang(namaBarangSearch);
+    } else {
+      setStokBarangOptions([]);
+      setShowStokDropdown(false);
+    }
+  }, [namaBarangSearch, debouncedSearchNamaBarang]);
 
   // Debounced search functions
   const debouncedSearchKategori = useCallback(
@@ -120,70 +154,37 @@ export default function FormPermintaanBarangPage() {
 
       try {
         setLoading(true);
-        // Load data permintaan
         const permintaanResponse = await permintaanService.getDetailPermintaan(
           editId
         );
         const permintaan = permintaanResponse.data;
 
-        console.log("📋 Data permintaan dari API:", permintaan);
-        console.log("📦 Data barang dari API:", permintaan.barang);
-
         setFormData({
           tanggal_kebutuhan: permintaan.tanggal_kebutuhan,
-          judul_permintaan: permintaan.judul_permintaan || permintaan.catatan || "", // Handle both fields
+          judul_permintaan:
+            permintaan.judul_permintaan || permintaan.catatan || "",
         });
 
-        // LOGGING: Cek struktur data
-        console.log("🔍 Struktur lengkap response:", permintaanResponse);
-
-        // Handle data barang berdasarkan struktur yang ada
         let barangData = [];
-
-        // Cek apakah barang ada dan dalam format apa
         if (permintaan.barang && permintaan.barang.data) {
-          // Format: { barang: { data: [...], pagination: {...} } }
-          console.log(
-            "📊 Barang dalam format paginated:",
-            permintaan.barang.data
-          );
           barangData = permintaan.barang.data;
         } else if (Array.isArray(permintaan.barang)) {
-          // Format: { barang: [...] }
-          console.log(
-            "📊 Barang dalam format array langsung:",
-            permintaan.barang
-          );
           barangData = permintaan.barang;
-        } else if (permintaan.barang) {
-          // Format lain? Log untuk debugging
-          console.log("❓ Format barang tidak dikenal:", permintaan.barang);
         }
 
-        // Map data barang ke format yang diharapkan
         const mappedBarangData = barangData.map((barang) => {
-          console.log("📝 Processing barang item:", barang);
-
-          // Debug: Tampilkan semua properti barang
-          console.log("🔍 Properties barang:", Object.keys(barang));
-
           let kategori_barang_id = null;
           let satuan_barang_id = null;
           let nama_satuan = "";
           let stok_available = 0;
+          let isFromStok = false;
 
-          // Cek jika ada stok_barang object
           if (barang.stok_barang) {
-            console.log("🏷️ Ada stok_barang:", barang.stok_barang);
             kategori_barang_id = barang.stok_barang.kategori_barang_id || null;
             satuan_barang_id = barang.stok_barang.satuan_barang_id || null;
             nama_satuan = barang.stok_barang.nama_satuan || "";
             stok_available = barang.stok_barang.stok || 0;
-          }
-          // Cek jika ada properti stok_barang_id tapi tidak ada stok_barang object
-          else if (barang.stok_barang_id) {
-            console.log("ℹ️ Hanya ada stok_barang_id:", barang.stok_barang_id);
-            // Kita perlu mengambil data stok dari API jika diperlukan
+            isFromStok = true;
           }
 
           return {
@@ -191,6 +192,7 @@ export default function FormPermintaanBarangPage() {
             kategori_barang: barang.kategori_barang || "",
             kategori_barang_id: kategori_barang_id,
             nama_barang: barang.nama_barang || "",
+            nama_barang_display: barang.nama_barang || "", // Tambah field display
             spesifikasi: barang.spesifikasi || "",
             satuan: nama_satuan || barang.satuan || "",
             satuan_barang_id: satuan_barang_id,
@@ -198,33 +200,19 @@ export default function FormPermintaanBarangPage() {
             keterangan: barang.keterangan || "",
             stok_barang_id: barang.stok_barang_id || null,
             stok_available: stok_available,
+            isFromStok: isFromStok, // Simpan status
           };
         });
 
-        console.log("✅ Processed barang data:", mappedBarangData);
-
-        if (mappedBarangData.length > 0) {
-          setBarangList(mappedBarangData);
-          setOriginalBarangIds(mappedBarangData.map((b) => b.id));
-        } else {
-          console.log("⚠️ Tidak ada barang ditemukan dalam draft");
-          setBarangList([]);
-          setOriginalBarangIds([]);
-        }
-
+        setBarangList(mappedBarangData);
+        setOriginalBarangIds(mappedBarangData.map((b) => b.id));
         setIsEditMode(true);
         setPermintaanId(editId);
       } catch (error) {
         console.error("❌ Error loading draft:", error);
-        console.error(
-          "Error details:",
-          error.response?.data || error.message || error
-        );
         setError(
           "Gagal memuat data draft: " + (error.message || "Unknown error")
         );
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -270,26 +258,13 @@ export default function FormPermintaanBarangPage() {
     } catch (error) {
       console.error("Error loading dropdown data:", error);
       setError("Gagal memuat data dropdown");
-    } finally {
-      setLoading(false);
     }
   };
 
   // Handle klik di luar dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
-      const dropdowns = document.querySelectorAll(".dropdown-container");
-      let isInsideDropdown = false;
-
-      dropdowns.forEach((dropdown) => {
-        if (dropdown.contains(event.target)) {
-          isInsideDropdown = true;
-        }
-      });
-
-      if (!isInsideDropdown) {
-        setShowKategoriDropdown(false);
-        setShowSatuanDropdown(false);
+      if (!event.target.closest(".dropdown-container")) {
         setShowStokDropdown(false);
       }
     };
@@ -331,42 +306,25 @@ export default function FormPermintaanBarangPage() {
     }));
   };
 
+  // Handle barang input change - DIPERBARUI
   const handleBarangInputChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "kategori_barang") {
+    if (name === "nama_barang_display") {
+      // Reset semua data terkait barang jika mengubah nama
       setBarangForm((prev) => ({
         ...prev,
-        [name]: value,
-        kategori_barang_id: null,
-        stok_barang_id: null,
+        nama_barang_display: value,
         nama_barang: "",
-        spesifikasi: "",
+        stok_barang_id: null,
+        stok_available: 0,
+        kategori_barang: "",
+        kategori_barang_id: null,
         satuan: "",
         satuan_barang_id: null,
-        stok_available: 0,
+        isFromStok: false,
       }));
-      setKategoriSearch(value);
-      setShowKategoriDropdown(true);
-    } else if (name === "satuan") {
-      setBarangForm((prev) => ({
-        ...prev,
-        [name]: value,
-        satuan_barang_id: null,
-      }));
-      setSatuanSearch(value);
-      setShowSatuanDropdown(true);
-    } else if (name === "nama_barang") {
-      setBarangForm((prev) => ({
-        ...prev,
-        [name]: value,
-        stok_barang_id: null,
-        stok_available: 0,
-      }));
-      setStokSearch(value);
-      if (barangForm.kategori_barang_id) {
-        setShowStokDropdown(true);
-      }
+      setNamaBarangSearch(value);
     } else {
       setBarangForm((prev) => ({
         ...prev,
@@ -409,11 +367,13 @@ export default function FormPermintaanBarangPage() {
     }
   };
 
+  // Handle select stok barang - DIPERBARUI
   const handleSelectStokBarang = (stokBarang) => {
     if (stokBarang) {
       setBarangForm((prev) => ({
         ...prev,
         nama_barang: stokBarang.nama_barang,
+        nama_barang_display: stokBarang.nama_barang,
         spesifikasi: stokBarang.spesifikasi || "",
         kategori_barang: stokBarang.nama_kategori,
         kategori_barang_id: stokBarang.kategori_barang_id,
@@ -421,29 +381,46 @@ export default function FormPermintaanBarangPage() {
         satuan_barang_id: stokBarang.satuan_barang_id,
         stok_barang_id: stokBarang.id,
         stok_available: stokBarang.stok,
+        isFromStok: true, // Tandai berasal dari stok
       }));
-      setStokSearch("");
+      setNamaBarangSearch("");
       setShowStokDropdown(false);
     }
+  };
+
+  // Reset form barang
+  const resetBarangForm = () => {
+    setBarangForm({
+      nama_barang: "",
+      nama_barang_display: "",
+      spesifikasi: "",
+      jumlah: "",
+      keterangan: "",
+      stok_barang_id: null,
+      stok_available: 0,
+      kategori_barang: "",
+      kategori_barang_id: null,
+      satuan: "",
+      satuan_barang_id: null,
+      isFromStok: false,
+    });
+    setNamaBarangSearch("");
+    setStokBarangOptions([]);
   };
 
   //==================================
 
   const validateBarangForm = () => {
-    if (!barangForm.kategori_barang_id) {
-      alert("Pilih kategori barang terlebih dahulu!");
-      return false;
-    }
     if (!barangForm.nama_barang.trim()) {
-      alert("Nama barang harus diisi!");
+      alert("Nama barang harus diisi! Silakan pilih dari dropdown.");
       return false;
     }
     if (!barangForm.jumlah || parseInt(barangForm.jumlah) <= 0) {
       alert("Jumlah harus lebih dari 0!");
       return false;
     }
-    if (!barangForm.satuan_barang_id) {
-      alert("Pilih satuan terlebih dahulu!");
+    if (!barangForm.isFromStok) {
+      alert("Barang harus dipilih dari daftar stok yang tersedia!");
       return false;
     }
     return true;
@@ -453,39 +430,24 @@ export default function FormPermintaanBarangPage() {
     if (!validateBarangForm()) return;
 
     const newBarang = {
-      id: Date.now(), // temporary ID
-      kategori_barang: barangForm.kategori_barang,
-      kategori_barang_id: barangForm.kategori_barang_id,
+      id: Date.now(),
       nama_barang: barangForm.nama_barang,
+      nama_barang_display: barangForm.nama_barang_display,
       spesifikasi: barangForm.spesifikasi || "",
-      satuan: barangForm.satuan,
-      satuan_barang_id: barangForm.satuan_barang_id,
       jumlah: parseInt(barangForm.jumlah),
       keterangan: barangForm.keterangan || "",
+      // Data otomatis dari stok
       stok_barang_id: barangForm.stok_barang_id,
       stok_available: barangForm.stok_available,
+      kategori_barang: barangForm.kategori_barang,
+      kategori_barang_id: barangForm.kategori_barang_id,
+      satuan: barangForm.satuan,
+      satuan_barang_id: barangForm.satuan_barang_id,
+      isFromStok: barangForm.isFromStok,
     };
 
     setBarangList([...barangList, newBarang]);
-
-    // Reset form barang
-    setBarangForm({
-      kategori_barang: "",
-      kategori_barang_id: null,
-      nama_barang: "",
-      spesifikasi: "",
-      satuan: "",
-      satuan_barang_id: null,
-      jumlah: "",
-      keterangan: "",
-      stok_barang_id: null,
-      stok_available: 0,
-    });
-
-    setKategoriSearch("");
-    setSatuanSearch("");
-    setStokSearch("");
-    setStokBarangOptions([]);
+    resetBarangForm();
   };
 
   const handleHapusBarang = (index) => {
@@ -524,8 +486,6 @@ export default function FormPermintaanBarangPage() {
         tanggal_kebutuhan: formData.tanggal_kebutuhan,
         judul_permintaan: formData.judul_permintaan, // Changed from catatan
       };
-
-      
 
       // 2. Kita perlu handle update barang
       // Untuk simplifikasi, kita hapus semua barang lama dan tambah yang baru
@@ -567,7 +527,7 @@ export default function FormPermintaanBarangPage() {
         // Buat draft baru
         const permintaanData = {
           tanggal_kebutuhan: formData.tanggal_kebutuhan,
-          judul_permintaan: formData.judul_permintaan // Changed from catatan
+          judul_permintaan: formData.judul_permintaan, // Changed from catatan
         };
 
         const createResponse = await permintaanService.createPermintaan(
@@ -629,7 +589,7 @@ export default function FormPermintaanBarangPage() {
         // Buat permintaan baru langsung submit
         const permintaanData = {
           tanggal_kebutuhan: formData.tanggal_kebutuhan,
-          judul_permintaan: formData.judul_permintaan// Changed from catatan
+          judul_permintaan: formData.judul_permintaan, // Changed from catatan
         };
 
         const createResponse = await permintaanService.createPermintaan(
@@ -817,166 +777,133 @@ export default function FormPermintaanBarangPage() {
                 </div>
               </div>
 
-              {/* Data Barang */}
+              {/* Data Barang - BAGIAN YANG DIUBAH */}
               <div className="px-6 py-4 border-b-4 border-b-gray-300">
                 <h4 className="text-lg font-semibold mb-4 text-gray-800">
                   Data Barang
                 </h4>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="relative dropdown-container">
-                    <label className="font-medium text-gray-700">Kategori Barang *</label>
-                    <input
-                      type="text"
-                      name="kategori_barang"
-                      value={barangForm.kategori_barang}
-                      onChange={handleBarangInputChange}
-                      onFocus={() => {
-                        if (barangForm.stok_barang_id === null) {
-                          if (kategoriOptions.length === 0) {
-                            loadInitialKategori();
-                          } else {
-                            setShowKategoriDropdown(true);
-                          }
-                        }
-                      }}
-                      disabled={barangForm.stok_barang_id !== null}
-                      className={`w-full border border-gray-300 rounded px-3 py-2 mt-1 text-gray-700 ${
-                        barangForm.stok_barang_id !== null
-                          ? 'bg-gray-100 cursor-not-allowed'
-                          : ''
-                      }`}
-                      placeholder={
-                        barangForm.stok_barang_id !== null
-                          ? 'Kategori terkunci karena barang sudah dipilih'
-                          : 'Cari atau ketik kategori'
-                      }
-                      required
-                    />
-                    {showKategoriDropdown && barangForm.stok_barang_id === null && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
-                        {loadingDropdown ? (
-                          <div className="p-2 text-center text-gray-500">Memuat...</div>
-                        ) : kategoriOptions.length > 0 ? (
-                          kategoriOptions.map((kategori) => (
-                            <div
-                              key={kategori.id}
-                              className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700"
-                              onClick={() => handleSelectKategori(kategori)}
-                            >
-                              {kategori.nama_kategori}
-                            </div>
-                          ))
-                        ) : (
-                          <div className="p-2 text-center text-gray-500">Tidak ditemukan</div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Nama Barang */}
-                  <div className="relative dropdown-container">
+                  {/* Nama Barang (WAJIB) */}
+                  <div className="relative dropdown-container md:col-span-2">
                     <label className="font-medium text-gray-700">
                       Nama Barang *
+                      <span className="text-sm text-gray-500 ml-2">
+                        (Cari dan pilih dari daftar stok)
+                      </span>
                     </label>
                     <div className="relative">
                       <input
                         type="text"
-                        name="nama_barang"
-                        value={barangForm.nama_barang}
+                        name="nama_barang_display"
+                        value={barangForm.nama_barang_display}
                         onChange={handleBarangInputChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2 mt-1 text-gray-700"
-                        placeholder={
-                          barangForm.kategori_barang_id
-                            ? "Cari atau ketik nama barang"
-                            : "Pilih kategori terlebih dahulu"
-                        }
-                        disabled={!barangForm.kategori_barang_id}
+                        onFocus={() => {
+                          if (barangForm.nama_barang_display) {
+                            setShowStokDropdown(true);
+                          }
+                        }}
+                        className="w-full border border-gray-300 rounded px-3 py-2 mt-1 text-gray-700 pr-10"
+                        placeholder="Ketik untuk mencari barang..."
                         required
+                        autoComplete="off"
                       />
-                      {barangForm.kategori_barang_id && (
-                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                          <span className="text-xs text-gray-500">
-                            🔍 Search
-                          </span>
-                        </div>
-                      )}
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <span className="text-gray-400">🔍</span>
+                      </div>
                     </div>
-                    {showStokDropdown &&
-                      barangForm.kategori_barang_id &&
-                      barangForm.stok_barang_id === null && (
-                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
-                          {loadingDropdown ? (
-                            <div className="p-2 text-center text-gray-500">
-                              Memuat...
-                            </div>
-                          ) : stokBarangOptions.length > 0 ? (
-                            stokBarangOptions.map((barang) => (
-                              <div
-                                key={barang.id}
-                                className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 border-b border-gray-100"
-                                onClick={() => handleSelectStokBarang(barang)}
-                              >
-                                <div className="font-medium">
-                                  {barang.nama_barang}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  Kode: {barang.kode_barang} | Stok:{" "}
-                                  {barang.stok}
-                                </div>
-                                {barang.spesifikasi && (
-                                  <div className="text-xs text-gray-400 mt-1">
-                                    {barang.spesifikasi}
-                                  </div>
-                                )}
-                              </div>
-                            ))
-                          ) : (
-                            <div className="p-2 text-center text-gray-500">
-                              Tidak ditemukan
-                            </div>
-                          )}
-                        </div>
-                      )}
-                  </div>
 
-                  {/* Satuan */}
-                  <div className="relative dropdown-container">
-                    <label className="font-medium text-gray-700">Satuan *</label>
-                    <input
-                      type="text"
-                      name="satuan"
-                      value={barangForm.satuan}
-                      onChange={handleBarangInputChange}
-                      onFocus={() => {
-                        if (satuanOptions.length === 0) {
-                          loadInitialSatuan();
-                        } else {
-                          setShowSatuanDropdown(true);
-                        }
-                      }}
-                      className="w-full border border-gray-300 rounded px-3 py-2 mt-1 text-gray-700"
-                      placeholder="Cari atau ketik satuan"
-                      required
-                    />
-                    {showSatuanDropdown && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
+                    {showStokDropdown && (
+                      <div className="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
                         {loadingDropdown ? (
-                          <div className="p-2 text-center text-gray-500">Memuat...</div>
-                        ) : satuanOptions.length > 0 ? (
-                          satuanOptions.map((satuan) => (
+                          <div className="p-3 text-center text-gray-500">
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500 mx-auto"></div>
+                            <p className="mt-1">Memuat...</p>
+                          </div>
+                        ) : stokBarangOptions.length > 0 ? (
+                          stokBarangOptions.map((barang) => (
                             <div
-                              key={satuan.id}
-                              className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700"
-                              onClick={() => handleSelectSatuan(satuan)}
+                              key={barang.id}
+                              className="p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100"
+                              onClick={() => handleSelectStokBarang(barang)}
                             >
-                              {satuan.nama_satuan}
+                              <div className="font-medium text-gray-800">
+                                {barang.nama_barang}
+                              </div>
+                              <div className="text-sm text-gray-600 mt-1">
+                                <span className="inline-block bg-blue-100 text-blue-800 px-2 py-0.5 rounded mr-2">
+                                  {barang.nama_kategori}
+                                </span>
+                                <span className="inline-block bg-green-100 text-green-800 px-2 py-0.5 rounded mr-2">
+                                  {barang.nama_satuan}
+                                </span>
+                                <span className="inline-block bg-gray-100 text-gray-800 px-2 py-0.5 rounded">
+                                  Stok: {barang.stok}
+                                </span>
+                              </div>
+                              {barang.spesifikasi && (
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Spesifikasi: {barang.spesifikasi}
+                                </div>
+                              )}
                             </div>
                           ))
-                        ) : (
-                          <div className="p-2 text-center text-gray-500">Tidak ditemukan</div>
-                        )}
+                        ) : namaBarangSearch ? (
+                          <div className="p-3 text-center text-gray-500">
+                            Barang tidak ditemukan. Pastikan nama barang sudah
+                            benar.
+                          </div>
+                        ) : null}
                       </div>
+                    )}
+                  </div>
+
+                  {/* Kategori Barang (OTOMATIS & TERKUNCI) */}
+                  <div>
+                    <label className="font-medium text-gray-700">
+                      Kategori Barang
+                    </label>
+                    <input
+                      type="text"
+                      value={
+                        barangForm.kategori_barang ||
+                        "Pilih nama barang terlebih dahulu"
+                      }
+                      disabled
+                      className={`w-full border border-gray-300 rounded px-3 py-2 mt-1 ${
+                        barangForm.kategori_barang
+                          ? "bg-gray-50 text-gray-700"
+                          : "bg-gray-100 text-gray-400"
+                      }`}
+                      readOnly
+                    />
+                    {!barangForm.kategori_barang && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        Akan terisi otomatis setelah memilih nama barang
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Satuan (OTOMATIS & TERKUNCI) */}
+                  <div>
+                    <label className="font-medium text-gray-700">Satuan</label>
+                    <input
+                      type="text"
+                      value={
+                        barangForm.satuan || "Pilih nama barang terlebih dahulu"
+                      }
+                      disabled
+                      className={`w-full border border-gray-300 rounded px-3 py-2 mt-1 ${
+                        barangForm.satuan
+                          ? "bg-gray-50 text-gray-700"
+                          : "bg-gray-100 text-gray-400"
+                      }`}
+                      readOnly
+                    />
+                    {!barangForm.satuan && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        Akan terisi otomatis setelah memilih nama barang
+                      </p>
                     )}
                   </div>
 
@@ -994,10 +921,34 @@ export default function FormPermintaanBarangPage() {
                       placeholder="0"
                       min="1"
                       required
+                      disabled={!barangForm.nama_barang}
                     />
+                    {!barangForm.nama_barang && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        Isi nama barang terlebih dahulu
+                      </p>
+                    )}
                   </div>
 
-                  {/* Spesifikasi */}
+                  {/* Info Stok */}
+                  {barangForm.stok_available > 0 && (
+                    <div>
+                      <label className="font-medium text-gray-700">
+                        Stok Tersedia
+                      </label>
+                      <div className="p-2 bg-green-50 text-green-700 rounded border border-green-200 mt-1">
+                        <div className="flex items-center">
+                          <span className="font-medium mr-2">📦</span>
+                          <span>
+                            Tersedia: {barangForm.stok_available}{" "}
+                            {barangForm.satuan}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Spesifikasi (BEBAS) */}
                   <div>
                     <label className="font-medium text-gray-700">
                       Spesifikasi
@@ -1008,11 +959,11 @@ export default function FormPermintaanBarangPage() {
                       value={barangForm.spesifikasi}
                       onChange={handleBarangInputChange}
                       className="w-full border border-gray-300 rounded px-3 py-2 mt-1 text-gray-700"
-                      placeholder="Masukkan spesifikasi"
+                      placeholder="Masukkan spesifikasi (jika berbeda dengan stok)"
                     />
                   </div>
 
-                  {/* Keterangan */}
+                  {/* Keterangan (BEBAS) */}
                   <div className="md:col-span-2">
                     <label className="font-medium text-gray-700">
                       Keterangan
@@ -1026,26 +977,24 @@ export default function FormPermintaanBarangPage() {
                       placeholder="Masukkan keterangan tambahan"
                     />
                   </div>
-
-                  {/* Info Stok */}
-                  {barangForm.stok_available > 0 && (
-                    <div className="md:col-span-2">
-                      <div className="p-2 bg-blue-50 text-blue-700 rounded">
-                        <span className="font-medium">Info Stok:</span>
-                        Tersedia {barangForm.stok_available} unit di gudang
-                      </div>
-                    </div>
-                  )}
                 </div>
 
-                {/* Tombol Tambah */}
-                <div className="mt-4 flex justify-end">
+                {/* Tombol Tambah Barang */}
+                <div className="mt-6 flex justify-end">
                   <button
                     onClick={handleTambahBarang}
-                    disabled={isSaving}
-                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={
+                      isSaving || !barangForm.nama_barang || !barangForm.jumlah
+                    }
+                    className={`px-6 py-2 rounded font-medium ${
+                      barangForm.nama_barang && barangForm.jumlah
+                        ? "bg-green-500 hover:bg-green-600 text-white"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
                   >
-                    Tambah Barang
+                    {barangForm.nama_barang && barangForm.jumlah
+                      ? "➕ Tambah Barang"
+                      : "Lengkapi data terlebih dahulu"}
                   </button>
                 </div>
               </div>
@@ -1054,99 +1003,142 @@ export default function FormPermintaanBarangPage() {
               <div className="px-6 py-4 bg-white">
                 {barangList.length > 0 ? (
                   <>
-                    <table className="w-full border-collapse text-gray-700 text-sm">
-                      <thead>
-                        <tr className="bg-gray-50 text-left">
-                          <th className="px-4 py-2 font-semibold border">No</th>
-                          <th className="px-4 py-2 font-semibold border">
-                            Kategori
-                          </th>
-                          <th className="px-4 py-2 font-semibold border">
-                            Nama Barang
-                          </th>
-                          <th className="px-4 py-2 font-semibold border">
-                            Spesifikasi
-                          </th>
-                          <th className="px-4 py-2 font-semibold border">
-                            Satuan
-                          </th>
-                          <th className="px-4 py-2 font-semibold border">
-                            Jumlah
-                          </th>
-                          <th className="px-4 py-2 font-semibold border">
-                            Keterangan
-                          </th>
-                          <th className="px-4 py-2 font-semibold border">
-                            Aksi
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {barangList.map((barang, index) => (
-                          <tr
-                            key={barang.id}
-                            className={`${
-                              index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                            } hover:bg-gray-100`}
-                          >
-                            <td className="px-4 py-2 border">{index + 1}</td>
-                            <td className="px-4 py-2 border">
-                              {barang.kategori_barang}
-                            </td>
-                            <td className="px-4 py-2 border font-medium">
-                              {barang.nama_barang}
-                            </td>
-                            <td className="px-4 py-2 border text-sm">
-                              {barang.spesifikasi || "-"}
-                            </td>
-                            <td className="px-4 py-2 border">
-                              {barang.satuan}
-                            </td>
-                            <td className="px-4 py-2 border">
-                              {barang.jumlah}
-                            </td>
-                            <td className="px-4 py-2 border">
-                              {barang.keterangan || "-"}
-                            </td>
-                            <td className="px-4 py-2 border">
-                              <button
-                                onClick={() => handleHapusBarang(index)}
-                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
-                              >
-                                Hapus
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    <div className="mb-4">
+                      <h5 className="text-lg font-semibold text-gray-800">
+                        Daftar Barang ({barangList.length} item)
+                      </h5>
+                      <p className="text-sm text-gray-600">
+                        *Kategori dan Satuan terkunci berdasarkan data stok
+                      </p>
+                    </div>
 
-                    {/* Info jumlah barang */}
-                    <div className="mt-4 text-sm text-gray-600">
-                      Total barang: {barangList.length}
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse text-gray-700 text-sm">
+                        <thead>
+                          <tr className="bg-gray-50 text-left">
+                            <th className="px-4 py-3 font-semibold border">
+                              No
+                            </th>
+                            <th className="px-4 py-3 font-semibold border">
+                              Nama Barang
+                            </th>
+                            <th className="px-4 py-3 font-semibold border">
+                              Kategori
+                            </th>
+                            <th className="px-4 py-3 font-semibold border">
+                              Spesifikasi
+                            </th>
+                            <th className="px-4 py-3 font-semibold border">
+                              Satuan
+                            </th>
+                            <th className="px-4 py-3 font-semibold border">
+                              Jumlah
+                            </th>
+                            <th className="px-4 py-3 font-semibold border">
+                              Keterangan
+                            </th>
+                            <th className="px-4 py-3 font-semibold border">
+                              Stok
+                            </th>
+                            <th className="px-4 py-3 font-semibold border">
+                              Aksi
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {barangList.map((barang, index) => (
+                            <tr key={barang.id} className="hover:bg-gray-50">
+                              <td className="px-4 py-3 border text-center">
+                                {index + 1}
+                              </td>
+                              <td className="px-4 py-3 border font-medium">
+                                {barang.nama_barang}
+                                {barang.isFromStok && (
+                                  <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                                    Dari Stok
+                                  </span>
+                                )}
+                              </td>
+                              <td className="px-4 py-3 border">
+                                <div className="flex items-center">
+                                  <span>{barang.kategori_barang}</span>
+                                  <span
+                                    className="ml-2 text-gray-400 text-xs"
+                                    title="Terisi otomatis"
+                                  >
+                                    🔒
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 border">
+                                {barang.spesifikasi || "-"}
+                              </td>
+                              <td className="px-4 py-3 border">
+                                <div className="flex items-center">
+                                  <span>{barang.satuan}</span>
+                                  <span
+                                    className="ml-2 text-gray-400 text-xs"
+                                    title="Terisi otomatis"
+                                  >
+                                    🔒
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 border text-center">
+                                {barang.jumlah}
+                              </td>
+                              <td className="px-4 py-3 border">
+                                {barang.keterangan || "-"}
+                              </td>
+                              <td className="px-4 py-3 border text-center">
+                                {barang.stok_available > 0 ? (
+                                  <span className="text-green-600 font-medium">
+                                    {barang.stok_available}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">-</span>
+                                )}
+                              </td>
+                              <td className="px-4 py-3 border text-center">
+                                <button
+                                  onClick={() => handleHapusBarang(index)}
+                                  className="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded text-sm"
+                                  title="Hapus barang"
+                                >
+                                  Hapus
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   </>
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    Belum ada barang yang ditambahkan
+                    <div className="text-4xl mb-2">📦</div>
+                    <p className="text-lg">Belum ada barang yang ditambahkan</p>
+                    <p className="text-sm mt-1">
+                      Tambahkan barang dengan mengisi form di atas
+                    </p>
                   </div>
                 )}
 
                 {/* Tombol Simpan & Kirim */}
-                <div className="flex justify-end gap-3 mt-6">
+                <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
                   <button
                     onClick={handleSimpanDraft}
                     disabled={isSaving || barangList.length === 0}
-                    className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isSaving ? "Menyimpan..." : "Simpan Draft"}
+                    {isSaving ? "⏳ Menyimpan..." : "💾 Simpan Draft"}
                   </button>
                   <button
                     onClick={handleKirim}
                     disabled={isSaving || barangList.length === 0}
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isSaving ? "Mengirim..." : "Kirim Permintaan"}
+                    {isSaving ? "⏳ Mengirim..." : "📤 Kirim Permintaan"}
                   </button>
                 </div>
               </div>
