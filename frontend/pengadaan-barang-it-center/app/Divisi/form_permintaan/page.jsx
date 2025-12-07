@@ -1176,6 +1176,9 @@ export default function FormPermintaanBarangPage() {
                               Stok
                             </th>
                             <th className="px-4 py-3 font-semibold border">
+                              Sisa Stok
+                            </th>
+                            <th className="px-4 py-3 font-semibold border">
                               Aksi
                             </th>
                           </tr>
