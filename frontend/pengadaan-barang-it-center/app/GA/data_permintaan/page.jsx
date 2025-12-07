@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { FaEye } from "react-icons/fa";
+import { FaEye, FaEdit, FaFileAlt } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import adminPermintaanService from "../../../lib/adminPermintaanService";
 
 export default function DataPermintaanPage() {
   const router = useRouter();
@@ -25,12 +26,15 @@ export default function DataPermintaanPage() {
   const fetchDivisi = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3200/api/admin/divisi/dropdown", {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-      });
-      
+      const response = await fetch(
+        "http://localhost:3200/api/admin/divisi/dropdown",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       const result = await response.json();
       if (response.ok) {
         setDivisiList(result.data || []);
@@ -40,37 +44,55 @@ export default function DataPermintaanPage() {
     }
   };
 
+  // Tambahkan fungsi untuk mengubah status
+  const handleUpdateStatus = async (id) => {
+    const newStatus = prompt(
+      "Masukkan status baru (menunggu/diproses/selesai/ditolak):"
+    );
+    if (
+      !newStatus ||
+      !["menunggu", "diproses", "selesai", "ditolak"].includes(newStatus)
+    ) {
+      alert("Status tidak valid!");
+      return;
+    }
+
+    try {
+      await adminPermintaanService.updatePermintaanStatus(id, newStatus);
+      alert("Status berhasil diubah!");
+      fetchPermintaan(pagination.currentPage, {
+        search,
+        status: statusFilter,
+        divisi_id: divisiFilter,
+        start_date: startDate,
+        end_date: endDate,
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      alert(
+        error.response?.data?.error || "Terjadi kesalahan saat mengubah status"
+      );
+    }
+  };
+
   // Fetch data permintaan
   const fetchPermintaan = async (page = 1, filters = {}) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
-      
-      let url = `http://localhost:3200/api/admin/permintaan?page=${page}&limit=${pagination.itemsPerPage}`;
-      
-      if (filters.search) url += `&search=${filters.search}`;
-      if (filters.status && filters.status !== "semua") url += `&status=${filters.status}`;
-      if (filters.divisi_id && filters.divisi_id !== "semua") url += `&divisi_id=${filters.divisi_id}`;
-      if (filters.start_date) url += `&start_date=${filters.start_date}`;
-      if (filters.end_date) url += `&end_date=${filters.end_date}`;
-      
-      const response = await fetch(url, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-      });
-      
-      const result = await response.json();
-      
-      if (response.ok) {
-        setData(result.data);
-        setPagination(result.pagination);
-      } else {
-        alert("Gagal mengambil data permintaan");
-      }
+
+      const result = await adminPermintaanService.getAllPermintaan(
+        page,
+        pagination.itemsPerPage,
+        filters
+      );
+
+      setData(result.data);
+      setPagination(result.pagination);
     } catch (error) {
       console.error("Error:", error);
-      alert("Terjadi kesalahan saat mengambil data");
+      alert(
+        error.response?.data?.error || "Terjadi kesalahan saat mengambil data"
+      );
     } finally {
       setLoading(false);
     }
@@ -80,7 +102,7 @@ export default function DataPermintaanPage() {
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearch(value);
-    
+
     // Debounce search
     const timeoutId = setTimeout(() => {
       fetchPermintaan(1, {
@@ -88,10 +110,10 @@ export default function DataPermintaanPage() {
         status: statusFilter,
         divisi_id: divisiFilter,
         start_date: startDate,
-        end_date: endDate
+        end_date: endDate,
       });
     }, 500);
-    
+
     return () => clearTimeout(timeoutId);
   };
 
@@ -102,7 +124,7 @@ export default function DataPermintaanPage() {
       status: statusFilter,
       divisi_id: divisiFilter,
       start_date: startDate,
-      end_date: endDate
+      end_date: endDate,
     });
   };
 
@@ -124,7 +146,7 @@ export default function DataPermintaanPage() {
       status: statusFilter,
       divisi_id: divisiFilter,
       start_date: startDate,
-      end_date: endDate
+      end_date: endDate,
     });
   };
 
@@ -141,33 +163,44 @@ export default function DataPermintaanPage() {
   // Get status color
   const getStatusColor = (status) => {
     switch (status) {
-      case "menunggu": return "bg-yellow-100 text-yellow-800";
-      case "diproses": return "bg-blue-100 text-blue-800";
-      case "selesai": return "bg-green-100 text-green-800";
-      case "ditolak": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "menunggu":
+        return "bg-yellow-100 text-yellow-800";
+      case "diproses":
+        return "bg-blue-100 text-blue-800";
+      case "selesai":
+        return "bg-green-100 text-green-800";
+      case "ditolak":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   // Get status text
   const getStatusText = (status) => {
     switch (status) {
-      case "menunggu": return "Menunggu";
-      case "diproses": return "Diproses";
-      case "selesai": return "Selesai";
-      case "ditolak": return "Ditolak";
-      case "draft": return "Draft";
-      default: return status;
+      case "menunggu":
+        return "Menunggu";
+      case "diproses":
+        return "Diproses";
+      case "selesai":
+        return "Selesai";
+      case "ditolak":
+        return "Ditolak";
+      case "draft":
+        return "Draft";
+      default:
+        return status;
     }
   };
 
   // Format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+    return date.toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
   };
 
@@ -306,7 +339,10 @@ export default function DataPermintaanPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                 {/* Search */}
                 <div>
-                  <label htmlFor="search" className="block font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="search"
+                    className="block font-medium text-gray-700 mb-1"
+                  >
                     Search
                   </label>
                   <input
@@ -321,7 +357,10 @@ export default function DataPermintaanPage() {
 
                 {/* Filter Status - HAPUS DRAFT */}
                 <div>
-                  <label htmlFor="status" className="block font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="status"
+                    className="block font-medium text-gray-700 mb-1"
+                  >
                     Status
                   </label>
                   <select
@@ -341,7 +380,10 @@ export default function DataPermintaanPage() {
 
                 {/* Filter Divisi */}
                 <div>
-                  <label htmlFor="divisi" className="block font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="divisi"
+                    className="block font-medium text-gray-700 mb-1"
+                  >
                     Divisi
                   </label>
                   <select
@@ -389,7 +431,7 @@ export default function DataPermintaanPage() {
                     className="border border-gray-300 rounded px-3 py-2 w-full"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block font-medium text-gray-700 mb-1">
                     Sampai Tanggal
@@ -434,9 +476,12 @@ export default function DataPermintaanPage() {
                       <th className="px-6 py-3 font-semibold">ID PB</th>
                       <th className="px-6 py-3 font-semibold">Divisi</th>
                       <th className="px-6 py-3 font-semibold">Nama Pemohon</th>
+                      <th className="px-6 py-3 font-semibold">Jumlah Barang</th>
                       <th className="px-6 py-3 font-semibold">Tanggal</th>
                       <th className="px-6 py-3 font-semibold">Status</th>
-                      <th className="px-6 py-3 font-semibold text-center">Aksi</th>
+                      <th className="px-6 py-3 font-semibold text-center">
+                        Aksi
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -446,37 +491,52 @@ export default function DataPermintaanPage() {
                         className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
                       >
                         <td className="px-6 py-3">
-                          {(pagination.currentPage - 1) * pagination.itemsPerPage + index + 1}
+                          {(pagination.currentPage - 1) *
+                            pagination.itemsPerPage +
+                            index +
+                            1}
                         </td>
                         <td className="px-6 py-3 font-medium">
                           {row.nomor_permintaan || `PB-${row.id}`}
                         </td>
+                        <td className="px-6 py-3">{row.nama_divisi || "-"}</td>
+                        <td className="px-6 py-3">{row.nama_lengkap || "-"}</td>
                         <td className="px-6 py-3">
-                          {row.nama_divisi || "-"}
-                        </td>
-                        <td className="px-6 py-3">
-                          {row.nama_lengkap || "-"}
+                          {row.jumlah_barang || "0"}{" "}
+                          {/* Asumsikan ada field jumlah_barang di response */}
                         </td>
                         <td className="px-6 py-3">
                           {formatDate(row.created_at)}
                         </td>
                         <td className="px-6 py-3">
-                          <span className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(row.status)}`}>
+                          <span
+                            className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(
+                              row.status
+                            )}`}
+                          >
                             {getStatusText(row.status)}
                           </span>
                         </td>
                         <td className="px-6 py-3 text-center">
-                          <Link href={`/GA/detail_permintaan?id=${row.id}`}>
-                            <button className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded">
-                              <FaEye />
-                            </button>
-                          </Link>
+                          <div className="flex justify-center space-x-2">
+                            <Link href={`/GA/detail_permintaan?id=${row.id}`}>
+                              <button
+                                className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded"
+                                title="Lihat Detail"
+                              >
+                                <FaEye />
+                              </button>
+                            </Link>
+                          </div>
                         </td>
                       </tr>
                     ))}
                     {data.length === 0 && (
                       <tr>
-                        <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                        <td
+                          colSpan="7"
+                          className="px-6 py-8 text-center text-gray-500"
+                        >
                           Tidak ada data permintaan
                         </td>
                       </tr>
@@ -491,7 +551,9 @@ export default function DataPermintaanPage() {
                   </div>
                   <div className="inline-flex text-sm border rounded-md overflow-hidden">
                     <button
-                      onClick={() => handlePageChange(pagination.currentPage - 1)}
+                      onClick={() =>
+                        handlePageChange(pagination.currentPage - 1)
+                      }
                       disabled={pagination.currentPage === 1}
                       className={`px-3 py-1 border-r ${
                         pagination.currentPage === 1
@@ -501,14 +563,15 @@ export default function DataPermintaanPage() {
                     >
                       Previous
                     </button>
-                    
+
                     {[...Array(pagination.totalPages)].map((_, i) => {
                       const pageNum = i + 1;
                       // Show only current page, first, last, and neighbors
                       if (
                         pageNum === 1 ||
                         pageNum === pagination.totalPages ||
-                        (pageNum >= pagination.currentPage - 1 && pageNum <= pagination.currentPage + 1)
+                        (pageNum >= pagination.currentPage - 1 &&
+                          pageNum <= pagination.currentPage + 1)
                       ) {
                         return (
                           <button
@@ -526,10 +589,14 @@ export default function DataPermintaanPage() {
                       }
                       return null;
                     })}
-                    
+
                     <button
-                      onClick={() => handlePageChange(pagination.currentPage + 1)}
-                      disabled={pagination.currentPage === pagination.totalPages}
+                      onClick={() =>
+                        handlePageChange(pagination.currentPage + 1)
+                      }
+                      disabled={
+                        pagination.currentPage === pagination.totalPages
+                      }
                       className={`px-3 py-1 ${
                         pagination.currentPage === pagination.totalPages
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
