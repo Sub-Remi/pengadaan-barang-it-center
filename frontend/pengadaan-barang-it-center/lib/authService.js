@@ -3,7 +3,7 @@ import axiosInstance from "./axiosConfig";
 const authService = {
   login: async (username, password) => {
     try {
-      const response = await axiosInstance.post("/auth/login", {
+      const response = await axiosInstance.post("/auth/login/login", {
         username,
         password,
       });
@@ -29,7 +29,7 @@ const authService = {
   logout: () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    window.location.href = "/login";
+    window.location.href = "/login/login";
   },
 
   // **PERBAIKAN: Hanya satu fungsi getCurrentUser yang mengambil dari localStorage**
