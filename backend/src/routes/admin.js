@@ -68,7 +68,6 @@ router.get("/permintaan/:id", getPermintaanDetail);
 router.put("/permintaan/:id/status", updatePermintaanStatus);
 router.put("/barang/:id/status", updateBarangStatus);
 
-
 // ===== PENERIMAAN BARANG =====
 router.post(
   "/penerimaan-barang",

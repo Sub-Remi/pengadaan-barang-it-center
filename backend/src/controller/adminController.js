@@ -110,16 +110,17 @@ export const updatePermintaanStatus = async (req, res) => {
   }
 };
 
-// Update status barang
 export const updateBarangStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status, catatan_admin } = req.body;
+    const userId = req.user.id;
 
     console.log("🔄 Admin updating barang status:", {
       id,
       status,
       catatan_admin,
+      userId,
     });
 
     if (!status) {
@@ -133,26 +134,50 @@ export const updateBarangStatus = async (req, res) => {
       "selesai",
       "ditolak",
     ];
+
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: "Status tidak valid." });
     }
 
-    const affectedRows = await BarangPermintaan.updateStatus(
-      id,
-      status,
-      catatan_admin
-    );
-
-    if (affectedRows === 0) {
-      return res.status(404).json({ error: "Barang tidak ditemukan." });
+    // Untuk status 'ditolak', wajib catatan
+    if (
+      status === "ditolak" &&
+      (!catatan_admin || catatan_admin.trim() === "")
+    ) {
+      return res.status(400).json({
+        error: "Harap berikan catatan penolakan.",
+      });
     }
 
+    // Gunakan fungsi baru yang menangani stok dan status permintaan
+    const result = await BarangPermintaan.updateStatusWithStok(
+      id,
+      status,
+      catatan_admin,
+      userId
+    );
+
+    // Langsung return response tanpa mengambil data lagi
     res.json({
       message: `Status barang berhasil diubah menjadi ${status}.`,
+      data: {
+        barang_id: id,
+        new_status: status,
+        permintaan_status: result.permintaanStatus || "diproses",
+        stok_updated: status === "selesai",
+      },
     });
   } catch (error) {
     console.error("💥 Update barang status error:", error);
-    res.status(500).json({ error: "Terjadi kesalahan server." });
+
+    // Tampilkan error detail untuk debugging
+    console.error("Error stack:", error.stack);
+
+    res.status(500).json({
+      error: "Terjadi kesalahan server.",
+      details:
+        process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
   }
 };
 

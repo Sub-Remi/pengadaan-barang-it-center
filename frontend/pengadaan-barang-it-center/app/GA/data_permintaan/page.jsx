@@ -502,8 +502,9 @@ export default function DataPermintaanPage() {
                         <td className="px-6 py-3">{row.nama_divisi || "-"}</td>
                         <td className="px-6 py-3">{row.nama_lengkap || "-"}</td>
                         <td className="px-6 py-3">
-                          {row.jumlah_barang || "0"}{" "}
-                          {/* Asumsikan ada field jumlah_barang di response */}
+                          {row.jumlah_barang > 0
+                            ? `${row.jumlah_barang} jenis barang`
+                            : "0"}
                         </td>
                         <td className="px-6 py-3">
                           {formatDate(row.created_at)}

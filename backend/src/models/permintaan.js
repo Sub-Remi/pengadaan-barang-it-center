@@ -256,8 +256,8 @@ const Permintaan = {
     return result;
   },
 
-  // Get all permintaan untuk admin (dengan filter)
-  // Di fungsi findAllWithFilters, tambahkan filter untuk exclude draft
+  // Di file models/permintaan.js, dalam fungsi findAllWithFilters:
+
   findAllWithFilters: async (filters = {}, page = 1, limit = 10) => {
     const offset = (page - 1) * limit;
     const pageNum = parseInt(page);
@@ -265,19 +265,25 @@ const Permintaan = {
     const offsetNum = parseInt(offset);
 
     let query = `
-    SELECT p.*, u.nama_lengkap, d.nama_divisi 
-    FROM permintaan p 
-    JOIN users u ON p.user_id = u.id 
-    JOIN divisi d ON u.divisi_id = d.id 
-    WHERE 1=1
-  `;
+  SELECT 
+    p.*, 
+    u.nama_lengkap, 
+    d.nama_divisi,
+    (SELECT COUNT(*) 
+     FROM barang_permintaan bp 
+     WHERE bp.permintaan_id = p.id) as jumlah_barang
+  FROM permintaan p 
+  JOIN users u ON p.user_id = u.id 
+  JOIN divisi d ON u.divisi_id = d.id 
+  WHERE 1=1
+`;
 
     let countQuery = `
-    SELECT COUNT(*) as total 
-    FROM permintaan p 
-    JOIN users u ON p.user_id = u.id 
-    WHERE 1=1
-  `;
+  SELECT COUNT(*) as total 
+  FROM permintaan p 
+  JOIN users u ON p.user_id = u.id 
+  WHERE 1=1
+`;
 
     const values = [];
     const countValues = [];
@@ -322,7 +328,7 @@ const Permintaan = {
     query += " ORDER BY p.created_at DESC";
     query += ` LIMIT ${limitNum} OFFSET ${offsetNum}`;
 
-    console.log("🔍 Admin query:", query);
+    console.log("🔍 Admin query dengan jumlah_barang:", query);
     console.log("📊 Admin query values:", values);
 
     try {
@@ -332,8 +338,19 @@ const Permintaan = {
       const total = countRows[0].total;
       const totalPages = Math.ceil(total / limitNum);
 
+      // Format jumlah_barang untuk memastikan selalu ada nilai
+      const formattedRows = rows.map((row) => ({
+        ...row,
+        jumlah_barang: parseInt(row.jumlah_barang) || 0,
+      }));
+
+      console.log(
+        "✅ Admin query dengan jumlah_barang berhasil. Total rows:",
+        formattedRows.length
+      );
+
       return {
-        data: rows,
+        data: formattedRows,
         total: total,
         page: pageNum,
         limit: limitNum,
@@ -343,14 +360,6 @@ const Permintaan = {
       console.error("💥 Admin find all error:", error);
       throw error;
     }
-  },
-
-  // Update status permintaan
-  updateStatus: async (id, status) => {
-    const query =
-      "UPDATE permintaan SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
-    const [result] = await dbPool.execute(query, [status, id]);
-    return result.affectedRows;
   },
 
   // Get draft permintaan by user ID (untuk halaman draft)
