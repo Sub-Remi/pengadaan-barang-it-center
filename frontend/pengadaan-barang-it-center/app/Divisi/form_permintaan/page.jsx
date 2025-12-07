@@ -149,6 +149,39 @@ export default function FormPermintaanBarangPage() {
 
   //==================================
 
+  // Di bagian useEffect untuk get user data
+  useEffect(() => {
+    const loadUserData = async () => {
+      const user = authService.getCurrentUser();
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+
+      // **TAMBAHKAN LOG UNTUK DEBUG**
+      console.log("👤 User data loaded:", user);
+      console.log("📧 User email:", user.email);
+
+      setUserData(user);
+
+      // Set default date (today + 7 days)
+      const today = new Date();
+      const nextWeek = new Date(today);
+      nextWeek.setDate(today.getDate() + 7);
+      const formattedDate = nextWeek.toISOString().split("T")[0];
+
+      setFormData((prev) => ({
+        ...prev,
+        tanggal_kebutuhan: formattedDate,
+      }));
+
+      // Load initial dropdown data
+      loadInitialDropdownData();
+    };
+
+    loadUserData();
+  }, [router]);
+
   // GANTI bagian useEffect untuk loadDraftData dengan ini:
   useEffect(() => {
     const loadDraftData = async () => {

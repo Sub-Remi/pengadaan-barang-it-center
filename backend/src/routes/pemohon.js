@@ -17,8 +17,10 @@ import {
   addBarangToPermintaan,
   updateBarangInPermintaan,
   deleteBarangFromPermintaan,
-  deleteAllBarangFromPermintaan
+  deleteAllBarangFromPermintaan,
 } from "../controller/barangPermintaanController.js";
+
+import { getDivisiDropdownForPemohon } from "../controller/divisiController.js"; // Buat controller baru
 
 const router = express.Router();
 
@@ -44,5 +46,7 @@ router.delete("/permintaan/:id/barang/all", deleteAllBarangFromPermintaan);
 // Route untuk operasi pada draft
 router.put("/permintaan/:id/draft", updateDraftPermintaan);
 router.delete("/permintaan/:id", deletePermintaan);
+
+router.get("/divisi/dropdown", getDivisiDropdownForPemohon);
 
 export default router;

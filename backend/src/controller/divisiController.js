@@ -194,6 +194,23 @@ export const getDivisiStats = async (req, res) => {
   }
 };
 
+// Get all divisi untuk dropdown (tanpa pagination) - untuk pemohon
+export const getDivisiDropdownForPemohon = async (req, res) => {
+  try {
+    console.log("📋 Pemohon getting divisi dropdown");
+
+    const divisiList = await Divisi.findAll();
+
+    res.json({
+      message: "Daftar divisi untuk dropdown berhasil diambil.",
+      data: divisiList,
+    });
+  } catch (error) {
+    console.error("💥 Get divisi dropdown for pemohon error:", error);
+    res.status(500).json({ error: "Terjadi kesalahan server." });
+  }
+};
+
 export default {
   getAllDivisi,
   getDivisiDropdown,
@@ -202,4 +219,5 @@ export default {
   updateDivisi,
   deleteDivisi,
   getDivisiStats,
+  getDivisiDropdownForPemohon,
 };

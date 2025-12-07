@@ -30,7 +30,7 @@ export const login = async (req, res) => {
     console.log("🔑 Password verification...");
     console.log("   Input password:", password);
     console.log("   Stored password:", user.password);
-    console.log("   Password length:", user.password.length);    
+    console.log("   Password length:", user.password.length);
     console.log("   User active status:", user.is_active);
 
     // === PERUBAHAN PENTING: Gunakan plain text comparison ===
@@ -54,6 +54,7 @@ export const login = async (req, res) => {
       id: user.id,
       username: user.username,
       role: user.role,
+      email: user.email,
       divisi_id: user.divisi_id,
       nama_lengkap: user.nama_lengkap,
     });
