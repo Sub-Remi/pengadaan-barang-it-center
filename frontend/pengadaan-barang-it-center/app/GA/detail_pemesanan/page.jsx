@@ -166,7 +166,7 @@ export default function DokumenPemesananPage() {
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="flex justify-between items-center px-6 py-5 border-b-4 border-b-gray-300">
               <h3 className="text-xl font-semibold text-teal-600">
-                Dokumen Pemesanan Independen
+                Dokumen Pemesanan
               </h3>
               <Link href="/GA/list_pemesanan">
                 <button className="bg-teal-600 hover:bg-green-600 text-white px-4 py-1.5 rounded">

@@ -4,23 +4,13 @@ import React, { useState } from "react";
 import { FaEye } from "react-icons/fa";
 
 export default function ListPemesananPage() {
-  // DATA PERMINTAAN
-  const dataPermintaan = [
-    { no: 1, idpb: "10111", tanggal: "01/01/2025", Divisi: "HR", status: "Selesai" },
-    { no: 2, idpb: "10777", tanggal: "02/06/2025", Divisi: "IT", status: "Diproses" },
+  // DATA PEMESANAN
+  const dataPemesanan = [
+    { no: 1, idpb: "10111", tanggal: "01/01/2025", barang: "Laptop", status: "Selesai" },
+    { no: 2, idpb: "10777", tanggal: "02/06/2025", barang: "Printer", status: "Diproses" },
+    { no: 3, idpb: "10112", tanggal: "03/01/2025", barang: "Monitor", status: "Selesai" },
+    { no: 4, idpb: "10778", tanggal: "05/01/2025", barang: "Keyboard", status: "Diproses" },
   ];
-
-  // DATA INDEPENDEN
-  const dataIndependen = [
-    { no: 1, idpb: "9001", tanggal: "03/01/2025", barang: "Spidol", status: "Diproses" },
-    { no: 2, idpb: "9002", tanggal: "05/01/2025", barang: "Map Arsip", status: "Selesai" },
-  ];
-
-  // STATE FILTER AKTIF
-  const [filter, setFilter] = useState("permintaan");
-
-  // DATA YANG DITAMPILKAN
-  const displayedData = filter === "permintaan" ? dataPermintaan : dataIndependen;
 
   return (
     <div className="flex flex-col min-h-screen font-poppins bg-gray-100">
@@ -46,7 +36,6 @@ export default function ListPemesananPage() {
               <hr className="border-t border-white/30 my-2" />
 
               {/* DATA MASTER */}
-              {/* DATA MASTER */}
               <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
                 DATA MASTER
               </li>
@@ -68,7 +57,6 @@ export default function ListPemesananPage() {
                   Kategori Barang
                 </li>
               </Link>
-
 
               <Link href="/GA/data_satuanbarang">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
@@ -147,11 +135,10 @@ export default function ListPemesananPage() {
               </h3>
             </div>
 
-            {/* FILTER BUTTONS */}
-            <div className="flex flex-wrap items-center justify-between px-6 py-4 border-b bg-white">
+            {/* FILTER TANGGAL */}
+            <div className="flex flex-wrap items-center px-6 py-4 border-b bg-white">
               <div className="flex items-center gap-3 flex-wrap">
-
-              <label className="font-medium text-gray-700">Dari Tanggal:</label>
+                <label className="font-medium text-gray-700">Dari Tanggal:</label>
                 <input
                   type="date"
                   className="border border-gray-300 rounded px-2 py-1 text-x1"
@@ -162,28 +149,6 @@ export default function ListPemesananPage() {
                   type="date"
                   className="border border-gray-300 rounded px-2 py-1 text-x1"
                 />
-
-              <button
-                onClick={() => setFilter("permintaan")}
-                className={`px-4 py-1 rounded font-medium border ${
-                  filter === "permintaan"
-                    ? "bg-teal-600 text-white"
-                    : "bg-white text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                Permintaan
-              </button>
-
-              <button
-                onClick={() => setFilter("independen")}
-                className={`px-4 py-1 rounded font-medium border ${
-                  filter === "independen"
-                    ? "bg-teal-600 text-white"
-                    : "bg-white text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                Independen
-              </button>
               </div>
             </div>
 
@@ -192,21 +157,16 @@ export default function ListPemesananPage() {
               <thead>
                 <tr className="bg-white text-left">
                   <th className="px-6 py-3 font-semibold">No</th>
-                  <th className="px-6 py-3 font-semibold">ID PB</th>
+                  <th className="px-6 py-3 font-semibold">ID</th>
                   <th className="px-6 py-3 font-semibold">Tanggal</th>
-
-                  {/* Header dinamis */}
-                  <th className="px-6 py-3 font-semibold">
-                    {filter === "permintaan" ? "Divisi" : "Nama Barang"}
-                  </th>
-
+                  <th className="px-6 py-3 font-semibold">Nama Barang</th>
                   <th className="px-6 py-3 font-semibold">Status</th>
                   <th className="px-6 py-3 font-semibold text-center">Aksi</th>
                 </tr>
               </thead>
 
               <tbody>
-                {displayedData.map((row, index) => (
+                {dataPemesanan.map((row, index) => (
                   <tr
                     key={index}
                     className={`${index % 2 === 0 ? "bg-gray-100" : "bg-white"}`}
@@ -214,22 +174,10 @@ export default function ListPemesananPage() {
                     <td className="px-6 py-3">{row.no}</td>
                     <td className="px-6 py-3">{row.idpb}</td>
                     <td className="px-6 py-3">{row.tanggal}</td>
-
-                    {/* Isi kolom dinamis */}
-                    <td className="px-6 py-3 font-medium text-gray-800">
-                      {filter === "permintaan" ? row.Divisi : row.barang}
-                    </td>
-
+                    <td className="px-6 py-3 font-medium text-gray-800">{row.barang}</td>
                     <td className="px-6 py-3">{row.status}</td>
-
                     <td className="px-6 py-3 text-center">
-                      <Link
-                        href={
-                          filter === "permintaan"
-                            ? `/GA/detail_pemesanan_perm?id=${row.idpb}`
-                            : `/GA/detail_pemesanan_indep?id=${row.idpb}`
-                        }
-                      >
+                      <Link href={`/GA/detail_pemesanan?id=${row.idpb}`}>
                         <button className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded">
                           <FaEye />
                         </button>
@@ -239,6 +187,27 @@ export default function ListPemesananPage() {
                 ))}
               </tbody>
             </table>
+
+            {/* Pagination */}
+            <div className="flex justify-end px-6 py-4 bg-white border-t">
+              <div className="inline-flex text-sm border rounded-md overflow-hidden">
+                <button className="px-3 py-1 bg-white hover:bg-gray-100 border-r">
+                  Previous
+                </button>
+                <button className="px-3 py-1 bg-teal-600 text-white border-r">
+                  1
+                </button>
+                <button className="px-3 py-1 bg-white hover:bg-gray-100 border-r">
+                  2
+                </button>
+                <button className="px-3 py-1 bg-white hover:bg-gray-100 border-r">
+                  3
+                </button>
+                <button className="px-3 py-1 bg-white hover:bg-gray-100">
+                  Next
+                </button>
+              </div>
+            </div>
 
             {/* Garis bawah */}
             <div className="h-1 bg-teal-600 w-full"></div>
