@@ -148,44 +148,12 @@ function DashboardDivisiPage() {
 
               {/* Statistik tambahan */}
               <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow">
-                  <h3 className="text-lg font-semibold mb-4">Status Permintaan</h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="flex items-center">
-                        <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
-                        Menunggu
-                      </span>
-                      <span className="font-semibold">0</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="flex items-center">
-                        <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                        Diproses
-                      </span>
-                      <span className="font-semibold">0</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="flex items-center">
-                        <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                        Selesai
-                      </span>
-                      <span className="font-semibold">0</span>
-                    </div>
-                  </div>
-                </div>
                 
-                <div className="bg-white p-6 rounded-lg shadow">
-                  <h3 className="text-lg font-semibold mb-4">Aktivitas Terbaru</h3>
-                  <div className="text-sm text-gray-600 space-y-2">
-                    <p>Belum ada aktivitas terbaru</p>
-                  </div>
-                </div>
                 
                 <div className="bg-white p-6 rounded-lg shadow">
                   <h3 className="text-lg font-semibold mb-4">Info Cepat</h3>
                   <ul className="text-sm space-y-2">
-                    <li>• Total semua permintaan: {counts.permintaan + counts.draft}</li>
+                    <li>• Total semua permintaan: {counts.permintaan}</li>
                     <li>• Draft yang belum diajukan: {counts.draft}</li>
                     <li>• Notifikasi aktif: {pendingChanges.hasPendingStatusChange ? "1" : "0"}</li>
                   </ul>
