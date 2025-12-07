@@ -5,8 +5,10 @@ import { FaPlus, FaEye, FaSync } from "react-icons/fa";
 import permintaanService from "../../../lib/permintaanService";
 import authService from "../../../lib/authService";
 import ProtectedRoute from "../../../app/components/ProtectedRoute";
+import { useNotification } from "../../../app/context/NotificationContext";
 
 export default function PermintaanPage() {
+  const { fetchCounts, markAsRead } = useNotification();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -37,6 +39,7 @@ export default function PermintaanPage() {
       });
       setData(response.data);
       setPagination(response.pagination);
+      await fetchCounts();
     } catch (error) {
       console.error("Error fetching data:", error);
       alert(error.error || "Gagal mengambil data permintaan.");
@@ -44,6 +47,12 @@ export default function PermintaanPage() {
       setLoading(false);
     }
   };
+
+  // Tambahkan useEffect untuk mark as read saat halaman dibuka
+  useEffect(() => {
+    // Mark notifications as read when page is opened
+    markAsRead();
+  }, []);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -77,6 +86,10 @@ export default function PermintaanPage() {
         return "bg-gray-100 text-gray-800";
     }
   };
+
+  
+
+  
 
   return (
     <ProtectedRoute allowedRoles={["pemohon"]}>

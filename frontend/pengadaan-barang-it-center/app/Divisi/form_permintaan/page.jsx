@@ -744,7 +744,7 @@ export default function FormPermintaanBarangPage() {
           </div>
           <nav className="flex-1 mt-6 overflow-y-auto">
             <ul className="space-y-1 pb-6">
-              <Link href="/divisi/dashboard_divisi">
+              <Link href="/Divisi/dashboard_divisi">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Dashboard
                 </li>

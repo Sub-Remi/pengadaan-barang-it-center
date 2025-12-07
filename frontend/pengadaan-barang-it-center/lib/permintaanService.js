@@ -26,6 +26,19 @@ apiClient.interceptors.request.use(
   }
 );
 
+// Interceptor untuk handle response error
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired, redirect to login
+      authService.logout();
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
 const permintaanService = {
   // Membuat permintaan baru
   createPermintaan: async (data) => {
@@ -42,8 +55,12 @@ const permintaanService = {
     try {
       const params = new URLSearchParams();
       Object.keys(filters).forEach((key) => {
-        if (filters[key]) {
-          params.append(key, filters[key]);
+        if (filters[key] !== undefined && filters[key] !== "") {
+          if (Array.isArray(filters[key])) {
+            params.append(key, filters[key].join(","));
+          } else {
+            params.append(key, filters[key]);
+          }
         }
       });
       const response = await apiClient.get(
@@ -130,7 +147,7 @@ const permintaanService = {
     try {
       const params = new URLSearchParams();
       Object.keys(filters).forEach((key) => {
-        if (filters[key]) {
+        if (filters[key] !== undefined && filters[key] !== "") {
           params.append(key, filters[key]);
         }
       });
@@ -172,7 +189,156 @@ const permintaanService = {
       throw error.response?.data || { error: "Terjadi kesalahan" };
     }
   },
+
+  // **TAMBAHAN BARU UNTUK NOTIFIKASI DAN DASHBOARD**
+
+  // Mengambil total jumlah untuk dashboard
+  getDashboardCounts: async () => {
+    try {
+      const response = await apiClient.get("/pemohon/permintaan/dashboard/counts");
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Terjadi kesalahan" };
+    }
+  },
+
+  // Mengecek perubahan status terbaru
+  checkStatusChanges: async (lastChecked) => {
+    try {
+      const response = await apiClient.get("/pemohon/permintaan/status-changes", {
+        params: { lastChecked }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Terjadi kesalahan" };
+    }
+  },
+
+  // Mengambil summary status untuk dashboard
+  getStatusSummary: async () => {
+    try {
+      const response = await apiClient.get("/pemohon/permintaan/status-summary");
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Terjadi kesalahan" };
+    }
+  },
+
+  // Mengambil riwayat permintaan (selesai/ditolak)
+  getRiwayatPermintaan: async (filters = {}) => {
+    try {
+      const params = new URLSearchParams();
+      Object.keys(filters).forEach((key) => {
+        if (filters[key] !== undefined && filters[key] !== "") {
+          params.append(key, filters[key]);
+        }
+      });
+      const response = await apiClient.get(
+        `/pemohon/permintaan/riwayat?${params.toString()}`
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Terjadi kesalahan" };
+    }
+  },
+
+  // Mengambil jumlah riwayat
+  getRiwayatCount: async () => {
+    try {
+      const response = await apiClient.get("/pemohon/permintaan/riwayat/count");
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Terjadi kesalahan" };
+    }
+  },
+
+  // Mark status changes as read
+  markStatusChangesAsRead: async (permintaanIds = []) => {
+    try {
+      const response = await apiClient.post("/pemohon/permintaan/mark-read", {
+        permintaanIds
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Terjadi kesalahan" };
+    }
+  },
+
+  // Get permintaan yang memiliki status "menunggu" atau "diproses"
+  getActivePermintaan: async () => {
+    try {
+      const response = await apiClient.get("/pemohon/permintaan/active");
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Terjadi kesalahan" };
+    }
+  },
+
+  // Get latest updates untuk notifikasi
+  getLatestUpdates: async () => {
+    try {
+      const response = await apiClient.get("/pemohon/permintaan/latest-updates");
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Terjadi kesalahan" };
+    }
+  },
+
+  // Export data ke Excel
+  exportToExcel: async (filters = {}) => {
+    try {
+      const params = new URLSearchParams();
+      Object.keys(filters).forEach((key) => {
+        if (filters[key] !== undefined && filters[key] !== "") {
+          params.append(key, filters[key]);
+        }
+      });
+      
+      const response = await apiClient.get(
+        `/pemohon/permintaan/export/excel?${params.toString()}`,
+        {
+          responseType: 'blob' // Penting untuk download file
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Terjadi kesalahan" };
+    }
+  },
+
+  // Export data ke PDF
+  exportToPDF: async (filters = {}) => {
+    try {
+      const params = new URLSearchParams();
+      Object.keys(filters).forEach((key) => {
+        if (filters[key] !== undefined && filters[key] !== "") {
+          params.append(key, filters[key]);
+        }
+      });
+      
+      const response = await apiClient.get(
+        `/pemohon/permintaan/export/pdf?${params.toString()}`,
+        {
+          responseType: 'blob'
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Terjadi kesalahan" };
+    }
+  },
+
+  // Get permintaan dengan status tertentu untuk notifikasi
+  getPermintaanByStatuses: async (statuses = []) => {
+    try {
+      const response = await apiClient.get("/pemohon/permintaan/by-status", {
+        params: { statuses: statuses.join(",") }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Terjadi kesalahan" };
+    }
+  }
 };
 
-// ✅ KOREKSI: Ekspor langsung objek service, bukan object yang berisi permintaanService
 export default permintaanService;
