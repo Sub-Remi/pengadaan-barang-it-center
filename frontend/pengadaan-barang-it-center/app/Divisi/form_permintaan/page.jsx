@@ -40,26 +40,23 @@ export default function FormPermintaanBarangPage() {
 
   const [formData, setFormData] = useState({
     tanggal_kebutuhan: "",
-    catatan: "", // Changed from catatan to judul_permintaan
+    catatan: "",
   });
 
-  // State untuk form barang - DIPERBARUI
+  // State untuk form barang
   const [barangForm, setBarangForm] = useState({
     nama_barang: "",
-    nama_barang_display: "", // Untuk display di input
+    nama_barang_display: "",
     spesifikasi: "",
     jumlah: "",
     keterangan: "",
-    // Data otomatis dari stok
     stok_barang_id: null,
     stok_available: 0,
     kategori_barang: "",
     kategori_barang_id: null,
     satuan: "",
     satuan_barang_id: null,
-    // Flag untuk menandai apakah data sudah diambil dari stok
     isFromStok: false,
-    // Tambahkan state untuk error
     jumlahError: "",
   });
 
@@ -68,7 +65,6 @@ export default function FormPermintaanBarangPage() {
     debounce(async (search) => {
       try {
         setLoadingDropdown(true);
-        // Cari semua barang tanpa filter kategori
         const data = await dropdownService.getStokBarang(search, null);
         setStokBarangOptions(data);
         setShowStokDropdown(true);
@@ -147,8 +143,6 @@ export default function FormPermintaanBarangPage() {
     [barangForm.kategori_barang_id]
   );
 
-  //==================================
-
   // Di bagian useEffect untuk get user data
   useEffect(() => {
     const loadUserData = async () => {
@@ -158,17 +152,11 @@ export default function FormPermintaanBarangPage() {
         return;
       }
 
-      // **TAMBAHKAN LOG UNTUK DEBUG**
-      console.log("👤 User data loaded:", user);
-      console.log("📧 User email:", user.email);
-
       setUserData(user);
 
-      // Set default date (today + 7 days)
+      // Set default date (TODAY) - PERBAIKAN DI SINI
       const today = new Date();
-      const nextWeek = new Date(today);
-      nextWeek.setDate(today.getDate() + 7);
-      const formattedDate = nextWeek.toISOString().split("T")[0];
+      const formattedDate = today.toISOString().split("T")[0];
 
       setFormData((prev) => ({
         ...prev,
@@ -182,7 +170,7 @@ export default function FormPermintaanBarangPage() {
     loadUserData();
   }, [router]);
 
-  // GANTI bagian useEffect untuk loadDraftData dengan ini:
+  // Load draft data untuk mode edit
   useEffect(() => {
     const loadDraftData = async () => {
       if (!editId) return;
@@ -228,7 +216,7 @@ export default function FormPermintaanBarangPage() {
             kategori_barang: barang.kategori_barang || "",
             kategori_barang_id: kategori_barang_id,
             nama_barang: barang.nama_barang || "",
-            nama_barang_display: barang.nama_barang || "", // Tambah field display
+            nama_barang_display: barang.nama_barang || "",
             spesifikasi: barang.spesifikasi || "",
             satuan: nama_satuan || barang.satuan || "",
             satuan_barang_id: satuan_barang_id,
@@ -236,7 +224,7 @@ export default function FormPermintaanBarangPage() {
             keterangan: barang.keterangan || "",
             stok_barang_id: barang.stok_barang_id || null,
             stok_available: stok_available,
-            isFromStok: isFromStok, // Simpan status
+            isFromStok: isFromStok,
           };
         });
 
@@ -254,32 +242,6 @@ export default function FormPermintaanBarangPage() {
 
     loadDraftData();
   }, [editId]);
-
-  // Get user data on component mount
-  useEffect(() => {
-    const user = authService.getCurrentUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    setUserData(user);
-
-    // Set default date (today + 7 days)
-    const today = new Date();
-    const nextWeek = new Date(today);
-    nextWeek.setDate(today.getDate() + 7);
-    const formattedDate = nextWeek.toISOString().split("T")[0];
-
-    setFormData((prev) => ({
-      ...prev,
-      tanggal_kebutuhan: formattedDate,
-    }));
-
-    // Load initial dropdown data
-    loadInitialDropdownData();
-  }, [router]);
-
-  //================================
 
   // Load initial dropdown data
   const loadInitialDropdownData = async () => {
@@ -332,8 +294,6 @@ export default function FormPermintaanBarangPage() {
     }
   }, [stokSearch, debouncedSearchStok, barangForm.kategori_barang_id]);
 
-  //==================================
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -342,12 +302,11 @@ export default function FormPermintaanBarangPage() {
     }));
   };
 
-  // Handle barang input change - DIPERBARUI dengan validasi
+  // Handle barang input change
   const handleBarangInputChange = (e) => {
     const { name, value } = e.target;
 
     if (name === "nama_barang_display") {
-      // Reset semua data terkait barang jika mengubah nama
       setBarangForm((prev) => ({
         ...prev,
         nama_barang_display: value,
@@ -359,7 +318,7 @@ export default function FormPermintaanBarangPage() {
         satuan: "",
         satuan_barang_id: null,
         isFromStok: false,
-        jumlahError: "", // Reset error
+        jumlahError: "",
       }));
       setNamaBarangSearch(value);
     } else if (name === "jumlah") {
@@ -393,7 +352,7 @@ export default function FormPermintaanBarangPage() {
         ...prev,
         kategori_barang: kategori.nama_kategori,
         kategori_barang_id: kategori.id,
-        stok_barang_id: null, // Reset stok_barang_id when kategori changes
+        stok_barang_id: null,
         nama_barang: "",
         spesifikasi: "",
         satuan: "",
@@ -402,8 +361,6 @@ export default function FormPermintaanBarangPage() {
       }));
       setKategoriSearch("");
       setShowKategoriDropdown(false);
-
-      // Reset stok search
       setStokSearch("");
       setStokBarangOptions([]);
     }
@@ -421,8 +378,7 @@ export default function FormPermintaanBarangPage() {
     }
   };
 
-  // Handle select stok barang - DIPERBARUI
-  // Handle select stok barang - DIPERBARUI
+  // Handle select stok barang
   const handleSelectStokBarang = (stokBarang) => {
     if (stokBarang) {
       setBarangForm((prev) => ({
@@ -436,8 +392,8 @@ export default function FormPermintaanBarangPage() {
         satuan_barang_id: stokBarang.satuan_barang_id,
         stok_barang_id: stokBarang.id,
         stok_available: stokBarang.stok,
-        isFromStok: true, // Tandai berasal dari stok
-        jumlahError: "", // Reset error
+        isFromStok: true,
+        jumlahError: "",
       }));
       setNamaBarangSearch("");
       setShowStokDropdown(false);
@@ -463,8 +419,6 @@ export default function FormPermintaanBarangPage() {
     setNamaBarangSearch("");
     setStokBarangOptions([]);
   };
-
-  //==================================
 
   const validateBarangForm = () => {
     if (!barangForm.nama_barang.trim()) {
@@ -492,7 +446,6 @@ export default function FormPermintaanBarangPage() {
       return false;
     }
 
-    // Jika ada error dari real-time validation
     if (barangForm.jumlahError) {
       alert(barangForm.jumlahError);
       return false;
@@ -508,7 +461,6 @@ export default function FormPermintaanBarangPage() {
       return false;
     }
 
-    // Cek setiap barang apakah melebihi stok
     for (const barang of barangList) {
       if (barang.stok_available > 0 && barang.jumlah > barang.stok_available) {
         alert(
@@ -531,7 +483,6 @@ export default function FormPermintaanBarangPage() {
       spesifikasi: barangForm.spesifikasi || "",
       jumlah: parseInt(barangForm.jumlah),
       keterangan: barangForm.keterangan || "",
-      // Data otomatis dari stok
       stok_barang_id: barangForm.stok_barang_id,
       stok_available: barangForm.stok_available,
       kategori_barang: barangForm.kategori_barang,
@@ -572,11 +523,8 @@ export default function FormPermintaanBarangPage() {
     }
   };
 
-  //==================================
-
   const updateDraftPermintaan = async () => {
     try {
-      // 1. Update data permintaan
       const updateData = {
         tanggal_kebutuhan: formData.tanggal_kebutuhan,
         catatan: formData.catatan,
@@ -592,7 +540,6 @@ export default function FormPermintaanBarangPage() {
         })),
       };
 
-      // 2. Panggil API update draft
       const response = await permintaanService.updateDraftPermintaan(
         permintaanId,
         updateData
@@ -607,7 +554,6 @@ export default function FormPermintaanBarangPage() {
   };
 
   const handleSimpanDraft = async () => {
-    // Validasi form utama
     if (!formData.tanggal_kebutuhan) {
       alert("Tanggal kebutuhan harus diisi!");
       return;
@@ -618,7 +564,6 @@ export default function FormPermintaanBarangPage() {
       return;
     }
 
-    // Validasi semua barang tidak melebihi stok
     if (!validateAllBarang()) {
       return;
     }
@@ -628,11 +573,9 @@ export default function FormPermintaanBarangPage() {
 
     try {
       if (isEditMode) {
-        // Update draft yang sudah ada
         await updateDraftPermintaan();
         alert("Draft berhasil diperbarui!");
       } else {
-        // Buat draft baru
         const permintaanData = {
           tanggal_kebutuhan: formData.tanggal_kebutuhan,
           catatan: formData.catatan,
@@ -644,7 +587,6 @@ export default function FormPermintaanBarangPage() {
         const newPermintaanId = createResponse.data.id;
         setPermintaanId(newPermintaanId);
 
-        // Tambahkan semua barang ke permintaan
         const barangPromises = barangList.map((barang) =>
           tambahBarangKePermintaan(newPermintaanId, barang)
         );
@@ -664,7 +606,6 @@ export default function FormPermintaanBarangPage() {
   };
 
   const handleKirim = async () => {
-    // Validasi form utama
     if (!formData.tanggal_kebutuhan) {
       alert("Tanggal kebutuhan harus diisi!");
       return;
@@ -675,7 +616,6 @@ export default function FormPermintaanBarangPage() {
       return;
     }
 
-    // Validasi semua barang tidak melebihi stok
     if (!validateAllBarang()) {
       return;
     }
@@ -689,15 +629,11 @@ export default function FormPermintaanBarangPage() {
 
     try {
       if (isEditMode) {
-        // 1. Update dulu draftnya
         await updateDraftPermintaan();
-
-        // 2. Submit draft yang sudah diupdate
         await permintaanService.submitPermintaan(permintaanId);
         alert("Permintaan berhasil dikirim!");
         router.push("/Divisi/permintaan_divisi");
       } else {
-        // Buat permintaan baru langsung submit
         const permintaanData = {
           tanggal_kebutuhan: formData.tanggal_kebutuhan,
           catatan: formData.catatan,
@@ -708,14 +644,11 @@ export default function FormPermintaanBarangPage() {
         );
         const newPermintaanId = createResponse.data.id;
 
-        // Tambahkan semua barang ke permintaan
         const barangPromises = barangList.map((barang) =>
           tambahBarangKePermintaan(newPermintaanId, barang)
         );
 
         await Promise.all(barangPromises);
-
-        // Submit permintaan (ubah status dari draft menjadi menunggu)
         await permintaanService.submitPermintaan(newPermintaanId);
 
         alert("Permintaan berhasil dikirim!");
@@ -859,7 +792,7 @@ export default function FormPermintaanBarangPage() {
 
                   <div>
                     <label className="font-medium text-gray-700">
-                      Tanggal Kebutuhan
+                      Tanggal permintaan
                     </label>
                     <input
                       type="date"
@@ -888,14 +821,14 @@ export default function FormPermintaanBarangPage() {
                 </div>
               </div>
 
-              {/* Data Barang - BAGIAN YANG DIUBAH */}
+              {/* Data Barang */}
               <div className="px-6 py-4 border-b-4 border-b-gray-300">
                 <h4 className="text-lg font-semibold mb-4 text-gray-800">
                   Data Barang
                 </h4>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Nama Barang (WAJIB) */}
+                  {/* Nama Barang */}
                   <div className="relative dropdown-container md:col-span-2">
                     <label className="font-medium text-gray-700">
                       Nama Barang *
@@ -969,7 +902,7 @@ export default function FormPermintaanBarangPage() {
                     )}
                   </div>
 
-                  {/* Kategori Barang (OTOMATIS & TERKUNCI) */}
+                  {/* Kategori Barang */}
                   <div>
                     <label className="font-medium text-gray-700">
                       Kategori Barang
@@ -995,7 +928,7 @@ export default function FormPermintaanBarangPage() {
                     )}
                   </div>
 
-                  {/* Satuan (OTOMATIS & TERKUNCI) */}
+                  {/* Satuan */}
                   <div>
                     <label className="font-medium text-gray-700">Satuan</label>
                     <input
@@ -1083,7 +1016,7 @@ export default function FormPermintaanBarangPage() {
                     </div>
                   )}
 
-                  {/* Spesifikasi (BEBAS) */}
+                  {/* Spesifikasi */}
                   <div>
                     <label className="font-medium text-gray-700">
                       Spesifikasi
@@ -1098,7 +1031,7 @@ export default function FormPermintaanBarangPage() {
                     />
                   </div>
 
-                  {/* Keterangan (BEBAS) */}
+                  {/* Keterangan */}
                   <div className="md:col-span-2">
                     <label className="font-medium text-gray-700">
                       Keterangan
@@ -1290,7 +1223,6 @@ export default function FormPermintaanBarangPage() {
                   </div>
                 )}
 
-                {/* Tombol Simpan & Kirim */}
                 {/* Tombol Simpan & Kirim */}
                 <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
                   <button
