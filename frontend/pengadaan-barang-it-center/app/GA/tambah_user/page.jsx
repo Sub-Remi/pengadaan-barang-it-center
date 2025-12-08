@@ -1,13 +1,13 @@
 "use client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // IMPORT useRouter
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import userService from "../../../lib/userService";
 import divisiService from "../../../lib/divisiService";
 
 export default function TambahUserPage() {
-  const router = useRouter(); // INITIALIZE useRouter
+  const router = useRouter();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -97,253 +97,297 @@ export default function TambahUserPage() {
   };
 
   return (
-    <div className="flex h-screen font-poppins bg-gray-100 overflow-hidden">
-      {/* Sidebar */}
-      <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1 fixed top-0 left-0 h-full">
-        <div className="h-20 border-b border-white flex items-center justify-center bg-white">
-          <img
-            src="/logo/ItCenter.png"
-            alt="IT Center"
-            className="w-32 border-white"
-          />
+    <div className="flex flex-col h-screen font-poppins bg-gray-100">
+      {/* Header - Tetap fixed di atas */}
+      <header className="fixed top-0 left-0 right-0 z-50 flex bg-white shadow-sm items-center h-16">
+        <div className="bg-white w-60 h-16 flex items-center justify-center border-r border-gray-200">
+          <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
         </div>
-        <nav className="flex-1 mt-6 overflow-y-auto">
-          <ul className="space-y-1 pb-6">
-            <Link href="/GA/dashboard_ga">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Dashboard
-              </li>
-            </Link>
-            <hr className="border-t border-white/30 my-2" />
-            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-              DATA MASTER
-            </li>
+        <div className="flex-1 h-16 flex items-center px-8">
+          {/* Kosong untuk saat ini, bisa diisi dengan user profile dll */}
+        </div>
+      </header>
 
-            <Link href="/GA/data_permintaan">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Permintaan
-              </li>
-            </Link>
+      <div className="flex flex-1 overflow-hidden pt-16">
+        {/* Sidebar - Fixed dengan tinggi yang tepat dan scrollable */}
+        <aside className="w-60 bg-blue-900 text-white flex flex-col fixed left-0 top-16 bottom-0">
+          {/* Container scrollable untuk menu */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <style jsx>{`
+              /* Custom scrollbar untuk semua browser */
+              .custom-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: #3b82f6 #1e3a8a;
+              }
+              
+              /* Untuk WebKit browsers (Chrome, Safari, Edge) */
+              .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-track {
+                background: #1e3a8a; /* blue-900 */
+                border-radius: 4px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: #3b82f6; /* blue-500 */
+                border-radius: 4px;
+                border: 2px solid #1e3a8a;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background-color: #60a5fa; /* blue-400 */
+              }
+            `}</style>
+            
+            <nav className="p-2">
+              <ul className="space-y-1">
+                <Link href="/GA/dashboard_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Dashboard
+                  </li>
+                </Link>
 
-            <Link href="/GA/data_barang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Barang
-              </li>
-            </Link>
+                <hr className="border-t border-white/30 my-2" />
 
-            <Link href="/GA/data_kategoribarang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Kategori Barang
-              </li>
-            </Link>
+                {/* DATA MASTER */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  DATA MASTER
+                </li>
 
-            <Link href="/GA/data_satuanbarang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Satuan Barang
-              </li>
-            </Link>
+                <Link href="/GA/data_permintaan">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Permintaan
+                  </li>
+                </Link>
 
-            <Link href="/GA/data_stokbarang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Stok Barang
-              </li>
-            </Link>
+                <Link href="/GA/data_barang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Barang
+                  </li>
+                </Link>
 
-            <Link href="/GA/data_divisi">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Divisi
-              </li>
-            </Link>
+                <Link href="/GA/data_kategoribarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Kategori Barang
+                  </li>
+                </Link>
 
-            <Link href="/GA/manajemen_user">
-              <li className="bg-blue-500 px-5 py-2 cursor-pointer">
-                Manajemen User
-              </li>
-            </Link>
+                <Link href="/GA/data_satuanbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Satuan Barang
+                  </li>
+                </Link>
 
-            <hr className="border-t border-white/30 my-2" />
+                <Link href="/GA/data_stokbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Stok Barang
+                  </li>
+                </Link>
 
-            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-              MONITORING
-            </li>
+                <Link href="/GA/data_divisi">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Divisi
+                  </li>
+                </Link>
 
-            <Link href="/GA/laporan_ga">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Laporan
-              </li>
-            </Link>
+                <Link href="/GA/manajemen_user">
+                  <li className="bg-blue-500 px-5 py-2 cursor-pointer rounded">
+                    Manajemen User
+                  </li>
+                </Link>
 
-            <Link href="/GA/riwayat_ga">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Riwayat
-              </li>
-            </Link>
+                <hr className="border-t border-white/30 my-2" />
 
-            <hr className="border-t border-white/30 my-2" />
+                {/* MONITORING */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  MONITORING
+                </li>
 
-            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-              PEMESANAN
-            </li>
+                <Link href="/GA/laporan_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Laporan
+                  </li>
+                </Link>
 
-            <Link href="/GA/list_pemesanan">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                List Pemesanan
-              </li>
-            </Link>
+                <Link href="/GA/riwayat_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Riwayat
+                  </li>
+                </Link>
 
-            <Link href="/GA/form_penerimaanbarang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Form Penerimaan
-              </li>
-            </Link>
-          </ul>
-        </nav>
-      </aside>
+                <hr className="border-t border-white/30 my-2" />
 
-      <div className="flex flex-col flex-1 ml-60 h-full">
-        <header className="flex bg-white shadow-sm items-center h-20 fixed top-0 left-60 right-0 z-10">
-          <div className="flex-1 h-full flex items-center px-8"></div>
-        </header>
+                {/* PEMESANAN */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  PEMESANAN
+                </li>
 
-        <main className="flex-1 mt-20 overflow-y-auto bg-gray-200 p-8">
-          <h2 className="text-3xl font-semibold mb-6">Manajemen User</h2>
+                <Link href="/GA/list_pemesanan">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    List Pemesanan
+                  </li>
+                </Link>
 
-          <div className="bg-white rounded-lg shadow-md relative">
+                <Link href="/GA/form_penerimaanbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Form Penerimaan
+                  </li>
+                </Link>
+              </ul>
+            </nav>
+          </div>
+        </aside>
+
+        {/* Main Content - Scrollable dengan padding yang lebih baik */}
+        <main className="flex-1 text-black p-6 bg-gray-200 overflow-y-auto ml-60">
+          {/* Fixed header untuk judul halaman */}
+          <div className="bg-gray-200 pt-4 pb-4 mb-6">
+            <h2 className="text-2xl text-black font-semibold">Manajemen User</h2>
+          </div>
+
+          {/* Card container */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+            {/* Header atas card */}
             <div className="flex justify-between items-center px-6 py-4 border-b">
-              <h3 className="text-lg font-semibold text-[#00A99D]">
+              <h3 className="text-xl font-semibold text-teal-600">
                 Form Tambah User
               </h3>
               <Link href="/GA/manajemen_user">
-                <button className="bg-[#00A99D] hover:bg-[#009B91] text-white px-5 py-2 rounded">
+                <button className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded text-sm transition-colors">
                   Kembali
                 </button>
               </Link>
             </div>
 
             {error && (
-              <div className="mx-10 mt-6 p-3 bg-red-100 text-red-700 rounded">
+              <div className="mx-6 mt-4 p-3 bg-red-100 text-red-700 rounded text-sm">
                 {error}
               </div>
             )}
 
-            <form
-              onSubmit={handleSubmit}
-              className="px-10 py-8 space-y-6 mx-auto max-w-2xl"
-            >
-              {/* Username */}
-              <div>
-                <label className="block font-semibold text-gray-800 mb-1">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="w-full border rounded px-3 py-2 bg-[#bfe5e1] focus:outline-none"
-                  required
-                />
-              </div>
+            {/* Form Input */}
+            <form onSubmit={handleSubmit} className="px-6 py-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Username */}
+                <div>
+                  <label className="block font-medium text-gray-700 mb-2 text-sm">
+                    Username *
+                  </label>
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    required
+                    placeholder="Masukkan username"
+                  />
+                </div>
 
-              {/* Password */}
-              <div className="relative">
-                <label className="block font-semibold text-gray-800 mb-1">
-                  Password
-                </label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full border rounded px-3 py-2 pr-10 bg-[#bfe5e1] focus:outline-none"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-[40px] text-gray-600"
-                >
-                  {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
-                </button>
-              </div>
+                {/* Nama */}
+                <div>
+                  <label className="block font-medium text-gray-700 mb-2 text-sm">
+                    Nama Lengkap *
+                  </label>
+                  <input
+                    type="text"
+                    name="nama_lengkap"
+                    value={formData.nama_lengkap}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    required
+                    placeholder="Masukkan nama lengkap"
+                  />
+                </div>
 
-              {/* Konfirmasi Password */}
-              <div className="relative">
-                <label className="block font-semibold text-gray-800 mb-1">
-                  Konfirmasi Password
-                </label>
-                <input
-                  type={showConfirm ? "text" : "password"}
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="w-full border rounded px-3 py-2 pr-10 focus:outline-none"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirm(!showConfirm)}
-                  className="absolute right-3 top-[40px] text-gray-500 items-center"
-                >
-                  {showConfirm ? <Eye size={20} /> : <EyeOff size={20} />}
-                </button>
-              </div>
+                {/* Password */}
+                <div className="relative">
+                  <label className="block font-medium text-gray-700 mb-2 text-sm">
+                    Password *
+                  </label>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    required
+                    placeholder="Masukkan password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-[38px] text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                  </button>
+                </div>
 
-              <hr className="border-b-2 border-gray-300 -mx-99" />
+                {/* Konfirmasi Password */}
+                <div className="relative">
+                  <label className="block font-medium text-gray-700 mb-2 text-sm">
+                    Konfirmasi Password *
+                  </label>
+                  <input
+                    type={showConfirm ? "text" : "password"}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    required
+                    placeholder="Konfirmasi password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirm(!showConfirm)}
+                    className="absolute right-3 top-[38px] text-gray-500 hover:text-gray-700"
+                  >
+                    {showConfirm ? <Eye size={18} /> : <EyeOff size={18} />}
+                  </button>
+                </div>
 
-              {/* Nama */}
-              <div>
-                <label className="block font-semibold text-gray-800 mb-1">
-                  Nama
-                </label>
-                <input
-                  type="text"
-                  name="nama_lengkap"
-                  value={formData.nama_lengkap}
-                  onChange={handleChange}
-                  className="w-full border rounded px-3 py-2 focus:outline-none"
-                  required
-                />
-              </div>
+                {/* Email */}
+                <div>
+                  <label className="block font-medium text-gray-700 mb-2 text-sm">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    placeholder="contoh@email.com"
+                  />
+                </div>
 
-              {/* Email */}
-              <div>
-                <label className="block font-semibold text-gray-800 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full border rounded px-3 py-2 focus:outline-none"
-                />
-              </div>
-
-              {/* Divisi (Dropdown) */}
-              <div>
-                <label className="block font-semibold text-gray-800 mb-1">
-                  Divisi
-                </label>
-                <select
-                  name="divisi_id"
-                  value={formData.divisi_id}
-                  onChange={handleChange}
-                  className="w-full border rounded px-3 py-2 focus:outline-none"
-                >
-                  <option value="">Pilih Divisi</option>
-                  {divisiList.map((divisi) => (
-                    <option key={divisi.id} value={divisi.id}>
-                      {divisi.nama_divisi}
-                    </option>
-                  ))}
-                </select>
+                {/* Divisi (Dropdown) */}
+                <div>
+                  <label className="block font-medium text-gray-700 mb-2 text-sm">
+                    Divisi
+                  </label>
+                  <select
+                    name="divisi_id"
+                    value={formData.divisi_id}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  >
+                    <option value="">Pilih Divisi</option>
+                    {divisiList.map((divisi) => (
+                      <option key={divisi.id} value={divisi.id}>
+                        {divisi.nama_divisi}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               {/* Role (Radio Button) */}
-              <div>
-                <label className="block font-semibold text-gray-800 mb-2">
-                  Role
+              <div className="mt-4">
+                <label className="block font-medium text-gray-700 mb-3 text-sm">
+                  Role *
                 </label>
                 <div className="flex gap-6">
                   <label className="flex items-center gap-2">
@@ -353,8 +397,9 @@ export default function TambahUserPage() {
                       value="Pemohon"
                       checked={formData.role === "Pemohon"}
                       onChange={handleChange}
+                      className="text-teal-600 focus:ring-teal-500"
                     />
-                    Pemohon
+                    <span className="text-sm">Pemohon</span>
                   </label>
                   <label className="flex items-center gap-2">
                     <input
@@ -363,8 +408,9 @@ export default function TambahUserPage() {
                       value="Admin"
                       checked={formData.role === "Admin"}
                       onChange={handleChange}
+                      className="text-teal-600 focus:ring-teal-500"
                     />
-                    Admin
+                    <span className="text-sm">Admin</span>
                   </label>
                   <label className="flex items-center gap-2">
                     <input
@@ -373,32 +419,34 @@ export default function TambahUserPage() {
                       value="Validator"
                       checked={formData.role === "Validator"}
                       onChange={handleChange}
+                      className="text-teal-600 focus:ring-teal-500"
                     />
-                    Validator
+                    <span className="text-sm">Validator</span>
                   </label>
                 </div>
               </div>
 
               {/* Tombol */}
-              <div className="flex justify-center gap-6 pt-4">
+              <div className="flex justify-center gap-4 pt-6">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="bg-[#00A651] hover:bg-[#00944A] text-white font-semibold px-6 py-2 rounded shadow disabled:opacity-50"
+                  className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded text-sm transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  {loading ? "Menambahkan..." : "Tambah"}
+                  {loading ? "Menambahkan..." : "Tambah User"}
                 </button>
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="bg-[#ED1C24] hover:bg-[#C8171D] text-white font-semibold px-6 py-2 rounded shadow"
+                  className="bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2 rounded text-sm transition-colors"
                 >
                   Reset
                 </button>
               </div>
             </form>
 
-            <div className="h-2 bg-[#00A99D] w-full rounded-b-lg"></div>
+            {/* Garis bawah hijau */}
+            <div className="h-1 bg-teal-600 w-full"></div>
           </div>
         </main>
       </div>

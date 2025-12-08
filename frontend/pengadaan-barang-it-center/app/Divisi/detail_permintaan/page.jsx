@@ -259,7 +259,7 @@ export default function DetailPermintaanPage() {
               className="w-32 border-white"
             />
           </div>
-          <nav className="flex-1 mt-6 overflow-y-auto">
+          <nav className="flex-1 mt-6 overflow-y-auto text-x1">
             <ul className="space-y-1 pb-6">
               <Link href="/divisi/dashboard_divisi">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">

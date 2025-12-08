@@ -18,7 +18,7 @@ export default function ManajemenUserPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   // State untuk filter
   const [search, setSearch] = useState("");
@@ -39,7 +39,6 @@ export default function ManajemenUserPage() {
   }, []);
 
   // Load users
-  // manajemen_user.jsx - Perbaiki fungsi loadUsers
   const loadUsers = useCallback(
     async (page = 1) => {
       console.log("🔄 Memuat data users... Page:", page);
@@ -156,281 +155,323 @@ export default function ManajemenUserPage() {
   };
 
   return (
-    <div className="flex min-h-screen font-poppins bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-60 bg-blue-900 text-white flex flex-col fixed top-0 left-0 h-full">
-        <div className="h-20 border-b border-white flex items-center justify-center bg-white">
+    <div className="flex flex-col h-screen font-poppins bg-gray-100">
+      {/* Header - Tetap fixed di atas */}
+      <header className="fixed top-0 left-0 right-0 z-50 flex bg-white shadow-sm items-center h-16">
+        <div className="bg-white w-60 h-16 flex items-center justify-center border-r border-gray-200">
           <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
         </div>
-        <nav className="flex-1 mt-6 overflow-y-auto">
-          <ul className="space-y-1 pb-6">
-            <Link href="/GA/dashboard_ga">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Dashboard
-              </li>
-            </Link>
+        <div className="flex-1 h-16 flex items-center px-8">
+          {/* Kosong untuk saat ini, bisa diisi dengan user profile dll */}
+        </div>
+      </header>
 
-            <hr className="border-t border-white/30 my-2" />
+      <div className="flex flex-1 overflow-hidden pt-16">
+        {/* Sidebar - Fixed dengan tinggi yang tepat dan scrollable */}
+        <aside className="w-60 bg-blue-900 text-white flex flex-col fixed left-0 top-16 bottom-0">
+          {/* Container scrollable untuk menu */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <style jsx>{`
+              /* Custom scrollbar untuk semua browser */
+              .custom-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: #3b82f6 #1e3a8a;
+              }
+              
+              /* Untuk WebKit browsers (Chrome, Safari, Edge) */
+              .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-track {
+                background: #1e3a8a; /* blue-900 */
+                border-radius: 4px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: #3b82f6; /* blue-500 */
+                border-radius: 4px;
+                border: 2px solid #1e3a8a;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background-color: #60a5fa; /* blue-400 */
+              }
+            `}</style>
+            
+            <nav className="p-2">
+              <ul className="space-y-1">
+                <Link href="/GA/dashboard_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Dashboard
+                  </li>
+                </Link>
 
-            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-              DATA MASTER
-            </li>
+                <hr className="border-t border-white/30 my-2" />
 
-            <Link href="/GA/data_permintaan">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Permintaan
-              </li>
-            </Link>
+                {/* DATA MASTER */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  DATA MASTER
+                </li>
 
-            <Link href="/GA/data_barang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Barang
-              </li>
-            </Link>
+                <Link href="/GA/data_permintaan">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Permintaan
+                  </li>
+                </Link>
 
-            <Link href="/GA/data_kategoribarang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Kategori Barang
-              </li>
-            </Link>
+                <Link href="/GA/data_barang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Barang
+                  </li>
+                </Link>
 
-            <Link href="/GA/data_satuanbarang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Satuan Barang
-              </li>
-            </Link>
+                <Link href="/GA/data_kategoribarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Kategori Barang
+                  </li>
+                </Link>
 
-            <Link href="/GA/data_stokbarang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Stok Barang
-              </li>
-            </Link>
+                <Link href="/GA/data_satuanbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Satuan Barang
+                  </li>
+                </Link>
 
-            <Link href="/GA/data_divisi">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Divisi
-              </li>
-            </Link>
+                <Link href="/GA/data_stokbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Stok Barang
+                  </li>
+                </Link>
 
-            <Link href="/GA/manajemen_user">
-              <li className="bg-blue-500 px-5 py-2 cursor-pointer">
-                Manajemen User
-              </li>
-            </Link>
+                <Link href="/GA/data_divisi">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Divisi
+                  </li>
+                </Link>
 
-            <hr className="border-t border-white/30 my-2" />
+                <Link href="/GA/manajemen_user">
+                  <li className="bg-blue-500 px-5 py-2 cursor-pointer rounded">
+                    Manajemen User
+                  </li>
+                </Link>
 
-            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-              MONITORING
-            </li>
+                <hr className="border-t border-white/30 my-2" />
 
-            <Link href="/GA/laporan_ga">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Laporan
-              </li>
-            </Link>
+                {/* MONITORING */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  MONITORING
+                </li>
 
-            <Link href="/GA/riwayat_ga">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Riwayat
-              </li>
-            </Link>
+                <Link href="/GA/laporan_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Laporan
+                  </li>
+                </Link>
 
-            <hr className="border-t border-white/30 my-2" />
+                <Link href="/GA/riwayat_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Riwayat
+                  </li>
+                </Link>
 
-            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-              PEMESANAN
-            </li>
+                <hr className="border-t border-white/30 my-2" />
 
-            <Link href="/GA/list_pemesanan">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                List Pemesanan
-              </li>
-            </Link>
+                {/* PEMESANAN */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  PEMESANAN
+                </li>
 
-            <Link href="/GA/form_penerimaanbarang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Form Penerimaan
-              </li>
-            </Link>
-          </ul>
-        </nav>
-      </aside>
+                <Link href="/GA/list_pemesanan">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    List Pemesanan
+                  </li>
+                </Link>
 
-      {/* Main Content */}
-      <div className="flex flex-col flex-1 ml-60">
-        <header className="flex bg-white shadow-sm items-center h-20">
-          <div className="flex-1 h-full flex items-center px-8"></div>
-        </header>
+                <Link href="/GA/form_penerimaanbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Form Penerimaan
+                  </li>
+                </Link>
+              </ul>
+            </nav>
+          </div>
+        </aside>
 
-        <main className="flex-1 p-8 bg-gray-200">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-semibold">Manajemen User</h2>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={handleRefresh}
-                className="flex items-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition"
-              >
-                <FaSync className="mr-2" /> Refresh Data
-              </button>
-              <Link href="/GA/tambah_user">
-                <button className="flex items-center bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition">
-                  <FaPlus className="mr-2" /> Tambah User
-                </button>
-              </Link>
-            </div>
+        {/* Main Content - Scrollable dengan padding yang lebih baik */}
+        <main className="flex-1 text-black p-6 bg-gray-200 overflow-y-auto ml-60">
+          {/* Fixed header untuk judul halaman */}
+          <div className="bg-gray-200 mb-6">
+            <h2 className="text-3xl text-black font-semibold">Manajemen User</h2>
           </div>
 
-          {/* Filter dan Search */}
+          {/* Card container */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-            <div className="flex flex-wrap items-center gap-4 px-6 py-4">
-              <div className="flex items-center">
-                <label
-                  htmlFor="search"
-                  className="text-gray-700 font-medium mr-2"
+            {/* Header atas card */}
+            <div className="flex justify-between items-center px-6 py-4 border-b">
+              <h3 className="text-xl font-semibold text-teal-600">
+                Data User
+              </h3>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={handleRefresh}
+                  className="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded text-sm transition-colors"
                 >
-                  Search
-                </label>
-                <input
-                  id="search"
-                  type="text"
-                  value={search}
-                  onChange={handleSearchChange}
-                  className="border border-gray-300 rounded px-3 py-1.5 text-sm"
-                  placeholder="Cari nama, username, email"
-                />
-              </div>
-
-              <div className="flex items-center">
-                <label className="font-medium text-gray-700 mr-2">Peran</label>
-                <select
-                  className="border border-gray-300 rounded px-3 py-1.5 text-sm"
-                  value={roleFilter}
-                  onChange={handleRoleChange}
-                >
-                  <option value="semua">Semua</option>
-                  <option value="pemohon">Pemohon</option>
-                  <option value="admin">Admin</option>
-                  <option value="validator">Validator</option>
-                </select>
-              </div>
-
-              <div className="flex items-center">
-                <label className="font-medium text-gray-700 mr-2">Divisi</label>
-                <select
-                  className="border border-gray-300 rounded px-3 py-1.5 text-sm min-w-[150px]"
-                  value={divisiFilter}
-                  onChange={handleDivisiChange}
-                >
-                  <option value="semua">Semua</option>
-                  {divisiList.map((divisi) => (
-                    <option key={divisi.id} value={divisi.id}>
-                      {divisi.nama_divisi}
-                    </option>
-                  ))}
-                </select>
+                  <FaSync className="mr-2" /> Refresh Data
+                </button>
+                <Link href="/GA/tambah_user">
+                  <button className="flex items-center bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded text-sm transition-colors">
+                    <FaPlus className="mr-2" /> Tambah User
+                  </button>
+                </Link>
               </div>
             </div>
-          </div>
 
-          {/* Tampilkan jumlah data */}
-          <div className="mb-4 text-sm text-gray-600">
-            {loading
-              ? "Memuat data..."
-              : `Menampilkan ${users.length} dari ${totalItems} user`}
-          </div>
+            {/* Filter section */}
+            <div className="px-6 py-4 border-b bg-white">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                {/* Search */}
+                <div>
+                  <label
+                    htmlFor="search"
+                    className="block font-medium text-x1 mb-1"
+                  >
+                    Search
+                  </label>
+                  <input
+                    id="search"
+                    type="text"
+                    value={search}
+                    onChange={handleSearchChange}
+                    placeholder="Cari nama, username, email..."
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
+                  />
+                </div>
 
-          {/* Tabel User */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            {loading ? (
-              <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-600 mb-2"></div>
-                <p className="text-gray-500">Memuat data user...</p>
+                {/* Filter Role */}
+                <div>
+                  <label
+                    htmlFor="role"
+                    className="block font-medium text-x1 text-gray-700 mb-1"
+                  >
+                    Peran
+                  </label>
+                  <select
+                    id="role"
+                    value={roleFilter}
+                    onChange={handleRoleChange}
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-x1"
+                  >
+                    <option value="semua">Semua</option>
+                    <option value="pemohon">Pemohon</option>
+                    <option value="admin">Admin</option>
+                    <option value="validator">Validator</option>
+                  </select>
+                </div>
+
+                {/* Filter Divisi */}
+                <div>
+                  <label
+                    htmlFor="divisi"
+                    className="block font-medium text-x1 text-gray-700 mb-1"
+                  >
+                    Divisi
+                  </label>
+                  <select
+                    id="divisi"
+                    value={divisiFilter}
+                    onChange={handleDivisiChange}
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-x1"
+                  >
+                    <option value="semua">Semua</option>
+                    {divisiList.map((divisi) => (
+                      <option key={divisi.id} value={divisi.id}>
+                        {divisi.nama_divisi}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto">
+            </div>
+
+            {/* Tabel - Container dengan overflow untuk tabel panjang */}
+            <div className="overflow-x-auto">
+              {loading ? (
+                <div className="px-6 py-8 text-center">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-600"></div>
+                  <p className="mt-2 text-gray-600">Memuat data...</p>
+                </div>
+              ) : (
+                <>
+                  {/* Tampilkan jumlah data */}
+                  <div className="px-6 py-3 text-sm text-gray-600 bg-gray-50">
+                    {users.length > 0 
+                      ? `Menampilkan ${users.length} dari ${totalItems} user` 
+                      : 'Tidak ada data user ditemukan'}
+                  </div>
+
                   <table className="w-full border-collapse">
                     <thead>
                       <tr className="bg-gray-50 text-left">
-                        <th className="px-6 py-3 font-semibold text-gray-700 border-b">
-                          No
-                        </th>
-                        <th className="px-6 py-3 font-semibold text-gray-700 border-b">
-                          Nama
-                        </th>
-                        <th className="px-6 py-3 font-semibold text-gray-700 border-b">
-                          Username
-                        </th>
-                        <th className="px-6 py-3 font-semibold text-gray-700 border-b">
-                          Email
-                        </th>
-                        <th className="px-6 py-3 font-semibold text-gray-700 border-b">
-                          Divisi
-                        </th>
-                        <th className="px-6 py-3 font-semibold text-gray-700 border-b">
-                          Peran
-                        </th>
-                        <th className="px-6 py-3 font-semibold text-gray-700 border-b text-center">
+                        <th className="px-4 py-3 font-semibold text-x1">No</th>
+                        <th className="px-4 py-3 font-semibold text-x1">Nama</th>
+                        <th className="px-4 py-3 font-semibold text-x1">Username</th>
+                        <th className="px-4 py-3 font-semibold text-x1">Email</th>
+                        <th className="px-4 py-3 font-semibold text-x1">Divisi</th>
+                        <th className="px-4 py-3 font-semibold text-x1">Peran</th>
+                        <th className="px-4 py-3 font-semibold text-x1 text-center">
                           Aksi
                         </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {users.length > 0 ? (
-                        users.map((row, index) => (
-                          <tr
-                            key={row.id}
-                            className="hover:bg-gray-50 transition-colors"
-                          >
-                            <td className="px-6 py-3 text-gray-700 border-b">
-                              {(currentPage - 1) * itemsPerPage + index + 1}
-                            </td>
-                            <td className="px-6 py-3 font-medium text-gray-800 border-b">
-                              {row.nama_lengkap}
-                            </td>
-                            <td className="px-6 py-3 text-gray-700 border-b">
-                              {row.username}
-                            </td>
-                            <td className="px-6 py-3 text-gray-700 border-b">
-                              {row.email || "-"}
-                            </td>
-                            <td className="px-6 py-3 text-gray-700 border-b">
-                              {row.nama_divisi || "-"}
-                            </td>
-                            <td className="px-6 py-3 border-b">
-                              <span
-                                className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                  row.role === "admin"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : row.role === "validator"
-                                    ? "bg-purple-100 text-purple-800"
-                                    : "bg-green-100 text-green-800"
-                                }`}
-                              >
-                                {formatRole(row.role)}
-                              </span>
-                            </td>
-                            <td className="px-6 py-3 border-b text-center">
+                      {users.map((row, index) => (
+                        <tr
+                          key={row.id}
+                          className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                        >
+                          <td className="px-4 py-3 text-x1">
+                            {(currentPage - 1) * itemsPerPage + index + 1}
+                          </td>
+                          <td className="px-4 py-3 text-x1 font-medium">
+                            {row.nama_lengkap}
+                          </td>
+                          <td className="px-4 py-3 text-x1">{row.username}</td>
+                          <td className="px-4 py-3 text-x1">{row.email || "-"}</td>
+                          <td className="px-4 py-3 text-x1">{row.nama_divisi || "-"}</td>
+                          <td className="px-4 py-3 text-x1">
+                            <span
+                              className={`px-2 py-1 rounded text-sm font-medium ${
+                                row.role === "admin"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : row.role === "validator"
+                                  ? "bg-purple-100 text-purple-800"
+                                  : "bg-green-100 text-green-800"
+                              }`}
+                            >
+                              {formatRole(row.role)}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <div className="flex justify-center space-x-2">
                               <button
-                                onClick={() =>
-                                  handleDelete(row.id, row.username)
-                                }
-                                className="bg-red-600 hover:bg-red-700 text-white p-2 rounded transition-colors"
+                                onClick={() => handleDelete(row.id, row.username)}
+                                className="bg-red-600 hover:bg-red-700 text-white p-2 rounded text-sm transition-colors"
                                 title="Hapus User"
                               >
-                                <FaTrash />
+                                <FaTrash size={14} />
                               </button>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {users.length === 0 && (
                         <tr>
                           <td
                             colSpan="7"
-                            className="px-6 py-12 text-center text-gray-500"
+                            className="px-6 py-8 text-center text-gray-500"
                           >
-                            <div className="mb-2">📭</div>
+                            <div className="mb-2 text-2xl">📭</div>
                             <p className="font-medium">
                               Tidak ada data user ditemukan
                             </p>
@@ -446,80 +487,71 @@ export default function ManajemenUserPage() {
                       )}
                     </tbody>
                   </table>
-                </div>
 
-                {/* Pagination */}
-                {users.length > 0 && totalPages > 1 && (
-                  <div className="flex flex-col sm:flex-row justify-between items-center px-6 py-4 bg-white border-t">
-                    <div className="mb-3 sm:mb-0 text-sm text-gray-700">
-                      Halaman {currentPage} dari {totalPages} • {totalItems}{" "}
-                      total user
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => goToPage(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="px-3 py-1.5 text-sm border rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        ← Previous
-                      </button>
+                  {/* Pagination */}
+                  {users.length > 0 && totalPages > 1 && (
+                    <div className="flex flex-col sm:flex-row justify-between items-center px-6 py-4 bg-white border-t">
+                      <div className="mb-3 sm:mb-0 text-sm text-gray-600">
+                        Halaman {currentPage} dari {totalPages} • {totalItems} total user
+                      </div>
+                      <div className="inline-flex text-sm border rounded-md overflow-hidden">
+                        <button
+                          onClick={() => goToPage(currentPage - 1)}
+                          disabled={currentPage === 1}
+                          className={`px-3 py-1 border-r text-sm ${
+                            currentPage === 1
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : "bg-white hover:bg-gray-100"
+                          }`}
+                        >
+                          Previous
+                        </button>
 
-                      {/* Pagination numbers */}
-                      <div className="flex space-x-1">
-                        {(() => {
-                          const pages = [];
-                          const maxVisiblePages = 5;
-
-                          // Tentukan halaman awal dan akhir
-                          let startPage = Math.max(
-                            1,
-                            currentPage - Math.floor(maxVisiblePages / 2)
-                          );
-                          let endPage = Math.min(
-                            totalPages,
-                            startPage + maxVisiblePages - 1
-                          );
-
-                          // Adjust jika tidak cukup halaman
-                          if (endPage - startPage + 1 < maxVisiblePages) {
-                            startPage = Math.max(
-                              1,
-                              endPage - maxVisiblePages + 1
-                            );
-                          }
-
-                          for (let i = startPage; i <= endPage; i++) {
-                            pages.push(
+                        {[...Array(totalPages)].map((_, i) => {
+                          const pageNum = i + 1;
+                          // Show only current page, first, last, and neighbors
+                          if (
+                            pageNum === 1 ||
+                            pageNum === totalPages ||
+                            (pageNum >= currentPage - 1 &&
+                              pageNum <= currentPage + 1)
+                          ) {
+                            return (
                               <button
-                                key={i}
-                                onClick={() => goToPage(i)}
-                                className={`px-3 py-1.5 text-sm border rounded-md min-w-[40px] ${
-                                  currentPage === i
-                                    ? "bg-teal-600 text-white border-teal-600"
-                                    : "bg-white hover:bg-gray-50"
-                                } transition-colors`}
+                                key={pageNum}
+                                onClick={() => goToPage(pageNum)}
+                                className={`px-3 py-1 border-r text-sm ${
+                                  pageNum === currentPage
+                                    ? "bg-teal-600 text-white"
+                                    : "bg-white hover:bg-gray-100"
+                                }`}
                               >
-                                {i}
+                                {pageNum}
                               </button>
                             );
                           }
-                          return pages;
-                        })()}
+                          return null;
+                        })}
+
+                        <button
+                          onClick={() => goToPage(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                          className={`px-3 py-1 text-sm ${
+                            currentPage === totalPages
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : "bg-white hover:bg-gray-100"
+                          }`}
+                        >
+                          Next
+                        </button>
                       </div>
-
-                      <button
-                        onClick={() => goToPage(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className="px-3 py-1.5 text-sm border rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        Next →
-                      </button>
                     </div>
-                  </div>
-                )}
-              </>
-            )}
+                  )}
+                </>
+              )}
+            </div>
 
+            {/* Garis bawah hijau */}
             <div className="h-1 bg-teal-600 w-full"></div>
           </div>
         </main>

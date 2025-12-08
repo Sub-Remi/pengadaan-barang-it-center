@@ -41,14 +41,14 @@ const FormPenolakanModal = ({
           <button
             onClick={onClose}
             disabled={loading}
-            className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50"
+            className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition"
           >
             Batal
           </button>
           <button
             onClick={onConfirm}
             disabled={loading || !catatan.trim()}
-            className={`px-4 py-2 rounded text-white ${
+            className={`px-4 py-2 rounded text-white transition ${
               !catatan.trim()
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-red-600 hover:bg-red-700"
@@ -434,7 +434,7 @@ export default function DetailPermintaanPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-600"></div>
         <p className="ml-2">Memuat data...</p>
       </div>
@@ -443,7 +443,7 @@ export default function DetailPermintaanPage() {
 
   if (!permintaanData) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center h-screen">
         <p className="text-red-600">Data permintaan tidak ditemukan</p>
       </div>
     );
@@ -452,117 +452,148 @@ export default function DetailPermintaanPage() {
   const stats = getBarangStats();
 
   return (
-    <div className="flex flex-col min-h-screen font-poppins bg-gray-100">
-      {/* Header */}
-      <header className="flex bg-white shadow-sm items-center">
-        <div className="bg-white w-60 h-20 flex items-center justify-center border-r border-white">
+    <div className="flex flex-col h-screen font-poppins bg-gray-100">
+      {/* Header - Tetap fixed di atas */}
+      <header className="fixed top-0 left-0 right-0 z-50 flex bg-white shadow-sm items-center h-16">
+        <div className="bg-white w-60 h-16 flex items-center justify-center border-r border-gray-200">
           <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
         </div>
-        <div className="flex-1 h-20 flex items-center px-8"></div>
+        <div className="flex-1 h-16 flex items-center px-8"></div>
       </header>
 
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1">
-          <nav className="flex-1 mt-6">
-            <ul className="space-y-1">
-              <Link href="/GA/dashboard_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Dashboard
+      <div className="flex flex-1 overflow-hidden pt-16">
+        {/* Sidebar - Fixed dengan tinggi yang tepat dan scrollable */}
+        <aside className="w-60 bg-blue-900 text-white flex flex-col fixed left-0 top-16 bottom-0">
+          {/* Container scrollable untuk menu */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <style jsx>{`
+              /* Custom scrollbar untuk semua browser */
+              .custom-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: #3b82f6 #1e3a8a;
+              }
+              
+              /* Untuk WebKit browsers (Chrome, Safari, Edge) */
+              .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-track {
+                background: #1e3a8a; /* blue-900 */
+                border-radius: 4px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: #3b82f6; /* blue-500 */
+                border-radius: 4px;
+                border: 2px solid #1e3a8a;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background-color: #60a5fa; /* blue-400 */
+              }
+            `}</style>
+            
+            <nav className="p-2">
+              <ul className="space-y-1">
+                <Link href="/GA/dashboard_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Dashboard
+                  </li>
+                </Link>
+
+                <hr className="border-t border-white/30 my-2" />
+
+                {/* DATA MASTER */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  DATA MASTER
                 </li>
-              </Link>
 
-              <hr className="border-t border-white/30 my-2" />
+                <Link href="/GA/data_permintaan">
+                  <li className="bg-blue-500 px-5 py-2 cursor-pointer rounded">
+                    Permintaan
+                  </li>
+                </Link>
 
-              {/* DATA MASTER */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                DATA MASTER
-              </li>
+                <Link href="/GA/data_barang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Barang
+                  </li>
+                </Link>
 
-              <Link href="/GA/data_permintaan">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
-                  Permintaan
+                <Link href="/GA/data_kategoribarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Kategori Barang
+                  </li>
+                </Link>
+
+                <Link href="/GA/data_satuanbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Satuan Barang
+                  </li>
+                </Link>
+
+                <Link href="/GA/data_stokbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Stok Barang
+                  </li>
+                </Link>
+
+                <Link href="/GA/data_divisi">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Divisi
+                  </li>
+                </Link>
+
+                <Link href="/GA/manajemen_user">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Manajemen User
+                  </li>
+                </Link>
+
+                <hr className="border-t border-white/30 my-2" />
+
+                {/* MONITORING */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  MONITORING
                 </li>
-              </Link>
 
-              <Link href="/GA/data_barang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Barang
+                <Link href="/GA/laporan_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Laporan
+                  </li>
+                </Link>
+
+                <Link href="/GA/riwayat_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Riwayat
+                  </li>
+                </Link>
+
+                <hr className="border-t border-white/30 my-2" />
+
+                {/* PEMESANAN */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  PEMESANAN
                 </li>
-              </Link>
 
-              <Link href="/GA/data_kategoribarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Kategori Barang
-                </li>
-              </Link>
+                <Link href="/GA/list_pemesanan">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    List Pemesanan
+                  </li>
+                </Link>
 
-              <Link href="/GA/data_satuanbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Satuan Barang
-                </li>
-              </Link>
-
-              <Link href="/GA/data_stokbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Stok Barang
-                </li>
-              </Link>
-
-              <Link href="/GA/data_divisi">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Divisi
-                </li>
-              </Link>
-
-              <Link href="/GA/manajemen_user">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Manajemen User
-                </li>
-              </Link>
-
-              <hr className="border-t border-white/30 my-2" />
-
-              {/* MONITORING */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                MONITORING
-              </li>
-
-              <Link href="/GA/laporan_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Laporan
-                </li>
-              </Link>
-
-              <Link href="/GA/riwayat_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Riwayat
-                </li>
-              </Link>
-
-              <hr className="border-t border-white/30 my-2" />
-
-              {/* PEMESANAN */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                PEMESANAN
-              </li>
-
-              <Link href="/GA/list_pemesanan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  List Pemesanan
-                </li>
-              </Link>
-
-              <Link href="/GA/form_penerimaanbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Form Penerimaan
-                </li>
-              </Link>
-            </ul>
-          </nav>
+                <Link href="/GA/form_penerimaanbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Form Penerimaan
+                  </li>
+                </Link>
+              </ul>
+            </nav>
+          </div>
         </aside>
 
-        {/* Main Content */}
+        {/* Modal untuk penolakan */}
         <FormPenolakanModal
           isOpen={modalTolak.isOpen}
           onClose={closeModalTolak}
@@ -574,16 +605,17 @@ export default function DetailPermintaanPage() {
           loading={saving}
         />
 
-        <main className="flex-1 p-8 bg-gray-200">
-          <h2 className="text-3xl font-semibold mb-6">Permintaan</h2>
+        {/* Main Content */}
+        <main className="flex-1 p-8 bg-gray-200 overflow-y-auto ml-60">
+          <h2 className="text-3xl font-semibold mb-6 text-gray-800">Permintaan</h2>
 
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="flex justify-between items-center px-6 py-5 border-b-4 border-b-gray-300">
+          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+            <div className="flex justify-between items-center px-6 py-5 border-b">
               <h3 className="text-xl font-semibold text-teal-600">
                 Detail Permintaan
               </h3>
               <Link href="/GA/data_permintaan">
-                <button className="bg-teal-600 hover:bg-green-600 text-white px-4 py-1.5 rounded">
+                <button className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded transition">
                   &lt; Kembali
                 </button>
               </Link>
@@ -594,8 +626,8 @@ export default function DetailPermintaanPage() {
               <div
                 className={`px-6 py-4 ${
                   error
-                    ? "bg-red-100 text-red-700"
-                    : "bg-green-100 text-green-700"
+                    ? "bg-red-100 text-red-700 border-l-4 border-red-500"
+                    : "bg-green-100 text-green-700 border-l-4 border-green-500"
                 }`}
               >
                 {error || success}
@@ -603,13 +635,13 @@ export default function DetailPermintaanPage() {
             )}
 
             {/* Data Permintaan */}
-            <div className="px-6 py-4 border-b-4 border-b-gray-300">
+            <div className="px-6 py-4 border-b">
               <h4 className="text-lg font-semibold mb-4 text-gray-800">
                 Data Permintaan
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-gray-700 block mb-1">
                     ID Permintaan
                   </label>
                   <input
@@ -619,16 +651,16 @@ export default function DetailPermintaanPage() {
                       `PB-${permintaanData.id}`
                     }
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-gray-700 block mb-1">
                     Status Permintaan
                   </label>
                   <div
-                    className={`mt-1 px-3 py-2 rounded font-semibold ${getStatusColor(
+                    className={`px-3 py-2 rounded font-semibold ${getStatusColor(
                       permintaanData.status
                     )}`}
                   >
@@ -641,82 +673,82 @@ export default function DetailPermintaanPage() {
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-gray-700 block mb-1">
                     Nama Pemohon
                   </label>
                   <input
                     type="text"
                     value={permintaanData.nama_lengkap || "-"}
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Divisi</label>
+                  <label className="font-medium text-gray-700 block mb-1">Divisi</label>
                   <input
                     type="text"
                     value={permintaanData.nama_divisi || "-"}
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Email</label>
+                  <label className="font-medium text-gray-700 block mb-1">Email</label>
                   <input
                     type="text"
                     value={permintaanData.email || "-"}
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-gray-700 block mb-1">
                     Tanggal Permintaan
                   </label>
                   <input
                     type="text"
                     value={formatDate(permintaanData.created_at)}
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-gray-700 block mb-1">
                     Tanggal Kebutuhan
                   </label>
                   <input
                     type="text"
                     value={formatDate(permintaanData.tanggal_kebutuhan)}
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-gray-700 block mb-1">
                     Jumlah Barang
                   </label>
                   <input
                     type="text"
                     value={`${barangData.length} jenis barang`}
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2"
                   />
                 </div>
 
                 {permintaanData.catatan && (
                   <div className="md:col-span-2">
-                    <label className="font-medium text-gray-700">
+                    <label className="font-medium text-gray-700 block mb-1">
                       Judul Permintaan
                     </label>
                     <textarea
                       value={permintaanData.catatan}
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2"
                       rows="2"
                     />
                   </div>
@@ -761,7 +793,7 @@ export default function DetailPermintaanPage() {
             {barangData.map((barang, index) => (
               <div
                 key={barang.id}
-                className="px-6 py-4 border-b-4 border-b-gray-300"
+                className="px-6 py-4 border-b"
               >
                 <div className="flex justify-between items-center mb-4">
                   <div>
@@ -783,60 +815,60 @@ export default function DetailPermintaanPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="font-medium text-gray-700">
+                    <label className="font-medium text-gray-700 block mb-1">
                       Kategori Barang
                     </label>
                     <input
                       type="text"
                       value={barang.kategori_barang || "-"}
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2"
                     />
                   </div>
 
                   <div>
-                    <label className="font-medium text-gray-700">
+                    <label className="font-medium text-gray-700 block mb-1">
                       Nama Barang
                     </label>
                     <input
                       type="text"
                       value={barang.nama_barang || "-"}
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2"
                     />
                   </div>
 
                   <div>
-                    <label className="font-medium text-gray-700">
+                    <label className="font-medium text-gray-700 block mb-1">
                       Spesifikasi
                     </label>
                     <input
                       type="text"
                       value={barang.spesifikasi || "-"}
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2"
                     />
                   </div>
 
                   <div>
-                    <label className="font-medium text-gray-700">
+                    <label className="font-medium text-gray-700 block mb-1">
                       Jumlah Diminta
                     </label>
                     <input
                       type="text"
                       value={barang.jumlah || 0}
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2"
                     />
                   </div>
 
                   {barang.stok_barang && (
                     <>
                       <div>
-                        <label className="font-medium text-gray-700">
+                        <label className="font-medium text-gray-700 block mb-1">
                           Stok Tersedia
                         </label>
-                        <div className="flex items-center mt-1">
+                        <div className="flex items-center">
                           <input
                             type="text"
                             value={barang.stok_barang.stok || 0}
@@ -850,11 +882,11 @@ export default function DetailPermintaanPage() {
                       </div>
 
                       <div>
-                        <label className="font-medium text-gray-700">
+                        <label className="font-medium text-gray-700 block mb-1">
                           Status Stok
                         </label>
                         <div
-                          className={`mt-1 px-3 py-2 rounded ${
+                          className={`px-3 py-2 rounded ${
                             (barang.stok_barang.stok || 0) >=
                             (barang.jumlah || 0)
                               ? "bg-green-100 text-green-800"
@@ -871,26 +903,26 @@ export default function DetailPermintaanPage() {
                   )}
 
                   <div className="md:col-span-2">
-                    <label className="font-medium text-gray-700">
+                    <label className="font-medium text-gray-700 block mb-1">
                       Keterangan Pemohon
                     </label>
                     <textarea
                       value={barang.keterangan || "-"}
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2"
                       rows="2"
                     />
                   </div>
 
                   {barang.catatan_admin && (
                     <div className="md:col-span-2">
-                      <label className="font-medium text-gray-700">
+                      <label className="font-medium text-gray-700 block mb-1">
                         Catatan Admin
                       </label>
                       <textarea
                         value={barang.catatan_admin}
                         disabled
-                        className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                        className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2"
                         rows="2"
                       />
                     </div>
@@ -913,7 +945,7 @@ export default function DetailPermintaanPage() {
                               handleAjukanPembelian(barang.id, barang)
                             }
                             disabled={saving}
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded flex items-center gap-2"
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded flex items-center gap-2 transition"
                           >
                             <span>📋 Ajukan Pembelian</span>
                           </button>
@@ -921,7 +953,7 @@ export default function DetailPermintaanPage() {
                           <button
                             onClick={() => handleValidasiBarang(barang.id)}
                             disabled={saving}
-                            className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded flex items-center gap-2"
+                            className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded flex items-center gap-2 transition"
                           >
                             <span>✅ Validasi</span>
                           </button>
@@ -931,7 +963,7 @@ export default function DetailPermintaanPage() {
                               openModalTolak(barang.id, barang.nama_barang)
                             }
                             disabled={saving}
-                            className="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded flex items-center gap-2"
+                            className="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded flex items-center gap-2 transition"
                           >
                             <span>❌ Tolak</span>
                           </button>
@@ -972,7 +1004,7 @@ export default function DetailPermintaanPage() {
                             handleAjukanPembelian(barang.id, barang)
                           }
                           disabled={saving}
-                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded"
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded transition"
                         >
                           Lihat Proses Pembelian
                         </button>
@@ -987,7 +1019,7 @@ export default function DetailPermintaanPage() {
                             handleAjukanPembelian(barang.id, barang)
                           }
                           disabled={saving}
-                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded"
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded transition"
                         >
                           Pantau Pemesanan
                         </button>
@@ -1001,7 +1033,7 @@ export default function DetailPermintaanPage() {
                             )
                           }
                           disabled={saving}
-                          className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded"
+                          className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded transition"
                         >
                           Tandai Selesai
                         </button>
@@ -1047,7 +1079,7 @@ export default function DetailPermintaanPage() {
                             )
                           }
                           disabled={saving}
-                          className="bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded"
+                          className="bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded transition"
                         >
                           Reset ke Menunggu Validasi
                         </button>
@@ -1059,11 +1091,11 @@ export default function DetailPermintaanPage() {
             ))}
 
             {/* Tombol Refresh */}
-            <div className="flex justify-end px-8 py-5 gap-3">
+            <div className="flex justify-end px-6 py-5 gap-3">
               <button
                 onClick={() => fetchPermintaanDetail()}
                 disabled={saving}
-                className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-5 py-2 rounded"
+                className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-5 py-2 rounded transition"
               >
                 Refresh Data
               </button>

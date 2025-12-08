@@ -100,126 +100,158 @@ export default function DataStokBarangPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center h-screen">
         <div className="text-xl">Loading data stok...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen font-poppins bg-gray-100">
-      <header className="flex bg-white shadow-sm items-center">
-        <div className="bg-white w-60 h-20 flex items-center justify-center border-r border-white">
+    <div className="flex flex-col h-screen font-poppins bg-gray-100">
+      {/* Header - Tetap fixed di atas */}
+      <header className="fixed top-0 left-0 right-0 z-50 flex bg-white shadow-sm items-center h-16">
+        <div className="bg-white w-60 h-16 flex items-center justify-center border-r border-gray-200">
           <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
         </div>
-        <div className="flex-1 h-20 flex items-center px-8"></div>
+        <div className="flex-1 h-16 flex items-center px-8"></div>
       </header>
 
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1">
-          <nav className="flex-1 mt-6">
-            <ul className="space-y-1">
-              <Link href="/GA/dashboard_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Dashboard
+      <div className="flex flex-1 overflow-hidden pt-16">
+        {/* Sidebar - Fixed dengan tinggi yang tepat dan scrollable */}
+        <aside className="w-60 bg-blue-900 text-white flex flex-col fixed left-0 top-16 bottom-0">
+          {/* Container scrollable untuk menu */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <style jsx>{`
+              /* Custom scrollbar untuk semua browser */
+              .custom-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: #3b82f6 #1e3a8a;
+              }
+              
+              /* Untuk WebKit browsers (Chrome, Safari, Edge) */
+              .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-track {
+                background: #1e3a8a; /* blue-900 */
+                border-radius: 4px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: #3b82f6; /* blue-500 */
+                border-radius: 4px;
+                border: 2px solid #1e3a8a;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background-color: #60a5fa; /* blue-400 */
+              }
+            `}</style>
+            
+            <nav className="p-2">
+              <ul className="space-y-1">
+                <Link href="/GA/dashboard_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Dashboard
+                  </li>
+                </Link>
+
+                <hr className="border-t border-white/30 my-2" />
+
+                {/* DATA MASTER */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  DATA MASTER
                 </li>
-              </Link>
 
-              <hr className="border-t border-white/30 my-2" />
+                <Link href="/GA/data_permintaan">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Permintaan
+                  </li>
+                </Link>
 
-              {/* DATA MASTER */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                DATA MASTER
-              </li>
+                <Link href="/GA/data_barang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Barang
+                  </li>
+                </Link>
 
-              <Link href="/GA/data_permintaan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Permintaan
+                <Link href="/GA/data_kategoribarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Kategori Barang
+                  </li>
+                </Link>
+
+                <Link href="/GA/data_satuanbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Satuan Barang
+                  </li>
+                </Link>
+
+                <Link href="/GA/data_stokbarang">
+                  <li className="bg-blue-500 px-5 py-2 cursor-pointer rounded">
+                    Stok Barang
+                  </li>
+                </Link>
+
+                <Link href="/GA/data_divisi">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Divisi
+                  </li>
+                </Link>
+
+                <Link href="/GA/manajemen_user">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Manajemen User
+                  </li>
+                </Link>
+
+                <hr className="border-t border-white/30 my-2" />
+
+                {/* MONITORING */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  MONITORING
                 </li>
-              </Link>
 
-              <Link href="/GA/data_barang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Barang
+                <Link href="/GA/laporan_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Laporan
+                  </li>
+                </Link>
+
+                <Link href="/GA/riwayat_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Riwayat
+                  </li>
+                </Link>
+
+                <hr className="border-t border-white/30 my-2" />
+
+                {/* PEMESANAN */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  PEMESANAN
                 </li>
-              </Link>
 
-              <Link href="/GA/data_kategoribarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Kategori Barang
-                </li>
-              </Link>
+                <Link href="/GA/list_pemesanan">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    List Pemesanan
+                  </li>
+                </Link>
 
-              <Link href="/GA/data_satuanbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Satuan Barang
-                </li>
-              </Link>
-
-              <Link href="/GA/data_stokbarang">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
-                  Stok Barang
-                </li>
-              </Link>
-
-              <Link href="/GA/data_divisi">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Divisi
-                </li>
-              </Link>
-
-              <Link href="/GA/manajemen_user">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Manajemen User
-                </li>
-              </Link>
-
-              <hr className="border-t border-white/30 my-2" />
-
-              {/* MONITORING */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                MONITORING
-              </li>
-
-              <Link href="/GA/laporan_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Laporan
-                </li>
-              </Link>
-
-              <Link href="/GA/riwayat_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Riwayat
-                </li>
-              </Link>
-
-              <hr className="border-t border-white/30 my-2" />
-
-              {/* PEMESANAN */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                PEMESANAN
-              </li>
-
-              <Link href="/GA/list_pemesanan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  List Pemesanan
-                </li>
-              </Link>
-
-              <Link href="/GA/form_penerimaanbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Form Penerimaan
-                </li>
-              </Link>
-            </ul>
-          </nav>
+                <Link href="/GA/form_penerimaanbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Form Penerimaan
+                  </li>
+                </Link>
+              </ul>
+            </nav>
+          </div>
         </aside>
 
-        <main className="flex-1 p-8 bg-gray-200">
-          <h2 className="text-3xl font-semibold mb-6">Stok Barang</h2>
+        <main className="flex-1 p-8 bg-gray-200 overflow-y-auto ml-60">
+          <h2 className="text-3xl font-semibold mb-6 text-gray-800">Stok Barang</h2>
 
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
             {/* Header atas */}
             <div className="flex justify-between items-center px-6 py-4 border-b">
               <h3 className="text-xl font-semibold text-teal-600">
@@ -235,7 +267,7 @@ export default function DataStokBarangPage() {
             </div>
 
             {/* Search */}
-            <div className="flex items-center gap-3 px-6 py-4 border-b bg-white">
+            <div className="px-6 py-4 border-b bg-white">
               <form onSubmit={handleSearch} className="flex items-center gap-3">
                 <label htmlFor="search" className="text-gray-700 font-medium">
                   Search
@@ -245,12 +277,12 @@ export default function DataStokBarangPage() {
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="border border-gray-300 rounded px-2 py-1 text-sx1"
+                  className="border border-gray-300 rounded px-3 py-2 text-sm w-64"
                   placeholder="Cari kode atau nama barang..."
                 />
                 <button
                   type="submit"
-                  className="bg-teal-600 text-white px-4 py-1 rounded"
+                  className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition"
                 >
                   Cari
                 </button>
@@ -265,59 +297,73 @@ export default function DataStokBarangPage() {
             )}
 
             {/* Tabel */}
-            <table className="w-full border-collapse text-x1">
-              <thead>
-                <tr className="bg-white text-left">
-                  <th className="px-6 py-3 font-semibold">No</th>
-                  <th className="px-6 py-3 font-semibold">Kode Barang</th>
-                  <th className="px-6 py-3 font-semibold">Nama Barang</th>
-                  <th className="px-6 py-3 font-semibold">Satuan</th>
-                  <th className="px-6 py-3 font-semibold">Stok</th>
-                  <th className="px-6 py-3 font-semibold text-center">Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((row, index) => (
-                  <tr
-                    key={row.id}
-                    className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
-                  >
-                    <td className="px-6 py-3">
-                      {(pagination.page - 1) * pagination.limit + index + 1}
-                    </td>
-                    <td className="px-6 py-3">{row.kode_barang}</td>
-                    <td className="px-6 py-3 font-medium text-gray-800">
-                      {row.nama_barang}
-                    </td>
-                    <td className="px-6 py-3">{row.nama_satuan}</td>
-                    <td className="px-6 py-3">{row.stok}</td>
-                    <td className="px-6 py-3 text-center">
-                      <div className="flex justify-center gap-2">
-                        <Link href={`/GA/kelola_stokbarang?id=${row.id}`}>
-                          <button className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded">
-                            <FaPen />
-                          </button>
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(row.id, row.nama_barang)}
-                          className="bg-red-600 hover:bg-red-700 text-white p-2 rounded"
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-50 text-left">
+                    <th className="px-6 py-3 font-semibold text-x1">No</th>
+                    <th className="px-6 py-3 font-semibold text-x1">Kode Barang</th>
+                    <th className="px-6 py-3 font-semibold text-x1">Nama Barang</th>
+                    <th className="px-6 py-3 font-semibold text-x1">Satuan</th>
+                    <th className="px-6 py-3 font-semibold text-x1">Stok</th>
+                    <th className="px-6 py-3 font-semibold text-x1 text-center">Aksi</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {data.map((row, index) => (
+                    <tr
+                      key={row.id}
+                      className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                    >
+                      <td className="px-6 py-3 text-x1">
+                        {(pagination.page - 1) * pagination.limit + index + 1}
+                      </td>
+                      <td className="px-6 py-3 text-x1">{row.kode_barang}</td>
+                      <td className="px-6 py-3 text-x1 font-medium text-gray-800">
+                        {row.nama_barang}
+                      </td>
+                      <td className="px-6 py-3 text-x1">{row.nama_satuan}</td>
+                      <td className="px-6 py-3 text-x1">{row.stok}</td>
+                      <td className="px-6 py-3 text-center">
+                        <div className="flex justify-center gap-2">
+                          <Link href={`/GA/kelola_stokbarang?id=${row.id}`}>
+                            <button className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded transition">
+                              <FaPen />
+                            </button>
+                          </Link>
+                          
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {data.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan="6"
+                        className="px-6 py-8 text-center text-gray-500"
+                      >
+                        Tidak ada data stok barang
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
 
             {/* Pagination */}
-            <div className="flex justify-end px-6 py-4 bg-white border-t">
+            <div className="flex justify-between items-center px-6 py-4 bg-white border-t">
+              <div className="text-sm text-gray-600">
+                Menampilkan {data.length} dari {pagination.totalItems} data
+              </div>
               <div className="inline-flex text-sm border rounded-md overflow-hidden">
                 <button
                   onClick={() => handlePageChange(pagination.page - 1)}
                   disabled={pagination.page === 1}
-                  className="px-3 py-1 bg-white hover:bg-gray-100 border-r disabled:bg-gray-200"
+                  className={`px-3 py-1 border-r ${
+                    pagination.page === 1
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "bg-white hover:bg-gray-100"
+                  }`}
                 >
                   Previous
                 </button>
@@ -325,11 +371,11 @@ export default function DataStokBarangPage() {
                   <button
                     key={i}
                     onClick={() => handlePageChange(i + 1)}
-                    className={`px-3 py-1 ${
+                    className={`px-3 py-1 border-r ${
                       pagination.page === i + 1
                         ? "bg-teal-600 text-white"
                         : "bg-white hover:bg-gray-100"
-                    } border-r`}
+                    }`}
                   >
                     {i + 1}
                   </button>
@@ -337,7 +383,11 @@ export default function DataStokBarangPage() {
                 <button
                   onClick={() => handlePageChange(pagination.page + 1)}
                   disabled={pagination.page === pagination.totalPages}
-                  className="px-3 py-1 bg-white hover:bg-gray-100 disabled:bg-gray-200"
+                  className={`px-3 py-1 ${
+                    pagination.page === pagination.totalPages
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "bg-white hover:bg-gray-100"
+                  }`}
                 >
                   Next
                 </button>

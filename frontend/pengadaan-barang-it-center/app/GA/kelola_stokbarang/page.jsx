@@ -104,7 +104,7 @@ export default function KelolaStokBarangPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center h-screen">
         <div className="text-xl">Loading data barang...</div>
       </div>
     );
@@ -112,12 +112,12 @@ export default function KelolaStokBarangPage() {
 
   if (error || !barang) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center h-screen">
         <div className="text-xl text-red-600">
           {error || "Data barang tidak ditemukan"}
         </div>
         <Link href="/GA/data_stokbarang">
-          <button className="ml-4 bg-teal-600 text-white px-4 py-2 rounded">
+          <button className="ml-4 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded transition">
             Kembali
           </button>
         </Link>
@@ -126,126 +126,158 @@ export default function KelolaStokBarangPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen font-poppins bg-gray-100">
-      <header className="flex bg-white shadow-sm items-center">
-        <div className="bg-white w-60 h-20 flex items-center justify-center border-r border-white">
+    <div className="flex flex-col h-screen font-poppins bg-gray-100">
+      {/* Header - Tetap fixed di atas */}
+      <header className="fixed top-0 left-0 right-0 z-50 flex bg-white shadow-sm items-center h-16">
+        <div className="bg-white w-60 h-16 flex items-center justify-center border-r border-gray-200">
           <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
         </div>
-        <div className="flex-1 h-20 flex items-center px-8"></div>
+        <div className="flex-1 h-16 flex items-center px-8"></div>
       </header>
 
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1">
-          <nav className="flex-1 mt-6">
-            <ul className="space-y-1">
-              <Link href="/GA/dashboard_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Dashboard
+      <div className="flex flex-1 overflow-hidden pt-16">
+        {/* Sidebar - Fixed dengan tinggi yang tepat dan scrollable */}
+        <aside className="w-60 bg-blue-900 text-white flex flex-col fixed left-0 top-16 bottom-0">
+          {/* Container scrollable untuk menu */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <style jsx>{`
+              /* Custom scrollbar untuk semua browser */
+              .custom-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: #3b82f6 #1e3a8a;
+              }
+              
+              /* Untuk WebKit browsers (Chrome, Safari, Edge) */
+              .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-track {
+                background: #1e3a8a; /* blue-900 */
+                border-radius: 4px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: #3b82f6; /* blue-500 */
+                border-radius: 4px;
+                border: 2px solid #1e3a8a;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background-color: #60a5fa; /* blue-400 */
+              }
+            `}</style>
+            
+            <nav className="p-2">
+              <ul className="space-y-1">
+                <Link href="/GA/dashboard_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Dashboard
+                  </li>
+                </Link>
+
+                <hr className="border-t border-white/30 my-2" />
+
+                {/* DATA MASTER */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  DATA MASTER
                 </li>
-              </Link>
 
-              <hr className="border-t border-white/30 my-2" />
+                <Link href="/GA/data_permintaan">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Permintaan
+                  </li>
+                </Link>
 
-              {/* DATA MASTER */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                DATA MASTER
-              </li>
+                <Link href="/GA/data_barang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Barang
+                  </li>
+                </Link>
 
-              <Link href="/GA/data_permintaan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Permintaan
+                <Link href="/GA/data_kategoribarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Kategori Barang
+                  </li>
+                </Link>
+
+                <Link href="/GA/data_satuanbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Satuan Barang
+                  </li>
+                </Link>
+
+                <Link href="/GA/data_stokbarang">
+                  <li className="bg-blue-500 px-5 py-2 cursor-pointer rounded">
+                    Stok Barang
+                  </li>
+                </Link>
+
+                <Link href="/GA/data_divisi">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Divisi
+                  </li>
+                </Link>
+
+                <Link href="/GA/manajemen_user">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Manajemen User
+                  </li>
+                </Link>
+
+                <hr className="border-t border-white/30 my-2" />
+
+                {/* MONITORING */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  MONITORING
                 </li>
-              </Link>
 
-              <Link href="/GA/data_barang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Barang
+                <Link href="/GA/laporan_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Laporan
+                  </li>
+                </Link>
+
+                <Link href="/GA/riwayat_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Riwayat
+                  </li>
+                </Link>
+
+                <hr className="border-t border-white/30 my-2" />
+
+                {/* PEMESANAN */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  PEMESANAN
                 </li>
-              </Link>
 
-              <Link href="/GA/data_kategoribarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Kategori Barang
-                </li>
-              </Link>
+                <Link href="/GA/list_pemesanan">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    List Pemesanan
+                  </li>
+                </Link>
 
-              <Link href="/GA/data_satuanbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Satuan Barang
-                </li>
-              </Link>
-
-              <Link href="/GA/data_stokbarang">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
-                  Stok Barang
-                </li>
-              </Link>
-
-              <Link href="/GA/data_divisi">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Divisi
-                </li>
-              </Link>
-
-              <Link href="/GA/manajemen_user">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Manajemen User
-                </li>
-              </Link>
-
-              <hr className="border-t border-white/30 my-2" />
-
-              {/* MONITORING */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                MONITORING
-              </li>
-
-              <Link href="/GA/laporan_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Laporan
-                </li>
-              </Link>
-
-              <Link href="/GA/riwayat_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Riwayat
-                </li>
-              </Link>
-
-              <hr className="border-t border-white/30 my-2" />
-
-              {/* PEMESANAN */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                PEMESANAN
-              </li>
-
-              <Link href="/GA/list_pemesanan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  List Pemesanan
-                </li>
-              </Link>
-
-              <Link href="/GA/form_penerimaanbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Form Penerimaan
-                </li>
-              </Link>
-            </ul>
-          </nav>
+                <Link href="/GA/form_penerimaanbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Form Penerimaan
+                  </li>
+                </Link>
+              </ul>
+            </nav>
+          </div>
         </aside>
 
-        <main className="flex-1 p-8 bg-gray-200">
-          <h2 className="text-3xl font-semibold mb-6">Stok Barang</h2>
+        <main className="flex-1 p-8 bg-gray-200 overflow-y-auto ml-60">
+          <h2 className="text-3xl font-semibold mb-6 text-gray-800">Stok Barang</h2>
 
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
             {/* Header atas */}
-            <div className="flex justify-between items-center px-6 py-5 border-b-4 border-b-gray-300">
+            <div className="flex justify-between items-center px-6 py-5 border-b">
               <h3 className="text-xl font-semibold text-teal-600">
                 Kelola Stok Barang
               </h3>
               <Link href="/GA/data_stokbarang">
-                <button className="bg-teal-600 hover:bg-green-600 text-white px-4 py-1.5 rounded">
+                <button className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded transition">
                   &lt; Kembali
                 </button>
               </Link>
@@ -256,83 +288,83 @@ export default function KelolaStokBarangPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Kategori Barang */}
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-gray-700 block mb-1">
                     Kategori Barang
                   </label>
                   <input
                     type="text"
                     value={barang.nama_kategori || "N/A"}
                     disabled
-                    className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-100 text-gray-800"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 text-gray-800"
                   />
                 </div>
 
                 {/* Kode Barang */}
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-gray-700 block mb-1">
                     Kode Barang
                   </label>
                   <input
                     type="text"
                     value={barang.kode_barang}
                     disabled
-                    className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-100 text-gray-800"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 text-gray-800"
                   />
                 </div>
 
                 {/* Nama Barang */}
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-gray-700 block mb-1">
                     Nama Barang
                   </label>
                   <input
                     type="text"
                     value={barang.nama_barang}
                     disabled
-                    className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-100 text-gray-800"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 text-gray-800"
                   />
                 </div>
 
                 {/* Spesifikasi */}
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-gray-700 block mb-1">
                     Spesifikasi
                   </label>
                   <input
                     type="text"
                     value={barang.spesifikasi || "Tidak ada spesifikasi"}
                     disabled
-                    className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-100 text-gray-800"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 text-gray-800"
                   />
                 </div>
 
                 {/* Satuan */}
                 <div>
-                  <label className="font-medium text-gray-700">Satuan</label>
+                  <label className="font-medium text-gray-700 block mb-1">Satuan</label>
                   <input
                     type="text"
                     value={barang.nama_satuan}
                     disabled
-                    className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-100 text-gray-800"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 text-gray-800"
                   />
                 </div>
 
                 {/* Stok Sekarang */}
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-gray-700 block mb-1">
                     Stok Saat Ini
                   </label>
                   <input
                     type="number"
                     value={barang.stok}
                     disabled
-                    className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-100 text-gray-800"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 text-gray-800"
                   />
                 </div>
 
                 {/* Tambah Stok (hanya bisa diisi saat edit mode) */}
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-gray-700 block mb-1">
                     Tambah Stok
                   </label>
                   <input
@@ -344,9 +376,9 @@ export default function KelolaStokBarangPage() {
                       setStok(barang.stok + tambah);
                     }}
                     disabled={!isEditMode}
-                    className={`w-full border rounded px-3 py-2 mt-1 transition ${
+                    className={`w-full border rounded px-3 py-2 ${
                       isEditMode
-                        ? "border-gray-300 bg-white text-gray-800"
+                        ? "border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                         : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
                     }`}
                   />
@@ -355,14 +387,14 @@ export default function KelolaStokBarangPage() {
                 {/* Stok Baru (hanya tampil saat edit mode) */}
                 {isEditMode && (
                   <div>
-                    <label className="font-medium text-gray-700">
+                    <label className="font-medium text-gray-700 block mb-1">
                       Stok Baru Akan Menjadi
                     </label>
                     <input
                       type="number"
                       value={stok}
                       disabled
-                      className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-blue-100 text-blue-800 font-bold"
+                      className="w-full border border-blue-300 bg-blue-50 rounded px-3 py-2 text-blue-800 font-bold"
                     />
                   </div>
                 )}
@@ -376,7 +408,7 @@ export default function KelolaStokBarangPage() {
                     isEditMode
                       ? "bg-gray-600 hover:bg-gray-700"
                       : "bg-blue-600 hover:bg-blue-700"
-                  } text-white px-5 py-2 rounded`}
+                  } text-white px-5 py-2.5 rounded transition`}
                   disabled={saving}
                 >
                   {isEditMode ? "Batal" : "Tambah Stok"}
@@ -385,7 +417,7 @@ export default function KelolaStokBarangPage() {
                   <button
                     onClick={handleTambahStok}
                     disabled={saving || stok <= barang.stok}
-                    className={`px-5 py-2 font-medium rounded text-white transition ${
+                    className={`px-5 py-2.5 font-medium rounded text-white transition ${
                       saving || stok <= barang.stok
                         ? "bg-gray-400 cursor-not-allowed"
                         : "bg-green-600 hover:bg-green-700"
@@ -398,7 +430,7 @@ export default function KelolaStokBarangPage() {
 
               {/* Info */}
               {isEditMode && (
-                <div className="mt-4 p-3 bg-blue-50 text-blue-700 rounded">
+                <div className="mt-6 p-3 bg-blue-50 text-blue-700 rounded border border-blue-200">
                   <p>
                     <strong>Info:</strong> Stok akan ditambahkan sejumlah yang
                     Anda input. Stok saat ini: <strong>{barang.stok}</strong>,
