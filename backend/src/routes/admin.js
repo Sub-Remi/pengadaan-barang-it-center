@@ -49,6 +49,12 @@ import {
   getDokumenStats,
 } from "../controller/dokumenController.js";
 
+import {
+  createPemesanan,
+  getAllPemesananForAdmin,
+  getPemesananDetail,
+} from "../controller/pemesananController.js";
+
 import { authenticate } from "../middleware/auth.js";
 import { requireAdmin } from "../middleware/roleAuth.js";
 import {
@@ -213,4 +219,32 @@ router.put("/barang/:id", authenticate, requireAdmin, updateStok); // Reuse dari
 // Delete barang
 router.delete("/barang/:id", authenticate, requireAdmin, deleteStok); // Reuse dari stokController
 
+// ===== PEMESANAN MANAGEMENT =====
+router.post("/pemesanan", authenticate, requireAdmin, createPemesanan);
+router.get("/pemesanan", authenticate, requireAdmin, getAllPemesananForAdmin);
+router.get("/pemesanan/:id", authenticate, requireAdmin, getPemesananDetail);
+
+// Temporary endpoint for pemesanan
+router.get("/pemesanan", authenticate, requireAdmin, async (req, res) => {
+  try {
+    console.log("📋 Admin getting pemesanan");
+
+    // Temporary data
+    const data = [];
+
+    res.json({
+      message: "Daftar pemesanan berhasil diambil.",
+      data: data,
+      pagination: {
+        currentPage: 1,
+        totalPages: 1,
+        totalItems: 0,
+        itemsPerPage: 10,
+      },
+    });
+  } catch (error) {
+    console.error("💥 Error:", error);
+    res.status(500).json({ error: "Terjadi kesalahan server." });
+  }
+});
 export default router;

@@ -322,8 +322,8 @@ export default function DataPermintaanPage() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-8 bg-gray-200">
-          <h2 className="text-3xl font-semibold mb-6">Permintaan</h2>
+        <main className="flex-1 text-black p-8 bg-gray-200">
+          <h2 className="text-3xl text-black font-semibold mb-6">Permintaan</h2>
 
           {/* Card container */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -334,14 +334,13 @@ export default function DataPermintaanPage() {
               </h3>
             </div>
 
-            {/* Filter dan tombol Excel/PDF */}
             <div className="px-6 py-4 border-b bg-white">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
                 {/* Search */}
                 <div>
                   <label
                     htmlFor="search"
-                    className="block font-medium text-gray-700 mb-1"
+                    className="block font-medium text- mb-1"
                   >
                     Search
                   </label>
@@ -401,25 +400,8 @@ export default function DataPermintaanPage() {
                   </select>
                 </div>
 
-                {/* Tombol Export */}
-                <div className="flex gap-2 items-end">
-                  <button
-                    onClick={handleExportExcel}
-                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded w-full"
-                  >
-                    Excel
-                  </button>
-                  <button
-                    onClick={handleExportPDF}
-                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded w-full"
-                  >
-                    PDF
-                  </button>
-                </div>
-              </div>
+                {/* Date Range Filter */}
 
-              {/* Date Range Filter */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block font-medium text-gray-700 mb-1">
                     Dari Tanggal
@@ -443,20 +425,24 @@ export default function DataPermintaanPage() {
                     className="border border-gray-300 rounded px-3 py-2 w-full"
                   />
                 </div>
+              </div>
 
-                <div className="flex gap-2 items-end">
-                  <button
-                    onClick={handleFilter}
-                    className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded w-full"
-                  >
-                    Terapkan Filter
-                  </button>
-                  <button
-                    onClick={handleResetFilter}
-                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-4 py-2 rounded w-full"
-                  >
-                    Reset Filter
-                  </button>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-start-3">
+                  <div className="flex gap-2 items-end">
+                    <button
+                      onClick={handleFilter}
+                      className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded w-full"
+                    >
+                      Terapkan Filter
+                    </button>
+                    <button
+                      onClick={handleResetFilter}
+                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-4 py-2 rounded w-full"
+                    >
+                      Reset Filter
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

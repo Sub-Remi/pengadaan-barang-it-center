@@ -270,13 +270,79 @@ export default function DetailPermintaanPage() {
     );
   };
 
-  // Handle ajukan pembelian
-  const handleAjukanPembelian = (barangId, barangData) => {
-    router.push(
-      `/GA/list_pemesanan?barang_id=${barangId}&permintaan_id=${id}&nama_barang=${encodeURIComponent(
-        barangData.nama_barang
-      )}&jumlah=${barangData.jumlah}`
-    );
+  // Fungsi untuk mengajukan pembelian
+  const handleAjukanPembelian = async (barangId, barangData) => {
+    if (
+      !confirm(
+        `Apakah yakin ingin mengajukan pembelian untuk:\n${barangData.nama_barang} (${barangData.jumlah} unit)?`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setError("");
+      setSuccess("");
+
+      const token = localStorage.getItem("token");
+
+      // 1. Ubah status barang menjadi "dalam pemesanan"
+      const statusResponse = await fetch(
+        `http://localhost:3200/api/admin/barang/${barangId}/status`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            status: "dalam pemesanan",
+            catatan_admin: null,
+          }),
+        }
+      );
+
+      if (!statusResponse.ok) {
+        const errorText = await statusResponse.text();
+        throw new Error(`Gagal mengubah status: ${errorText}`);
+      }
+
+      // 2. Buat record pemesanan
+      const pemesananResponse = await fetch(
+        `http://localhost:3200/api/admin/pemesanan`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            barang_permintaan_id: barangId,
+            tanggal_pemesanan: new Date().toISOString().split("T")[0],
+            estimasi_selesai: "", // Optional
+            catatan: `Pemesanan untuk ${barangData.nama_barang}`,
+          }),
+        }
+      );
+
+      if (!pemesananResponse.ok) {
+        const errorText = await pemesananResponse.text();
+        throw new Error(`Gagal membuat pemesanan: ${errorText}`);
+      }
+
+      setSuccess("Barang berhasil diajukan untuk pembelian!");
+
+      // Redirect ke halaman list pemesanan setelah 2 detik
+      setTimeout(() => {
+        router.push("/GA/list_pemesanan");
+      }, 2000);
+    } catch (error) {
+      console.error("💥 Error ajukan pembelian:", error);
+      setError(error.message || "Terjadi kesalahan saat mengajukan pembelian.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   // Format date
