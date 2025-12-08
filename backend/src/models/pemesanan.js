@@ -126,30 +126,43 @@ const Pemesanan = {
     try {
       await Pemesanan.createTableIfNotExists();
 
-      const offset = (page - 1) * limit;
+      // Konversi ke integer untuk memastikan tipe data benar
+      const pageNum = parseInt(page);
+      const limitNum = parseInt(limit);
+      const offset = (pageNum - 1) * limitNum;
+
+      console.log("📊 Pagination params:", {
+        pageNum,
+        limitNum,
+        offset,
+        filters,
+      });
+
       let query = `
-        SELECT 
-          pem.*,
-          bp.nama_barang,
-          bp.jumlah,
-          bp.spesifikasi,
-          perm.nomor_permintaan,
-          user_pemohon.nama_lengkap as pemohon_nama,
-          divisi.nama_divisi
-        FROM pemesanan pem
-        JOIN barang_permintaan bp ON pem.barang_permintaan_id = bp.id
-        JOIN permintaan perm ON bp.permintaan_id = perm.id
-        JOIN users user_pemohon ON perm.user_id = user_pemohon.id
-        JOIN divisi ON user_pemohon.divisi_id = divisi.id
-        WHERE 1=1
-      `;
+      SELECT 
+        pem.*,
+        bp.nama_barang,
+        bp.jumlah,
+        bp.spesifikasi,
+        perm.nomor_permintaan,
+        user_pemohon.nama_lengkap as pemohon_nama,
+        divisi.nama_divisi
+      FROM pemesanan pem
+      JOIN barang_permintaan bp ON pem.barang_permintaan_id = bp.id
+      JOIN permintaan perm ON bp.permintaan_id = perm.id
+      JOIN users user_pemohon ON perm.user_id = user_pemohon.id
+      JOIN divisi ON user_pemohon.divisi_id = divisi.id
+      WHERE 1=1
+    `;
 
       let countQuery = `
-        SELECT COUNT(*) as total
-        FROM pemesanan pem
-        JOIN barang_permintaan bp ON pem.barang_permintaan_id = bp.id
-        WHERE 1=1
-      `;
+      SELECT COUNT(*) as total
+      FROM pemesanan pem
+      JOIN barang_permintaan bp ON pem.barang_permintaan_id = bp.id
+      JOIN permintaan perm ON bp.permintaan_id = perm.id
+      JOIN users user_pemohon ON perm.user_id = user_pemohon.id
+      WHERE 1=1
+    `;
 
       const values = [];
       const countValues = [];
@@ -181,33 +194,151 @@ const Pemesanan = {
       }
 
       query += " ORDER BY pem.tanggal_pemesanan DESC";
-      query += " LIMIT ? OFFSET ?";
-      values.push(limit, offset);
+
+      // PERBAIKAN PENTING: Gunakan template literal untuk LIMIT dan OFFSET
+      // Jangan gunakan placeholder untuk LIMIT/OFFSET
+      query += ` LIMIT ${limitNum} OFFSET ${offset}`;
 
       console.log("🔍 Executing admin pemesanan query...");
+      console.log("📝 Query:", query);
+      console.log("📊 Values:", values);
+      console.log("📝 Count Query:", countQuery);
+      console.log("📊 Count Values:", countValues);
+
       const [rows] = await dbPool.execute(query, values);
       const [countRows] = await dbPool.execute(countQuery, countValues);
 
       const total = countRows[0]?.total || 0;
-      const totalPages = Math.ceil(total / limit);
+      const totalPages = Math.ceil(total / limitNum);
 
       console.log(`✅ Found ${total} pemesanan records`);
 
       return {
         data: rows,
         total: total,
-        page: page,
-        limit: limit,
+        page: pageNum,
+        limit: limitNum,
         totalPages: totalPages,
       };
     } catch (error) {
       console.error("💥 Find all for admin error:", error);
+      console.error("💥 Error details:", {
+        code: error.code,
+        errno: error.errno,
+        sqlState: error.sqlState,
+        sqlMessage: error.sqlMessage,
+        sql: error.sql,
+      });
       // Return empty result instead of throwing error
       return {
         data: [],
         total: 0,
-        page: page,
-        limit: limit,
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 10,
+        totalPages: 0,
+      };
+    }
+  },
+
+  // Di file pemesanan.js, tambahkan fungsi ini setelah findAllForAdmin
+  findAllForValidator: async (page = 1, limit = 10, filters = {}) => {
+    try {
+      await Pemesanan.createTableIfNotExists();
+
+      const pageNum = parseInt(page);
+      const limitNum = parseInt(limit);
+      const offset = (pageNum - 1) * limitNum;
+
+      console.log("📋 Validator getting pemesanan with filters:", filters);
+
+      let query = `
+      SELECT 
+        pem.*,
+        bp.nama_barang,
+        bp.jumlah,
+        bp.spesifikasi,
+        perm.nomor_permintaan,
+        user_pemohon.nama_lengkap as pemohon_nama,
+        divisi.nama_divisi,
+        dp.jenis_dokumen,
+        dp.is_valid,
+        dp.created_at as dokumen_created_at
+      FROM pemesanan pem
+      JOIN barang_permintaan bp ON pem.barang_permintaan_id = bp.id
+      JOIN permintaan perm ON bp.permintaan_id = perm.id
+      JOIN users user_pemohon ON perm.user_id = user_pemohon.id
+      JOIN divisi ON user_pemohon.divisi_id = divisi.id
+      LEFT JOIN dokumen_pembelian dp ON pem.barang_permintaan_id = dp.barang_permintaan_id
+      WHERE bp.status = 'dalam pemesanan'
+      AND (dp.is_valid IS NULL OR dp.is_valid = 0)  -- Dokumen belum divalidasi atau ditolak
+    `;
+
+      let countQuery = `
+      SELECT COUNT(DISTINCT pem.id) as total
+      FROM pemesanan pem
+      JOIN barang_permintaan bp ON pem.barang_permintaan_id = bp.id
+      LEFT JOIN dokumen_pembelian dp ON pem.barang_permintaan_id = dp.barang_permintaan_id
+      WHERE bp.status = 'dalam pemesanan'
+      AND (dp.is_valid IS NULL OR dp.is_valid = 0)
+    `;
+
+      const values = [];
+      const countValues = [];
+
+      // Filter by jenis dokumen
+      if (filters.jenis_dokumen && filters.jenis_dokumen !== "semua") {
+        query += " AND dp.jenis_dokumen = ?";
+        countQuery += " AND dp.jenis_dokumen = ?";
+        values.push(filters.jenis_dokumen);
+        countValues.push(filters.jenis_dokumen);
+      }
+
+      // Filter by date range
+      if (filters.start_date && filters.end_date) {
+        query += " AND DATE(pem.tanggal_pemesanan) BETWEEN ? AND ?";
+        countQuery += " AND DATE(pem.tanggal_pemesanan) BETWEEN ? AND ?";
+        values.push(filters.start_date, filters.end_date);
+        countValues.push(filters.start_date, filters.end_date);
+      }
+
+      // Filter by search
+      if (filters.search) {
+        query += " AND (bp.nama_barang LIKE ? OR perm.nomor_permintaan LIKE ?)";
+        countQuery +=
+          " AND (bp.nama_barang LIKE ? OR perm.nomor_permintaan LIKE ?)";
+        const searchTerm = `%${filters.search}%`;
+        values.push(searchTerm, searchTerm);
+        countValues.push(searchTerm, searchTerm);
+      }
+
+      query += " ORDER BY pem.tanggal_pemesanan DESC";
+      query += ` LIMIT ${limitNum} OFFSET ${offset}`;
+
+      console.log("🔍 Executing validator pemesanan query:", query);
+      console.log("📊 Query values:", values);
+
+      const [rows] = await dbPool.execute(query, values);
+      const [countRows] = await dbPool.execute(countQuery, countValues);
+
+      const total = countRows[0]?.total || 0;
+      const totalPages = Math.ceil(total / limitNum);
+
+      console.log(`✅ Found ${total} pemesanan records for validator`);
+
+      return {
+        data: rows,
+        total: total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: totalPages,
+      };
+    } catch (error) {
+      console.error("💥 Find all for validator error:", error);
+      return {
+        data: [],
+        total: 0,
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 10,
         totalPages: 0,
       };
     }

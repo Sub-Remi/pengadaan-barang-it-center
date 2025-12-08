@@ -47,6 +47,8 @@ import {
   deleteDokumen,
   downloadDokumen,
   getDokumenStats,
+  replaceDokumen,
+  checkExistingDokumen,
 } from "../controller/dokumenController.js";
 
 import {
@@ -164,6 +166,23 @@ router.get(
   authenticate,
   requireAdmin,
   getDokumenByBarangPermintaan
+);
+
+// Replace dokumen (update)
+router.post(
+  "/dokumen-pembelian/:id/replace",
+  authenticate,
+  requireAdmin,
+  uploadDokumenMiddleware.single("file_dokumen"),
+  handleUploadError,
+  replaceDokumen
+);
+
+router.get(
+  "/dokumen/check-existing",
+  authenticate,
+  requireAdmin,
+  checkExistingDokumen
 );
 
 // Get dokumen statistics

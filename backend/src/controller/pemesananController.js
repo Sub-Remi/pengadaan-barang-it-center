@@ -1,6 +1,7 @@
 import Pemesanan from "../models/pemesanan.js";
 import BarangPermintaan from "../models/barang_permintaan.js";
 import DokumenPembelian from "../models/dokumen_pembelian.js";
+import dbPool from "../config/database.js";
 
 // Create pemesanan (when admin clicks "Ajukan Pembelian")
 export const createPemesanan = async (req, res) => {
@@ -136,7 +137,7 @@ export const getAllPemesananForValidator = async (req, res) => {
       search: req.query.search || "",
     };
 
-    console.log("📋 Validator getting pemesanan:", filters);
+    console.log("📋 Validator getting pemesanan with filters:", filters);
 
     const result = await Pemesanan.findAllForValidator(page, limit, filters);
 
@@ -152,11 +153,15 @@ export const getAllPemesananForValidator = async (req, res) => {
     });
   } catch (error) {
     console.error("💥 Get pemesanan for validator error:", error);
-    res.status(500).json({ error: "Terjadi kesalahan server." });
+    res.status(500).json({
+      error: "Terjadi kesalahan server.",
+      details:
+        process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
   }
 };
 
-// Get detail pemesanan
+// Get detail pemesanan dengan data lengkap
 export const getPemesananDetail = async (req, res) => {
   try {
     const { id } = req.params;
@@ -168,15 +173,46 @@ export const getPemesananDetail = async (req, res) => {
       return res.status(404).json({ error: "Pemesanan tidak ditemukan." });
     }
 
+    // Get barang detail
+    const barangQuery = `
+      SELECT bp.*, kb.nama_kategori, sbu.nama_satuan
+      FROM barang_permintaan bp
+      LEFT JOIN stok_barang sb ON bp.stok_barang_id = sb.id
+      LEFT JOIN kategori_barang kb ON sb.kategori_barang_id = kb.id
+      LEFT JOIN satuan_barang sbu ON sb.satuan_barang_id = sbu.id
+      WHERE bp.id = ?
+    `;
+    const [barangRows] = await dbPool.execute(barangQuery, [
+      pemesanan.barang_permintaan_id,
+    ]);
+    const barang = barangRows[0];
+
     // Get dokumen terkait
     const dokumenList = await DokumenPembelian.findByBarangPermintaanId(
       pemesanan.barang_permintaan_id
     );
 
+    // Get info permintaan
+    const permintaanQuery = `
+      SELECT p.*, u.nama_lengkap, d.nama_divisi
+      FROM permintaan p
+      JOIN users u ON p.user_id = u.id
+      JOIN divisi d ON u.divisi_id = d.id
+      WHERE p.id = (
+        SELECT permintaan_id FROM barang_permintaan WHERE id = ?
+      )
+    `;
+    const [permintaanRows] = await dbPool.execute(permintaanQuery, [
+      pemesanan.barang_permintaan_id,
+    ]);
+    const permintaan = permintaanRows[0];
+
     res.json({
       message: "Detail pemesanan berhasil diambil.",
       data: {
         ...pemesanan,
+        barang: barang,
+        permintaan: permintaan,
         dokumen: dokumenList,
       },
     });
