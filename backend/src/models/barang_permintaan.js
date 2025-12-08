@@ -492,17 +492,40 @@ const BarangPermintaan = {
     return result.affectedRows;
   },
 
-  // Update status barang setelah validasi
-  updateStatusAfterValidation: async (id, status) => {
-    const query = `
-      UPDATE barang_permintaan 
-      SET status = ?, updated_at = CURRENT_TIMESTAMP 
-      WHERE id = ?
-    `;
-    const [result] = await dbPool.execute(query, [status, id]);
-    return result.affectedRows;
-  },
+  // Di file models/barang_permintaan.js - perbaiki fungsi updateStatusAfterValidation
+  updateStatusAfterValidation: async (
+    barang_permintaan_id,
+    status,
+    catatan = null
+  ) => {
+    try {
+      let query, values;
 
+      if (catatan) {
+        query =
+          "UPDATE barang_permintaan SET status = ?, catatan_validator = ?, updated_at = NOW() WHERE id = ?";
+        values = [status, catatan, barang_permintaan_id]; // Urutan yang benar
+      } else {
+        query =
+          "UPDATE barang_permintaan SET status = ?, updated_at = NOW() WHERE id = ?";
+        values = [status, barang_permintaan_id];
+      }
+
+      console.log("📝 Executing query:", { query, values });
+
+      const [result] = await dbPool.execute(query, values);
+
+      // Log status perubahan
+      console.log(
+        `📝 Status barang ${barang_permintaan_id} diubah menjadi ${status}`
+      );
+
+      return result.affectedRows;
+    } catch (error) {
+      console.error("💥 Update status after validation error:", error);
+      throw error;
+    }
+  },
   // Cek apakah semua dokumen untuk barang sudah divalidasi
   checkAllDokumenValidated: async (barang_permintaan_id) => {
     const query = `

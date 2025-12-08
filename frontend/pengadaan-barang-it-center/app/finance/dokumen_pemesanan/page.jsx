@@ -115,7 +115,7 @@ export default function DokumenPenerimaanPage() {
     return dokumenList.find((d) => d.jenis_dokumen === jenis);
   };
 
-  // Handle validation
+  // Handle validation yang diperbaiki
   const handleValidation = async (isValid) => {
     if (!isValid && !rejectNote.trim()) {
       alert("Harap isi catatan penolakan!");
@@ -126,56 +126,98 @@ export default function DokumenPenerimaanPage() {
 
     try {
       const token = localStorage.getItem("token");
+      let successCount = 0;
+      let errorMessages = [];
 
-      // Validate all documents
+      // Validate all documents one by one
       for (const dokumen of dokumenList) {
-        const response = await fetch(
-          `http://localhost:3200/api/validator/dokumen/${dokumen.id}/validate`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              is_valid: isValid,
-              catatan_validator: isValid ? "" : rejectNote,
-            }),
-          }
-        );
+        try {
+          const response = await fetch(
+            `http://localhost:3200/api/validator/dokumen/${dokumen.id}/validate`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                is_valid: isValid, // boolean langsung
+                catatan_validator: isValid
+                  ? "Dokumen telah divalidasi"
+                  : rejectNote,
+              }),
+            }
+          );
 
-        if (!response.ok) {
-          throw new Error("Gagal memvalidasi dokumen");
+          const result = await response.json();
+
+          if (response.ok) {
+            successCount++;
+            console.log(
+              `✅ Dokumen ${dokumen.jenis_dokumen} berhasil ${
+                isValid ? "divalidasi" : "ditolak"
+              }`
+            );
+          } else {
+            errorMessages.push(`${dokumen.jenis_dokumen}: ${result.error}`);
+          }
+        } catch (error) {
+          errorMessages.push(`${dokumen.jenis_dokumen}: ${error.message}`);
         }
       }
 
-      // Update barang status
-      const updateResponse = await fetch(
-        `http://localhost:3200/api/admin/barang/${pemesanan.barang_permintaan_id}/status`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            status: isValid ? "selesai" : "ditolak",
-            catatan_admin: isValid ? "Dokumen telah divalidasi" : rejectNote,
-          }),
-        }
-      );
+      // Tampilkan hasil
+      if (errorMessages.length === 0) {
+        alert(`Semua dokumen berhasil ${isValid ? "divalidasi" : "ditolak"}!`);
+      } else if (successCount > 0) {
+        alert(
+          `Sebagian dokumen berhasil diproses. Error: ${errorMessages.join(
+            ", "
+          )}`
+        );
+      } else {
+        alert(`Gagal memvalidasi dokumen: ${errorMessages.join(", ")}`);
+      }
 
-      if (updateResponse.ok) {
-        alert(`Dokumen berhasil ${isValid ? "divalidasi" : "ditolak"}!`);
+      // Refresh data setelah 2 detik untuk memberi waktu update database
+      setTimeout(() => {
         fetchPemesananDetail();
         setShowRejectNote(false);
         setRejectNote("");
-      }
+        setValidating(false);
+      }, 2000);
     } catch (error) {
       console.error("Validation error:", error);
       alert("Terjadi kesalahan saat memvalidasi dokumen.");
-    } finally {
       setValidating(false);
+    }
+  };
+
+  // Tambahkan fungsi untuk menampilkan status pemesanan
+  const getPemesananStatus = () => {
+    if (!pemesanan) return "Memuat...";
+
+    // Coba ambil dari beberapa sumber
+    return pemesanan.status || pemesanan.pemesanan_status || "Diproses";
+  };
+
+  // Tambahkan fungsi warna status
+  const getStatusColor = (status) => {
+    if (!status) return "bg-gray-100 text-gray-800";
+
+    switch (status.toLowerCase()) {
+      case "diproses":
+        return "bg-yellow-100 text-yellow-800";
+      case "selesai":
+        return "bg-green-100 text-green-800";
+      case "ditolak":
+        return "bg-red-100 text-red-800";
+      case "dalam pemesanan":
+        return "bg-blue-100 text-blue-800";
+      case "divalidasi": // STATUS BARU
+        return "bg-purple-100 text-purple-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -478,6 +520,43 @@ export default function DokumenPenerimaanPage() {
               </div>
             </div>
 
+            {/* Status Pemesanan */}
+            <div className="px-6 py-4 bg-gray-50 border-t">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium text-gray-700 mb-2">
+                    Status Pemesanan:
+                  </h4>
+                  <div className="flex items-center space-x-4">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                        getPemesananStatus()
+                      )}`}
+                    >
+                      {getPemesananStatus()}
+                    </span>
+                    <span className="text-sm text-gray-600">
+                      {dokumenList.length > 0
+                        ? `${
+                            dokumenList.filter((d) => d.is_valid === 1).length
+                          }/${dokumenList.length} dokumen tervalidasi`
+                        : "Belum ada dokumen"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <p className="text-sm text-gray-600">
+                    ID Pemesanan: {pemesananId}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Nomor Permintaan:{" "}
+                    {pemesanan?.permintaan?.nomor_permintaan || "-"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Status Validasi */}
             <div className="px-6 py-4 bg-gray-50">
               <h4 className="font-medium text-gray-700 mb-2">
@@ -485,7 +564,10 @@ export default function DokumenPenerimaanPage() {
               </h4>
               <div className="flex items-center space-x-4">
                 {dokumenList.map((dokumen) => (
-                  <div key={dokumen.id} className="flex items-center">
+                  <div
+                    key={`${dokumen.id}-${dokumen.jenis_dokumen}`}
+                    className="flex items-center"
+                  >
                     <span
                       className={`w-3 h-3 rounded-full mr-2 ${
                         dokumen.is_valid === 1

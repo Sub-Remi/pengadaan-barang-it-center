@@ -12,7 +12,7 @@ import authRoutes from "./src/routes/auth.js";
 import pemohonRoutes from "./src/routes/pemohon.js";
 import adminRoutes from "./src/routes/admin.js";
 import validatorRoutes from "./src/routes/validator.js";
-import kategoriRoutes from "./src/routes/kategori.js"; // ✅ TAMBAHKAN INI
+import kategoriRoutes from "./src/routes/kategori.js";
 import satuanRoutes from "./src/routes/satuan.js";
 import stokRoutes from "./src/routes/stok.js";
 import { previewFile, downloadFile } from "./src/controller/fileController.js";
@@ -63,9 +63,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   "/uploads",
   express.static(path.join(__dirname, "uploads"), {
-    setHeaders: (res, path) => {
+    setHeaders: (res, filePath) => {
       // Set proper MIME types
-      const ext = path.extname(path);
+      const ext = path.extname(filePath);
       if (ext === ".pdf") {
         res.setHeader("Content-Type", "application/pdf");
       } else if (ext === ".jpg" || ext === ".jpeg") {
@@ -106,58 +106,6 @@ app.use("/api/validator", validatorRoutes);
 app.use("/api/kategori", kategoriRoutes);
 app.use("/api/satuan", satuanRoutes);
 app.use("/api/stok", stokRoutes);
-
-app.get("/api/files/:type/:filename", (req, res) => {
-  try {
-    const { type, filename } = req.params;
-    const allowedTypes = ["dokumen_pembelian", "bukti_penerimaan"];
-
-    if (!allowedTypes.includes(type)) {
-      return res.status(400).json({ error: "Tipe file tidak diizinkan" });
-    }
-
-    const filePath = path.join(__dirname, "uploads", type, filename);
-
-    console.log("🔍 Looking for file:", filePath);
-
-    // Cek apakah file ada
-    if (!fs.existsSync(filePath)) {
-      console.error("❌ File not found:", filePath);
-      return res.status(404).json({ error: "File tidak ditemukan" });
-    }
-
-    // Set Content-Type berdasarkan ekstensi file
-    const ext = path.extname(filename).toLowerCase();
-    let contentType = "application/octet-stream";
-
-    switch (ext) {
-      case ".pdf":
-        contentType = "application/pdf";
-        break;
-      case ".jpg":
-      case ".jpeg":
-        contentType = "image/jpeg";
-        break;
-      case ".png":
-        contentType = "image/png";
-        break;
-      case ".gif":
-        contentType = "image/gif";
-        break;
-    }
-
-    // Set headers untuk inline display (preview)
-    res.setHeader("Content-Type", contentType);
-    res.setHeader("Content-Disposition", `inline; filename="${filename}"`);
-
-    // Stream file ke response
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
-  } catch (error) {
-    console.error("💥 File serving error:", error);
-    res.status(500).json({ error: "Terjadi kesalahan saat memuat file" });
-  }
-});
 
 // Test endpoint untuk cek file
 app.get("/api/test-file/:filename", (req, res) => {

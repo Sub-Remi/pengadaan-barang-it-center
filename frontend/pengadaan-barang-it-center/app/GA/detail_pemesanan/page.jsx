@@ -212,6 +212,23 @@ export default function DokumenPemesananPage() {
     }
   };
 
+  // Helper functions untuk status dokumen
+  const getDokumenStatusText = (jenis) => {
+    const dokumen = getDokumenByJenis(jenis);
+    if (!dokumen) return "⏳ Belum diupload";
+    if (dokumen.is_valid === 1) return "✅ Divalidasi";
+    if (dokumen.is_valid === 0) return "❌ Ditolak";
+    return "⏳ Menunggu validasi";
+  };
+
+  const getStatusColor = (jenis) => {
+    const dokumen = getDokumenByJenis(jenis);
+    if (!dokumen) return "status-pending";
+    if (dokumen.is_valid === 1) return "status-valid";
+    if (dokumen.is_valid === 0) return "status-ditolak";
+    return "status-pending";
+  };
+
   // Get dokumen by jenis
   const getDokumenByJenis = (jenis) => {
     return dokumenList.find((d) => d.jenis_dokumen === jenis);
@@ -221,16 +238,56 @@ export default function DokumenPemesananPage() {
   const renderPreviewWithActions = (dokumen, jenis) => {
     if (!dokumen) return null;
 
-    // Gunakan URL yang benar
     const fileUrl = `http://localhost:3200/api/files/dokumen_pembelian/${dokumen.nama_file}`;
     const isImage = /\.(jpg|jpeg|png|gif)$/i.test(dokumen.nama_file);
     const isPDF = /\.pdf$/i.test(dokumen.nama_file);
 
+    // Tentukan status dokumen
+    let statusColor = "bg-gray-100 text-gray-800";
+    let statusText = "Belum Divalidasi";
+
+    if (dokumen.is_valid === 1) {
+      statusColor = "bg-green-100 text-green-800";
+      statusText = "Divalidasi";
+    } else if (dokumen.is_valid === 0) {
+      statusColor = "bg-red-100 text-red-800";
+      statusText = "Ditolak";
+    }
+
     return (
       <div className="mt-2">
+        {/* Status Dokumen */}
+        <div className="flex justify-between items-center mb-2">
+          <span className={`text-xs px-2 py-1 rounded ${statusColor}`}>
+            {statusText}
+          </span>
+          <span className="text-xs text-gray-500">
+            {dokumen.validator_name
+              ? `Validasi oleh: ${dokumen.validator_name}`
+              : "Menunggu validasi"}
+          </span>
+        </div>
+
+        {/* Tampilkan Catatan Penolakan jika ada */}
+        {dokumen.is_valid === 0 && dokumen.catatan_validator && (
+          <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-md">
+            <div className="flex items-start">
+              <span className="text-red-600 mr-2">⚠️</span>
+              <div>
+                <div className="text-sm font-medium text-red-700">
+                  Alasan Penolakan:
+                </div>
+                <div className="text-sm text-red-600 mt-1">
+                  {dokumen.catatan_validator}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Preview File */}
         <div className="flex items-start gap-4">
           <div className="flex-1">
-            {/* Preview File */}
             {isImage ? (
               <div className="relative group">
                 <img
@@ -280,20 +337,32 @@ export default function DokumenPemesananPage() {
             </p>
           </div>
 
-          {/* Tombol Aksi */}
+          {/* Tombol Aksi - Nonaktifkan jika dokumen sudah divalidasi */}
           <div className="flex flex-col gap-2">
             <button
               onClick={() => triggerFileInput(jenis)}
-              disabled={uploading[jenis] || deleting}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm disabled:opacity-50"
+              disabled={uploading[jenis] || deleting || dokumen.is_valid === 1}
+              className={`px-3 py-1 rounded text-sm ${
+                dokumen.is_valid === 1
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
             >
-              {uploading[jenis] ? "Mengganti..." : "Ganti File"}
+              {uploading[jenis]
+                ? "Mengganti..."
+                : dokumen.is_valid === 1
+                ? "Tidak Bisa Diganti"
+                : "Ganti File"}
             </button>
 
             <button
               onClick={() => handleDeleteDokumen(dokumen.id, jenis)}
-              disabled={uploading[jenis] || deleting}
-              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm disabled:opacity-50"
+              disabled={uploading[jenis] || deleting || dokumen.is_valid === 1}
+              className={`px-3 py-1 rounded text-sm ${
+                dokumen.is_valid === 1
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-red-600 hover:bg-red-700 text-white"
+              }`}
             >
               {deleting ? "Menghapus..." : "Hapus"}
             </button>
@@ -490,6 +559,70 @@ export default function DokumenPemesananPage() {
               </Link>
             </div>
 
+            {/* Catatan Penolakan dari Validator */}
+            {pemesanan?.catatan_penolakan &&
+              pemesanan.catatan_penolakan.length > 0 && (
+                <div className="px-6 py-4 border-b-4 border-b-yellow-400 bg-yellow-50">
+                  <div className="flex items-start mb-3">
+                    <div className="mr-3">
+                      <span className="text-2xl">⚠️</span>
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-semibold text-yellow-800">
+                        Catatan Penolakan dari Validator
+                      </h4>
+                      <p className="text-sm text-yellow-700">
+                        Ada dokumen yang ditolak oleh validator. Silakan
+                        perbaiki dan upload ulang dokumen.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-lg border border-yellow-300 p-4">
+                    {pemesanan.catatan_penolakan.map((catatan, index) => (
+                      <div
+                        key={index}
+                        className={`mb-3 ${
+                          index > 0 ? "pt-3 border-t border-gray-200" : ""
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="font-medium text-gray-800">
+                            Dokumen:{" "}
+                            <span className="text-teal-600">
+                              {catatan.jenis_dokumen.toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {catatan.validator} •{" "}
+                            {new Date(catatan.tanggal).toLocaleDateString(
+                              "id-ID"
+                            )}
+                          </div>
+                        </div>
+                        <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-md">
+                          <div className="text-sm font-medium text-red-700 mb-1">
+                            Catatan Penolakan:
+                          </div>
+                          <div className="text-red-600 whitespace-pre-wrap">
+                            {catatan.catatan}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 flex items-center text-sm text-gray-600">
+                    <div className="mr-2">📝</div>
+                    <div>
+                      <span className="font-medium">Perhatian:</span> Mohon
+                      perbaiki dokumen sesuai catatan di atas, lalu upload ulang
+                      dokumen yang sudah diperbaiki.
+                    </div>
+                  </div>
+                </div>
+              )}
+
             {/* Data Barang */}
             <div className="px-6 py-4 border-b-4 border-b-gray-300">
               <h4 className="text-lg font-semibold mb-4 text-gray-800">
@@ -634,6 +767,28 @@ export default function DokumenPemesananPage() {
                       "form_penerimaan"
                     )
                   : renderUploadForm("form_penerimaan")}
+                <div className="mt-4 text-sm text-gray-600">
+                  <p>
+                    📝 <strong>Catatan:</strong> Anda bisa mengganti dokumen
+                    kapan saja sebelum divalidasi oleh Finance.
+                  </p>
+                  <p className="mt-1">
+                    ⚠️ <strong>Perhatian:</strong> Dokumen yang sudah divalidasi
+                    tidak bisa diganti. Jika ada catatan penolakan, mohon
+                    perbaiki dan upload ulang.
+                  </p>
+                  {pemesanan?.catatan_penolakan &&
+                    pemesanan.catatan_penolakan.length > 0 && (
+                      <p className="mt-1 text-red-600">
+                        🚨{" "}
+                        <strong>
+                          Ada {pemesanan.catatan_penolakan.length} dokumen yang
+                          ditolak.
+                        </strong>
+                        Silakan cek catatan penolakan di atas.
+                      </p>
+                    )}
+                </div>
               </div>
 
               {/* Ringkasan Status */}
@@ -642,61 +797,89 @@ export default function DokumenPemesananPage() {
                   Ringkasan Status Dokumen
                 </h5>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Status Nota */}
                   <div className="text-center p-3 bg-white rounded shadow">
                     <div className="text-sm font-medium text-gray-600">
                       Nota
                     </div>
                     <div
-                      className={`text-lg font-bold mt-1 ${
-                        getDokumenByJenis("nota")
-                          ? "text-green-600"
-                          : "text-yellow-600"
-                      }`}
+                      className={`text-lg font-bold mt-1 ${getStatusColor(
+                        "nota"
+                      )}`}
                     >
-                      {getDokumenByJenis("nota") ? "✓ Tersedia" : "⏳ Menunggu"}
+                      {getDokumenStatusText("nota")}
                     </div>
+                    {getDokumenByJenis("nota")?.catatan_validator && (
+                      <div className="text-xs text-red-500 mt-1">
+                        Catatan:{" "}
+                        {getDokumenByJenis("nota").catatan_validator.substring(
+                          0,
+                          20
+                        )}
+                        ...
+                      </div>
+                    )}
                   </div>
 
+                  {/* Status PO */}
                   <div className="text-center p-3 bg-white rounded shadow">
                     <div className="text-sm font-medium text-gray-600">PO</div>
                     <div
-                      className={`text-lg font-bold mt-1 ${
-                        getDokumenByJenis("po")
-                          ? "text-green-600"
-                          : "text-yellow-600"
-                      }`}
+                      className={`text-lg font-bold mt-1 ${getStatusColor(
+                        "po"
+                      )}`}
                     >
-                      {getDokumenByJenis("po") ? "✓ Tersedia" : "⏳ Menunggu"}
+                      {getDokumenStatusText("po")}
                     </div>
+                    {getDokumenByJenis("po")?.catatan_validator && (
+                      <div className="text-xs text-red-500 mt-1">
+                        Catatan:{" "}
+                        {getDokumenByJenis("po").catatan_validator.substring(
+                          0,
+                          20
+                        )}
+                        ...
+                      </div>
+                    )}
                   </div>
 
+                  {/* Status Form Penerimaan */}
                   <div className="text-center p-3 bg-white rounded shadow">
                     <div className="text-sm font-medium text-gray-600">
                       Form Penerimaan
                     </div>
                     <div
-                      className={`text-lg font-bold mt-1 ${
-                        getDokumenByJenis("form_penerimaan")
-                          ? "text-green-600"
-                          : "text-yellow-600"
-                      }`}
+                      className={`text-lg font-bold mt-1 ${getStatusColor(
+                        "form_penerimaan"
+                      )}`}
                     >
-                      {getDokumenByJenis("form_penerimaan")
-                        ? "✓ Tersedia"
-                        : "⏳ Menunggu"}
+                      {getDokumenStatusText("form_penerimaan")}
                     </div>
+                    {getDokumenByJenis("form_penerimaan")
+                      ?.catatan_validator && (
+                      <div className="text-xs text-red-500 mt-1">
+                        Catatan:{" "}
+                        {getDokumenByJenis(
+                          "form_penerimaan"
+                        ).catatan_validator.substring(0, 20)}
+                        ...
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <div className="mt-4 text-sm text-gray-600">
-                  <p>
-                    📝 <strong>Catatan:</strong> Anda bisa mengganti dokumen
-                    kapan saja sebelum divalidasi oleh Finance.
-                  </p>
-                  <p className="mt-1">
-                    ⚠️ Dokumen yang sudah divalidasi tidak bisa diganti.
-                  </p>
-                </div>
+                {/* Tambahkan helper functions */}
+                <style jsx>{`
+                  .status-ditolak {
+                    color: #dc2626;
+                  }
+                  .status-valid {
+                    color: #16a34a;
+                  }
+                  .status-pending {
+                    color: #d97706;
+                  }
+                `}</style>
               </div>
             </div>
           </div>

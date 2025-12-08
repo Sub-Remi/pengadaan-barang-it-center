@@ -6,6 +6,8 @@ import {
   validateDokumen,
   getValidatorStats,
   getPermintaanWithPemesanan,
+  updatePemesananStatus,
+  getPemesananForValidator,
 } from "../controller/validatorController.js";
 
 import {
@@ -15,6 +17,7 @@ import {
 
 import { authenticate } from "../middleware/auth.js";
 import { requireValidator } from "../middleware/roleAuth.js";
+import { get } from "lodash-es";
 
 const router = express.Router();
 
@@ -30,7 +33,8 @@ router.get(
   "/permintaan",
   authenticate,
   requireValidator,
-  getPermintaanWithPemesanan
+  getPermintaanWithPemesanan,
+  getPemesananForValidator
 );
 
 // ==================== DOKUMEN VALIDATION ====================
@@ -79,6 +83,14 @@ router.get(
   authenticate,
   requireValidator,
   getPemesananDetail
+);
+
+// Tambahkan route untuk update status pemesanan
+router.put(
+  "/pemesanan/:id/status",
+  authenticate,
+  requireValidator,
+  updatePemesananStatus
 );
 
 export default router;

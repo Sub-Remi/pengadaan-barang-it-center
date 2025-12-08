@@ -73,20 +73,57 @@ const DokumenPembelian = {
     return rows[0];
   },
 
-  // Update validation status
+  // Update validation status - PERBAIKI agar bisa update jika ditolak sebelumnya
   updateValidation: async (id, is_valid, catatan_validator, validated_by) => {
-    const query = `
+    try {
+      console.log("📝 Updating dokumen validation:", {
+        id,
+        is_valid,
+        catatan_validator,
+        validated_by,
+      });
+
+      // Pastikan is_valid adalah boolean
+      const isValidBoolean =
+        is_valid === true ||
+        is_valid === 1 ||
+        is_valid === "true" ||
+        is_valid === "1";
+
+      const query = `
       UPDATE dokumen_pembelian 
-      SET is_valid = ?, catatan_validator = ?, validated_by = ?, validated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
+      SET is_valid = ?, 
+          catatan_validator = ?, 
+          validated_by = ?, 
+          validated_at = NOW()
+      WHERE id = ? 
+      AND (is_valid IS NULL OR is_valid = 0)  -- Izinkan update jika null atau ditolak (0)
     `;
-    const [result] = await dbPool.execute(query, [
-      is_valid,
-      catatan_validator,
-      validated_by,
-      id,
-    ]);
-    return result.affectedRows;
+
+      const [result] = await dbPool.execute(query, [
+        isValidBoolean ? 1 : 0, // Convert to 1/0 for MySQL
+        catatan_validator || "",
+        validated_by,
+        id,
+      ]);
+
+      console.log(
+        "✅ Dokumen validation updated, affected rows:",
+        result.affectedRows
+      );
+
+      return result.affectedRows;
+    } catch (error) {
+      console.error("💥 Update validation error:", error);
+      console.error("Error details:", {
+        code: error.code,
+        errno: error.errno,
+        sqlState: error.sqlState,
+        sqlMessage: error.sqlMessage,
+        sql: error.sql,
+      });
+      throw error;
+    }
   },
 
   // Find dokumen untuk validasi

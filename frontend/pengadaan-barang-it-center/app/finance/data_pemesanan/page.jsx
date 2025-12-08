@@ -17,6 +17,7 @@ export default function DataPemesananPage() {
     start_date: "",
     end_date: "",
     search: "",
+    status: "",
   });
 
   // Fetch data pemesanan untuk validator
@@ -34,8 +35,8 @@ export default function DataPemesananPage() {
       if (filters.start_date) params.append("start_date", filters.start_date);
       if (filters.end_date) params.append("end_date", filters.end_date);
       if (filters.search) params.append("search", filters.search);
+      if (filters.status) params.append("status", filters.status); // Tambahkan status
 
-      // Coba endpoint validator
       const response = await fetch(
         `http://localhost:3200/api/validator/pemesanan?${params.toString()}`,
         {
@@ -168,11 +169,14 @@ export default function DataPemesananPage() {
     if (!status) return "bg-gray-100 text-gray-800";
 
     const statusLower = status.toLowerCase();
+
     if (statusLower.includes("menunggu") || statusLower.includes("pending")) {
       return "bg-yellow-100 text-yellow-800";
+    } else if (statusLower.includes("diproses")) {
+      return "bg-blue-100 text-blue-800";
     } else if (
-      statusLower.includes("valid") &&
-      !statusLower.includes("menunggu")
+      statusLower.includes("selesai") ||
+      statusLower.includes("valid")
     ) {
       return "bg-green-100 text-green-800";
     } else if (
@@ -180,6 +184,8 @@ export default function DataPemesananPage() {
       statusLower.includes("reject")
     ) {
       return "bg-red-100 text-red-800";
+    } else if (statusLower.includes("dalam pemesanan")) {
+      return "bg-purple-100 text-purple-800";
     } else {
       return "bg-gray-100 text-gray-800";
     }
@@ -242,6 +248,27 @@ export default function DataPemesananPage() {
             {/* FILTER - DIUBAH SESUAI GAYA */}
             <div className="px-6 py-4 border-b bg-white">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+                {/* Filter Status */}
+                <div>
+                  <label
+                    htmlFor="status"
+                    className="block font-medium text-gray-700 mb-1"
+                  >
+                    Status
+                  </label>
+                  <select
+                    id="status"
+                    name="status"
+                    value={filters.status}
+                    onChange={handleFilterChange}
+                    className="border border-gray-300 rounded px-3 py-2 w-full"
+                  >
+                    <option value="">Semua Status</option>
+                    <option value="diproses">Diproses</option>
+                    <option value="selesai">Selesai</option>
+                    <option value="ditolak">Ditolak</option>
+                  </select>
+                </div>
                 {/* Search */}
                 <div>
                   <label
@@ -353,7 +380,7 @@ export default function DataPemesananPage() {
                       <th className="px-6 py-3 font-semibold">Nama Barang</th>
                       <th className="px-6 py-3 font-semibold">Jenis Dokumen</th>
                       <th className="px-6 py-3 font-semibold">
-                        Status Validasi
+                        Status Pemesanan
                       </th>
                       <th className="px-6 py-3 font-semibold text-center">
                         Aksi

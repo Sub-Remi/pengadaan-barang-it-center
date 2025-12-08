@@ -173,6 +173,8 @@ export default function ListPemesananPage() {
         return "bg-red-100 text-red-800";
       case "dalam pemesanan":
         return "bg-blue-100 text-blue-800";
+      case "divalidasi": // TAMBAH INI
+        return "bg-purple-100 text-purple-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -341,6 +343,7 @@ export default function ListPemesananPage() {
                   <option value="diproses">Diproses</option>
                   <option value="selesai">Selesai</option>
                   <option value="ditolak">Ditolak</option>
+                  <option value="divalidasi">Divalidasi</option>
                   <option value="dalam pemesanan">Dalam Pemesanan</option>
                 </select>
               </div>

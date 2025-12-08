@@ -240,7 +240,7 @@ const Pemesanan = {
     }
   },
 
-  // Di file pemesanan.js, tambahkan fungsi ini setelah findAllForAdmin
+  // Di file: src/models/pemesanan.js
   findAllForValidator: async (page = 1, limit = 10, filters = {}) => {
     try {
       await Pemesanan.createTableIfNotExists();
@@ -251,6 +251,7 @@ const Pemesanan = {
 
       console.log("📋 Validator getting pemesanan with filters:", filters);
 
+      // QUERY YANG DIPERBAIKI:
       let query = `
       SELECT 
         pem.*,
@@ -260,26 +261,23 @@ const Pemesanan = {
         perm.nomor_permintaan,
         user_pemohon.nama_lengkap as pemohon_nama,
         divisi.nama_divisi,
-        dp.jenis_dokumen,
-        dp.is_valid,
-        dp.created_at as dokumen_created_at
+        bp.status as barang_status,
+        GROUP_CONCAT(DISTINCT dp.jenis_dokumen) as dokumen_jenis,
+        COUNT(DISTINCT dp.id) as jumlah_dokumen
       FROM pemesanan pem
       JOIN barang_permintaan bp ON pem.barang_permintaan_id = bp.id
       JOIN permintaan perm ON bp.permintaan_id = perm.id
       JOIN users user_pemohon ON perm.user_id = user_pemohon.id
       JOIN divisi ON user_pemohon.divisi_id = divisi.id
       LEFT JOIN dokumen_pembelian dp ON pem.barang_permintaan_id = dp.barang_permintaan_id
-      WHERE bp.status = 'dalam pemesanan'
-      AND (dp.is_valid IS NULL OR dp.is_valid = 0)  -- Dokumen belum divalidasi atau ditolak
+      WHERE 1=1
     `;
 
       let countQuery = `
       SELECT COUNT(DISTINCT pem.id) as total
       FROM pemesanan pem
       JOIN barang_permintaan bp ON pem.barang_permintaan_id = bp.id
-      LEFT JOIN dokumen_pembelian dp ON pem.barang_permintaan_id = dp.barang_permintaan_id
-      WHERE bp.status = 'dalam pemesanan'
-      AND (dp.is_valid IS NULL OR dp.is_valid = 0)
+      WHERE 1=1
     `;
 
       const values = [];
@@ -311,10 +309,20 @@ const Pemesanan = {
         countValues.push(searchTerm, searchTerm);
       }
 
+      // PERUBAHAN: Tambahkan filter untuk status pemesanan
+      if (filters.status && filters.status !== "semua") {
+        query += " AND pem.status = ?";
+        countQuery += " AND pem.status = ?";
+        values.push(filters.status);
+        countValues.push(filters.status);
+      }
+
+      query += " GROUP BY pem.id";
       query += " ORDER BY pem.tanggal_pemesanan DESC";
       query += ` LIMIT ${limitNum} OFFSET ${offset}`;
 
-      console.log("🔍 Executing validator pemesanan query:", query);
+      console.log("🔍 [DEBUG] Executing validator pemesanan query:");
+      console.log("📝 Query:", query);
       console.log("📊 Query values:", values);
 
       const [rows] = await dbPool.execute(query, values);
