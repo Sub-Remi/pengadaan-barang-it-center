@@ -1,18 +1,241 @@
 "use client";
 import Link from "next/link";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import permintaanService from "../../../lib/permintaanService";
+import authService from "../../../lib/authService";
+import ProtectedRoute from "../../../app/components/ProtectedRoute";
+import divisiPemohonService from "../../../lib/divisiPemohonService";
 
-export default function DetailPermintaanPage() {
-  return (
-    <div className="flex h-screen font-poppins bg-gray-100 overflow-hidden">
-      {/* Sidebar */}
-      <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1 fixed top-0 left-0 h-full">
-        <div className="h-20 border-b border-white flex items-center justify-center bg-white">
-          <img src="/logo/ItCenter.png" alt="IT Center" className="w-32 border-white" />
+export default function DetailRiwayatPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id"); // ID permintaan dari URL
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [permintaan, setPermintaan] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [divisiList, setDivisiList] = useState([]);
+
+  // Format tanggal
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  // Format status untuk riwayat (hanya selesai dan ditolak)
+  const formatStatus = (status) => {
+    const statusMap = {
+      selesai: { text: "Selesai", color: "bg-green-600 text-white" },
+      ditolak: { text: "Ditolak", color: "bg-red-500 text-white" },
+    };
+    return statusMap[status] || { text: status, color: "bg-gray-500 text-white" };
+  };
+
+  // Format status barang untuk riwayat
+  const formatStatusBarang = (status) => {
+    const statusMap = {
+      selesai: { text: "Selesai", color: "bg-green-600 text-white" },
+      ditolak: { text: "Ditolak", color: "bg-red-100 text-red-800" },
+      validasi: { text: "Divalidasi", color: "bg-green-100 text-green-800" },
+      diproses: { text: "Diproses", color: "bg-blue-100 text-blue-800" },
+      "dalam pemesanan": { text: "Dalam Pemesanan", color: "bg-purple-100 text-purple-800" },
+      "menunggu validasi": { text: "Menunggu Validasi", color: "bg-yellow-100 text-yellow-800" },
+    };
+    return statusMap[status] || { text: status, color: "bg-gray-100 text-gray-800" };
+  };
+
+  // Load divisi data
+  useEffect(() => {
+    const loadDivisi = async () => {
+      try {
+        const data = await divisiPemohonService.getDivisiDropdown();
+        setDivisiList(data);
+      } catch (error) {
+        console.error("Gagal memuat divisi:", error);
+        setDivisiList([]);
+      }
+    };
+    loadDivisi();
+  }, []);
+
+  // Load permintaan detail
+  useEffect(() => {
+    const loadData = async () => {
+      if (!id) {
+        setError("ID permintaan tidak ditemukan");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+
+        // Load user data
+        const user = authService.getCurrentUser();
+        if (!user) {
+          router.push("/login");
+          return;
+        }
+        setUserData(user);
+
+        // Load permintaan detail
+        const response = await permintaanService.getDetailPermintaan(id);
+
+        // Cek apakah user memiliki akses ke permintaan ini
+        if (user.role === "pemohon" && response.data.user_id !== user.id) {
+          setError("Anda tidak memiliki akses ke permintaan ini");
+          setLoading(false);
+          return;
+        }
+
+        // Cek apakah status permintaan termasuk dalam riwayat (selesai atau ditolak)
+        const status = response.data.status;
+        if (status !== "selesai" && status !== "ditolak") {
+          setError("Permintaan ini tidak termasuk dalam riwayat");
+          setLoading(false);
+          return;
+        }
+
+        setPermintaan(response.data);
+      } catch (error) {
+        console.error("❌ Error loading permintaan:", error);
+        setError(
+          error.response?.data?.error ||
+            error.error ||
+            "Gagal memuat detail permintaan"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [id, router]);
+
+  // Get divisi name by ID
+  const getDivisiName = (divisiId) => {
+    if (!divisiId) return "-";
+    const divisi = divisiList.find((d) => d.id === divisiId);
+    return divisi ? divisi.nama_divisi : "Divisi tidak ditemukan";
+  };
+
+  if (loading) {
+    return (
+      <div className="flex h-screen font-poppins bg-gray-100">
+        <aside className="w-60 bg-blue-900 text-white flex flex-col fixed top-0 left-0 h-full">
+          <div className="h-20 border-b border-white flex items-center justify-center bg-white">
+            <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
+          </div>
+        </aside>
+        <div className="flex flex-col flex-1 ml-60">
+          <header className="flex bg-white shadow-sm items-center h-20">
+            <div className="flex-1 h-full flex items-center px-8"></div>
+          </header>
+          <main className="flex-1 p-8 bg-gray-200 flex items-center justify-center">
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-600 mb-4"></div>
+              <p className="text-gray-600">Memuat detail riwayat...</p>
+            </div>
+          </main>
         </div>
-        <nav className="flex-1 mt-6 overflow-y-auto">
-          <ul className="space-y-1 pb-6">
-            <Link href="/divisi/dashboard_divisi">
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-screen font-poppins bg-gray-100">
+        <aside className="w-60 bg-blue-900 text-white flex flex-col fixed top-0 left-0 h-full">
+          <div className="h-20 border-b border-white flex items-center justify-center bg-white">
+            <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
+          </div>
+        </aside>
+        <div className="flex flex-col flex-1 ml-60">
+          <header className="flex bg-white shadow-sm items-center h-20">
+            <div className="flex-1 h-full flex items-center px-8"></div>
+          </header>
+          <main className="flex-1 p-8 bg-gray-200">
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="text-center py-8">
+                <div className="text-4xl mb-4">❌</div>
+                <h3 className="text-xl font-semibold text-red-600 mb-2">
+                  Terjadi Kesalahan
+                </h3>
+                <p className="text-gray-600 mb-4">{error}</p>
+                <Link href="/Divisi/riwayat_divisi">
+                  <button className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded">
+                    Kembali ke Daftar Riwayat
+                  </button>
+                </Link>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  if (!permintaan) {
+    return (
+      <div className="flex h-screen font-poppins bg-gray-100">
+        <aside className="w-60 bg-blue-900 text-white flex flex-col fixed top-0 left-0 h-full">
+          <div className="h-20 border-b border-white flex items-center justify-center bg-white">
+            <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
+          </div>
+        </aside>
+        <div className="flex flex-col flex-1 ml-60">
+          <header className="flex bg-white shadow-sm items-center h-20">
+            <div className="flex-1 h-full flex items-center px-8"></div>
+          </header>
+          <main className="flex-1 p-8 bg-gray-200">
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="text-center py-8">
+                <div className="text-4xl mb-4">📭</div>
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                  Riwayat Tidak Ditemukan
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Data riwayat yang Anda cari tidak ditemukan.
+                </p>
+                <Link href="/Divisi/riwayat_divisi">
+                  <button className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded">
+                    Kembali ke Daftar Riwayat
+                  </button>
+                </Link>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  // Ambil data barang
+  const barangList = permintaan.barang?.data || permintaan.barang || [];
+  const statusInfo = formatStatus(permintaan.status);
+
+  return (
+    <ProtectedRoute allowedRoles={["pemohon", "admin", "validator"]}>
+      <div className="flex h-screen font-poppins bg-gray-100 overflow-hidden">
+        {/* Sidebar */}
+        <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1 fixed top-0 left-0 h-full">
+          <div className="h-20 border-b border-white flex items-center justify-center bg-white">
+            <img
+              src="/logo/ItCenter.png"
+              alt="IT Center"
+              className="w-32 border-white"
+            />
+          </div>
+          <nav className="flex-1 mt-6 overflow-y-auto">
+            <ul className="space-y-1 pb-6">
+              <Link href="/divisi/dashboard_divisi">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Dashboard
                 </li>
@@ -30,7 +253,7 @@ export default function DetailPermintaanPage() {
                 </li>
               </Link>
 
-              <Link href="/Divisi/form_permintaan">
+              <Link href="/Divisi/permintaan_divisi">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Permintaan
                 </li>
@@ -41,186 +264,310 @@ export default function DetailPermintaanPage() {
                   Riwayat
                 </li>
               </Link>
-          </ul>
-        </nav>
-      </aside>
+            </ul>
+          </nav>
+        </aside>
 
-      {/* Main Wrapper (Header + Content) */}
-      <div className="flex flex-col flex-1 ml-60 h-full">
-        {/* Header */}
-        <header className="flex bg-white shadow-sm items-center h-20 fixed top-0 left-60 right-0 z-10">
-          <div className="flex-1 h-full flex items-center px-8">
-
-          </div>
-        </header>
-
-        {/* Main Content Scrollable */}
-        <main className="flex-1 mt-20 overflow-y-auto bg-gray-200 p-8">
-          <h2 className="text-3xl font-semibold mb-6">Riwayat</h2>
-
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            {/* Header */}
-            <div className="flex justify-between items-center px-6 py-5 border-b-4 border-b-gray-300">
-              <h3 className="text-xl font-semibold text-teal-600">
-                Detail Riwayat
-              </h3>
-              <Link href="/Divisi/permintaan_divisi">
-                <button className="bg-teal-600 hover:bg-green-600 text-white px-4 py-1.5 rounded">
-                  &lt; Kembali
-                </button>
-              </Link>
-            </div>
-
-            {/* Data Pemohon */}
-            <div className="px-6 py-4 border-b-4 border-b-gray-300">
-              <h4 className="text-lg font-semibold mb-4 text-gray-800">
-                Data Permintaan
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="font-medium text-gray-700">ID Permintaan</label>
-                  <input
-                    type="text"
-                    value="0000"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="font-medium text-gray-700">Nama</label>
-                  <input
-                    type="text"
-                    value="John Doe"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-medium text-gray-700">Departemen/Divisi</label>
-                  <input
-                    type="text"
-                    value="IT"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-medium text-gray-700">Email</label>
-                  <input
-                    type="text"
-                    value="john.doe@itcenter.co.id"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                </div>
-
- 
-
-                <div>
-                  <label className="font-medium text-gray-700">Judul Permintaan</label>
-                  <input
-                    type="text"
-                    value="Permintaan ATK"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-medium text-gray-700">Tanggal Permintaan</label>
-                  <input
-                    type="date"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-medium text-gray-700">Jumlah Barang Diminta</label>
-                  <input
-                    type="text"
-                    value="1"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                </div>
+        {/* Main Wrapper */}
+        <div className="flex flex-col flex-1 ml-60 h-full">
+          {/* Header */}
+          <header className="flex bg-white shadow-sm items-center h-20 fixed top-0 left-60 right-0 z-10">
+            <div className="flex-1 h-full flex items-center px-8">
+              <div className="ml-auto">
+                <span className="text-gray-700">
+                  {userData?.nama_lengkap || userData?.username || "User"}
+                </span>
               </div>
             </div>
+          </header>
 
-            {/* Data Barang */}
-            <div className="px-6 py-4 border-b">
-              <h4 className="text-lg font-semibold mb-4 text-gray-800">Data Barang 1</h4>
+          {/* Main Content */}
+          <main className="flex-1 mt-20 overflow-y-auto bg-gray-200 p-8">
+            <h2 className="text-3xl font-semibold mb-6">Detail Riwayat Permintaan</h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+              {/* Header */}
+              <div className="flex justify-between items-center px-6 py-5 border-b-4 border-b-gray-300">
                 <div>
-                  <label className="font-medium text-gray-700">Kategori Barang</label>
-                  <input
-                    type="text"
-                    value="ATK"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
+                  <h3 className="text-xl font-semibold text-teal-600">
+                    Detail Riwayat Permintaan
+                  </h3>
+                  <p className="text-gray-600 text-sm mt-1">
+                    No. Permintaan:{" "}
+                    <span className="font-semibold">
+                      {permintaan.nomor_permintaan}
+                    </span>
+                  </p>
                 </div>
-
-                <div>
-                  <label className="font-medium text-gray-700">Nama Barang</label>
-                  <input
-                    type="text"
-                    value="Pulpen"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-medium text-gray-700">Satuan</label>
-                  <input
-                    type="text"
-                    value="Pack"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-medium text-gray-700">Jumlah</label>
-                  <input
-                    type="text"
-                    value="5"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="font-medium text-gray-700">Keterangan</label>
-                  <textarea
-                    value="Kebutuhan Kantor"
-                    disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                    rows="3"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-medium text-gray-700">Status</label>
-                  <input
-                    type="text"
-                    value="Divalidasi"
-                    disabled
-                    className="w-full border border-gray-300 bg-green-600 text-white font-semibold rounded px-3 py-2 mt-1 mb-3"
-                  />
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`px-3 py-1 rounded-full text-white font-medium ${statusInfo.color}`}
+                  >
+                    {statusInfo.text}
+                  </span>
+                  <Link href="/Divisi/riwayat_divisi">
+                    <button className="bg-teal-600 hover:bg-green-600 text-white px-4 py-1.5 rounded">
+                      &lt; Kembali
+                    </button>
+                  </Link>
                 </div>
               </div>
-            </div>
 
-            {/* Garis bawah hijau */}
-            <div className="h-1 bg-teal-600 w-full"></div>
-          </div>
-        </main>
+              {/* Data Permintaan */}
+              <div className="px-6 py-4 border-b-4 border-b-gray-300">
+                <h4 className="text-lg font-semibold mb-4 text-gray-800">
+                  Data Permintaan
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="font-medium text-gray-700">
+                      ID Permintaan
+                    </label>
+                    <input
+                      type="text"
+                      value={permintaan.nomor_permintaan || "N/A"}
+                      disabled
+                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-medium text-gray-700">
+                      Nama Pemohon
+                    </label>
+                    <input
+                      type="text"
+                      value={
+                        permintaan.nama_lengkap ||
+                        userData?.nama_lengkap ||
+                        "N/A"
+                      }
+                      disabled
+                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-medium text-gray-700">Divisi</label>
+                    <input
+                      type="text"
+                      value={
+                        getDivisiName(permintaan.divisi_id) ||
+                        permintaan.nama_divisi ||
+                        "N/A"
+                      }
+                      disabled
+                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-medium text-gray-700">Email</label>
+                    <input
+                      type="text"
+                      value={userData?.email || permintaan.email || "N/A"}
+                      disabled
+                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-medium text-gray-700">
+                      Judul Permintaan
+                    </label>
+                    <input
+                      type="text"
+                      value={permintaan.catatan || "Tidak ada judul"}
+                      disabled
+                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-medium text-gray-700">
+                      Tanggal Kebutuhan
+                    </label>
+                    <input
+                      type="text"
+                      value={formatDate(permintaan.tanggal_kebutuhan)}
+                      disabled
+                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-medium text-gray-700">
+                      Jumlah Barang Diminta
+                    </label>
+                    <input
+                      type="text"
+                      value={barangList.length}
+                      disabled
+                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-medium text-gray-700">
+                      Tanggal Dibuat
+                    </label>
+                    <input
+                      type="text"
+                      value={formatDate(permintaan.created_at)}
+                      disabled
+                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Daftar Barang */}
+              {barangList.length > 0 ? (
+                barangList.map((barang, index) => {
+                  const barangStatus = formatStatusBarang(barang.status);
+                  return (
+                    <div
+                      key={barang.id}
+                      className="px-6 py-4 border-b-4 border-b-gray-300"
+                    >
+                      <div className="flex justify-between items-center mb-4">
+                        <h4 className="text-lg font-semibold text-gray-800">
+                          Data Barang {index + 1}
+                        </h4>
+                        <span
+                          className={`px-3 py-1 rounded-full text-sm font-medium ${barangStatus.color}`}
+                        >
+                          {barangStatus.text}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="font-medium text-gray-700">
+                            Kategori Barang
+                          </label>
+                          <input
+                            type="text"
+                            value={barang.kategori_barang || "N/A"}
+                            disabled
+                            className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-medium text-gray-700">
+                            Nama Barang
+                          </label>
+                          <input
+                            type="text"
+                            value={barang.nama_barang || "N/A"}
+                            disabled
+                            className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-medium text-gray-700">
+                            Satuan
+                          </label>
+                          <input
+                            type="text"
+                            value={
+                              barang.satuan ||
+                              barang.stok_barang?.nama_satuan ||
+                              "N/A"
+                            }
+                            disabled
+                            className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-medium text-gray-700">
+                            Jumlah
+                          </label>
+                          <input
+                            type="text"
+                            value={barang.jumlah || 0}
+                            disabled
+                            className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                          />
+                        </div>
+
+                        <div className="md:col-span-2">
+                          <label className="font-medium text-gray-700">
+                            Spesifikasi
+                          </label>
+                          <input
+                            value={
+                              barang.spesifikasi ||
+                              barang.stok_barang?.spesifikasi ||
+                              "Tidak ada spesifikasi"
+                            }
+                            disabled
+                            className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                            rows="2"
+                          />
+                        </div>
+
+                        <div className="md:col-span-2">
+                          <label className="font-medium text-gray-700">
+                            Keterangan
+                          </label>
+                          <textarea
+                            value={barang.keterangan || "Tidak ada keterangan"}
+                            disabled
+                            className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                            rows="2"
+                          />
+                        </div>
+
+                        {/* Catatan Admin/Validator jika ada */}
+                        {barang.catatan_admin && (
+                          <div className="md:col-span-2">
+                            <label className="font-medium  text-red-600">
+                              Catatan Admin
+                            </label>
+                            <textarea
+                              value={barang.catatan_admin}
+                              disabled
+                              className="w-full border border-red-200 bg-red-50 rounded px-3 py-2 mt-1 text-red-700"
+                              rows="2"
+                            />
+                          </div>
+                        )}
+
+                        {barang.catatan_validator && (
+                          <div className="md:col-span-2">
+                            <label className="font-medium  text-blue-600">
+                              Catatan Validator
+                            </label>
+                            <textarea
+                              value={barang.catatan_validator}
+                              disabled
+                              className="w-full border border-blue-200 bg-blue-50 rounded px-3 py-2 mt-1 text-blue-700"
+                              rows="2"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="px-6 py-8 text-center">
+                  <div className="text-4xl mb-3">📭</div>
+                  <p className="text-gray-600">
+                    Tidak ada barang dalam permintaan ini
+                  </p>
+                </div>
+              )}
+
+              {/* Garis bawah hijau */}
+              <div className="h-1 bg-teal-600 w-full"></div>
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }
