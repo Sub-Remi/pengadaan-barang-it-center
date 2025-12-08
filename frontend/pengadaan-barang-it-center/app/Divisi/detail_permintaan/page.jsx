@@ -4,20 +4,20 @@ import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import permintaanService from "../../../lib/permintaanService";
 import authService from "../../../lib/authService";
-import divisiService from "../../../lib/divisiService";
 import ProtectedRoute from "../../../app/components/ProtectedRoute";
-import divisiPemohonService from "../../../lib/divisiPemohonService"; // TAMBAHKAN INI
+import divisiPemohonService from "../../../lib/divisiPemohonService";
 
 export default function DetailPermintaanPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const id = searchParams.get("id"); // ID permintaan dari URL
+  const id = searchParams.get("id");
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [permintaan, setPermintaan] = useState(null);
   const [userData, setUserData] = useState(null);
   const [divisiList, setDivisiList] = useState([]);
+  const [catatanData, setCatatanData] = useState({});
 
   // Format tanggal
   const formatDate = (dateString) => {
@@ -63,8 +63,18 @@ export default function DetailPermintaanPage() {
     );
   };
 
-  // Load divisi data untuk mapping divisi_id ke nama
-  // Update useEffect untuk loadDivisi
+  // Fungsi untuk mendapatkan catatan penolakan dari berbagai field yang mungkin
+  const getCatatanPenolakan = (barang) => {
+    return (
+      barang.catatan_admin ||
+      barang.alasan_penolakan ||
+      barang.catatan ||
+      barang.keterangan_penolakan ||
+      ""
+    );
+  };
+
+  // Load divisi data
   useEffect(() => {
     const loadDivisi = async () => {
       try {
@@ -72,14 +82,13 @@ export default function DetailPermintaanPage() {
         setDivisiList(data);
       } catch (error) {
         console.error("Gagal memuat divisi:", error);
-        // Tetap set array kosong, jangan throw error
         setDivisiList([]);
       }
     };
     loadDivisi();
   }, []);
 
-  // Load permintaan detail
+  // Load permintaan detail dan catatan
   useEffect(() => {
     const loadData = async () => {
       if (!id) {
@@ -110,6 +119,17 @@ export default function DetailPermintaanPage() {
         }
 
         setPermintaan(response.data);
+
+        // Ambil data barang dan simpan catatan
+        const barangList = response.data.barang?.data || response.data.barang || [];
+        const catatanMap = {};
+        barangList.forEach(barang => {
+          if (barang.status === 'ditolak' || barang.catatan_admin) {
+            catatanMap[barang.id] = getCatatanPenolakan(barang);
+          }
+        });
+        setCatatanData(catatanMap);
+
       } catch (error) {
         console.error("❌ Error loading permintaan:", error);
         setError(
@@ -259,7 +279,7 @@ export default function DetailPermintaanPage() {
                 </li>
               </Link>
 
-              <Link href="/Divisi/form_permintaan">
+              <Link href="/Divisi/permintaan_divisi">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Permintaan
                 </li>
@@ -430,6 +450,8 @@ export default function DetailPermintaanPage() {
               {barangList.length > 0 ? (
                 barangList.map((barang, index) => {
                   const barangStatus = formatStatusBarang(barang.status);
+                  const catatanPenolakan = catatanData[barang.id] || getCatatanPenolakan(barang);
+                  
                   return (
                     <div
                       key={barang.id}
@@ -499,54 +521,11 @@ export default function DetailPermintaanPage() {
                           />
                         </div>
 
-                        <div>
-                          <label className="font-medium text-gray-700">
-                            Stok Tersedia
-                          </label>
-                          <input
-                            type="text"
-                            value={
-                              barang.stok_available ||
-                              barang.stok_barang?.stok ||
-                              "N/A"
-                            }
-                            disabled
-                            className={`w-full border border-gray-300 rounded px-3 py-2 mt-1 ${
-                              barang.stok_available > 0 &&
-                              barang.jumlah > barang.stok_available
-                                ? "bg-red-50 text-red-700"
-                                : "bg-gray-100"
-                            }`}
-                          />
-                          {barang.stok_available > 0 &&
-                            barang.jumlah > barang.stok_available && (
-                              <p className="text-xs text-red-600 mt-1">
-                                ⚠️ Jumlah melebihi stok tersedia
-                              </p>
-                            )}
-                        </div>
-
-                        <div>
-                          <label className="font-medium text-gray-700">
-                            Stok Barang ID
-                          </label>
-                          <input
-                            type="text"
-                            value={
-                              barang.stok_barang_id ||
-                              barang.stok_barang?.id ||
-                              "Tidak terkait stok"
-                            }
-                            disabled
-                            className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
-                          />
-                        </div>
-
                         <div className="md:col-span-2">
                           <label className="font-medium text-gray-700">
                             Spesifikasi
                           </label>
-                          <textarea
+                          <input
                             value={
                               barang.spesifikasi ||
                               barang.stok_barang?.spesifikasi ||
@@ -560,7 +539,7 @@ export default function DetailPermintaanPage() {
 
                         <div className="md:col-span-2">
                           <label className="font-medium text-gray-700">
-                            Keterangan
+                            Keterangan Pemohon
                           </label>
                           <textarea
                             value={barang.keterangan || "Tidak ada keterangan"}
@@ -570,16 +549,39 @@ export default function DetailPermintaanPage() {
                           />
                         </div>
 
-                        {/* Catatan Admin/Validator jika ada */}
-                        {barang.catatan_admin && (
+                        {/* Tampilkan Alasan Penolakan jika barang ditolak */}
+                        {barang.status === 'ditolak' && catatanPenolakan && (
                           <div className="md:col-span-2">
-                            <label className="font-medium text-gray-700 text-red-600">
+                            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                              <div className="flex items-center">
+                                <div className="flex-shrink-0 text-red-500">
+                                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                  </svg>
+                                </div>
+                                <div className="ml-3">
+                                  <h3 className="text-sm font-medium text-red-800">
+                                    Alasan Penolakan
+                                  </h3>
+                                  <div className="mt-2 text-sm text-red-700">
+                                    <p>{catatanPenolakan}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Tampilkan catatan admin untuk status lain */}
+                        {barang.status !== 'ditolak' && catatanPenolakan && (
+                          <div className="md:col-span-2">
+                            <label className="font-medium  text-blue-600">
                               Catatan Admin
                             </label>
                             <textarea
-                              value={barang.catatan_admin}
+                              value={catatanPenolakan}
                               disabled
-                              className="w-full border border-red-200 bg-red-50 rounded px-3 py-2 mt-1 text-red-700"
+                              className="w-full border border-blue-200 bg-blue-50 rounded px-3 py-2 mt-1 text-blue-700"
                               rows="2"
                             />
                           </div>
@@ -587,13 +589,13 @@ export default function DetailPermintaanPage() {
 
                         {barang.catatan_validator && (
                           <div className="md:col-span-2">
-                            <label className="font-medium text-gray-700 text-blue-600">
+                            <label className="font-medium  text-green-600">
                               Catatan Validator
                             </label>
                             <textarea
                               value={barang.catatan_validator}
                               disabled
-                              className="w-full border border-blue-200 bg-blue-50 rounded px-3 py-2 mt-1 text-blue-700"
+                              className="w-full border border-green-200 bg-green-50 rounded px-3 py-2 mt-1 text-green-700"
                               rows="2"
                             />
                           </div>
