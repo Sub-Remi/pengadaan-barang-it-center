@@ -1,13 +1,236 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function DetailBarangPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  
   const [isEditMode, setIsEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({
+    kode_barang: "",
+    nama_barang: "",
+    kategori_id: "",
+    satuan_id: "",
+    spesifikasi: "",
+    stok: "",
+  });
+  const [kategoriList, setKategoriList] = useState([]);
+  const [satuanList, setSatuanList] = useState([]);
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3200/api";
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  // Fetch data barang berdasarkan ID
+  const fetchBarangDetail = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_URL}/admin/barang/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Gagal mengambil data barang");
+
+      const result = await response.json();
+      console.log("Detail Barang:", result); // Debug log
+      
+      if (result.success) {
+        setFormData({
+          kode_barang: result.data.kode_barang || "",
+          nama_barang: result.data.nama_barang || "",
+          kategori_id: result.data.kategori_id ? result.data.kategori_id.toString() : "",
+          satuan_id: result.data.satuan_id ? result.data.satuan_id.toString() : "",
+          spesifikasi: result.data.spesifikasi || "",
+          stok: result.data.stok || "",
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching detail:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch kategori untuk dropdown
+  const fetchKategori = async () => {
+    try {
+      const response = await fetch(`${API_URL}/admin/kategori/dropdown`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      console.log("Kategori List:", result); // Debug log
+      if (result.success) {
+        setKategoriList(result.data);
+      }
+    } catch (err) {
+      console.error("Gagal mengambil kategori:", err);
+    }
+  };
+
+  // Fetch satuan untuk dropdown
+  const fetchSatuan = async () => {
+    try {
+      const response = await fetch(`${API_URL}/admin/satuan/dropdown`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      console.log("Satuan List:", result); // Debug log
+      if (result.success) {
+        setSatuanList(result.data);
+      }
+    } catch (err) {
+      console.error("Gagal mengambil satuan:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchBarangDetail();
+      fetchKategori();
+      fetchSatuan();
+    }
+  }, [id]);
+
+  // Handle perubahan form
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Validasi form sebelum submit
+  const validateForm = () => {
+    if (!formData.nama_barang.trim()) {
+      alert("Nama barang harus diisi");
+      return false;
+    }
+    if (!formData.kategori_id) {
+      alert("Kategori harus dipilih");
+      return false;
+    }
+    if (!formData.satuan_id) {
+      alert("Satuan harus dipilih");
+      return false;
+    }
+    return true;
+  };
+
+  // Handle submit untuk update
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Validasi form
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setError(null);
+      
+      // Pastikan data dikirim dengan format yang benar
+      const updateData = {
+        nama_barang: formData.nama_barang.trim(),
+        kategori_id: parseInt(formData.kategori_id), // Konversi ke number
+        satuan_id: parseInt(formData.satuan_id), // Konversi ke number
+        spesifikasi: formData.spesifikasi.trim(),
+        // kode_barang dan stok biasanya tidak diupdate, tapi jika diperlukan:
+        // kode_barang: formData.kode_barang,
+        // stok: parseInt(formData.stok)
+      };
+
+      console.log("Data yang akan dikirim:", updateData); // Debug log
+
+      const response = await fetch(`${API_URL}/admin/barang/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      const result = await response.json();
+      console.log("Response dari server:", result); // Debug log
+      
+      if (result.success) {
+        alert("Data barang berhasil diupdate!");
+        setIsEditMode(false);
+        fetchBarangDetail(); // Refresh data
+      } else {
+        // Tampilkan error spesifik dari server
+        const errorMessage = result.error || 
+                           result.message || 
+                           "Gagal mengupdate data";
+        throw new Error(errorMessage);
+      }
+    } catch (err) {
+      setError(err.message);
+      alert("Gagal mengupdate data: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Handle delete
+  const handleDelete = async () => {
+    if (!confirm("Yakin ingin menghapus barang ini?")) return;
+
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_URL}/admin/barang/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        alert("Data barang berhasil dihapus!");
+        router.push("/GA/data_barang");
+      } else {
+        throw new Error(result.error || "Gagal menghapus data");
+      }
+    } catch (err) {
+      setError(err.message);
+      alert("Gagal menghapus data: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleEditToggle = () => {
+    if (isEditMode) {
+      // Jika batal, reload data asli
+      fetchBarangDetail();
+    }
     setIsEditMode(!isEditMode);
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-xl">Loading data barang...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen font-poppins bg-gray-100">
@@ -52,7 +275,6 @@ export default function DetailBarangPage() {
                   Kategori Barang
                 </li>
               </Link>
-
 
               <Link href="/GA/data_satuanbarang">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
@@ -134,132 +356,169 @@ export default function DetailBarangPage() {
               </Link>
             </div>
 
+            {/* Error message */}
+            {error && (
+              <div className="px-6 py-4 bg-red-100 text-red-700">
+                <strong>Error:</strong> {error}
+              </div>
+            )}
+
             {/* Isi form */}
-            <div className="px-8 py-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={handleSubmit}>
+              <div className="px-8 py-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                {/* Kode Barang */}
-                <div>
-                  <label className="font-medium text-gray-700">Kode Barang</label>
-                  <input
-                    type="number"
-                    defaultValue="101"
-                    disabled
-                    className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-300 text-gray-800"
-                  />
+                  {/* Kode Barang */}
+                  <div>
+                    <label className="font-medium text-gray-700">Kode Barang</label>
+                    <input
+                      type="text"
+                      name="kode_barang"
+                      value={formData.kode_barang}
+                      onChange={handleChange}
+                      disabled
+                      className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-300 text-gray-800"
+                    />
+                  </div>
+
+                  {/* Nama Barang */}
+                  <div>
+                    <label className="font-medium text-gray-700">Nama Barang</label>
+                    <input
+                      type="text"
+                      name="nama_barang"
+                      value={formData.nama_barang}
+                      onChange={handleChange}
+                      disabled={!isEditMode}
+                      className={`w-full border rounded px-3 py-2 mt-1 transition ${
+                        isEditMode
+                          ? "border-gray-300 bg-white text-gray-800 focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                          : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
+                      }`}
+                      required
+                    />
+                  </div>
+
+                  {/* Dropdown Kategori */}
+                  <div>
+                    <label className="font-medium text-gray-700">Kategori Barang</label>
+                    <select
+                      name="kategori_id"
+                      value={formData.kategori_id}
+                      onChange={handleChange}
+                      disabled={!isEditMode}
+                      className={`w-full border rounded px-3 py-2 mt-1 transition ${
+                        isEditMode
+                          ? "border-gray-300 bg-white text-gray-800 focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                          : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
+                      }`}
+                      required
+                    >
+                      <option value="">Pilih Kategori</option>
+                      {kategoriList.map((kategori) => (
+                        <option key={kategori.id} value={kategori.id.toString()}>
+                          {kategori.nama_kategori}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Satuan */}
+                  <div>
+                    <label className="font-medium text-gray-700">Satuan</label>
+                    <select
+                      name="satuan_id"
+                      value={formData.satuan_id}
+                      onChange={handleChange}
+                      disabled={!isEditMode}
+                      className={`w-full border rounded px-3 py-2 mt-1 transition ${
+                        isEditMode
+                          ? "border-gray-300 bg-white text-gray-800 focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                          : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
+                      }`}
+                      required
+                    >
+                      <option value="">Pilih Satuan</option>
+                      {satuanList.map((satuan) => (
+                        <option key={satuan.id} value={satuan.id.toString()}>
+                          {satuan.nama_satuan}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Spesifikasi */}
+                  <div>
+                    <label className="font-medium text-gray-700">Spesifikasi</label>
+                    <input
+                      type="text"
+                      name="spesifikasi"
+                      value={formData.spesifikasi}
+                      onChange={handleChange}
+                      disabled={!isEditMode}
+                      className={`w-full border rounded px-3 py-2 mt-1 transition ${
+                        isEditMode
+                          ? "border-gray-300 bg-white text-gray-800 focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                          : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
+                      }`}
+                    />
+                  </div>
+
+                  {/* Stok */}
+                  <div>
+                    <label className="font-medium text-gray-700">Stok</label>
+                    <input
+                      type="number"
+                      name="stok"
+                      value={formData.stok}
+                      disabled
+                      className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-300 text-gray-800"
+                    />
+                  </div>
                 </div>
 
-                {/* Nama Barang */}
-                <div>
-                  <label className="font-medium text-gray-700">Nama Barang</label>
-                  <input
-                    type="text"
-                    defaultValue="Kertas HVS"
-                    disabled={!isEditMode}
-                    className={`w-full border rounded px-3 py-2 mt-1 transition ${
-                      isEditMode
-                        ? "border-gray-300 bg-white text-gray-800"
-                        : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
-                    }`}
-                  />
-                </div>
+                {/* Tombol Hapus, Ubah, Simpan */}
+                <div className="flex justify-end mt-8 gap-2">
 
-                {/* Dropdown Kategori */}
-                <div>
-                  <label className="font-medium text-gray-700">Kategori Barang</label>
-                  <select
-                    disabled={!isEditMode}
-                    className={`w-full border rounded px-3 py-2 mt-1 transition ${
+                  {/* Tombol Hapus */}
+                  <button
+                    type="button"
+                    className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded transition"
+                    onClick={handleDelete}
+                    disabled={loading}
+                  >
+                    Hapus
+                  </button>
+
+                  {/* Tombol Ubah / Batal */}
+                  <button
+                    type="button"
+                    onClick={handleEditToggle}
+                    className={`${
                       isEditMode
-                        ? "border-gray-300 bg-white text-gray-800"
-                        : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
+                        ? "bg-gray-600 hover:bg-gray-700"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    } text-white px-5 py-2 rounded transition`}
+                    disabled={loading || saving}
+                  >
+                    {isEditMode ? "Batal" : "Ubah"}
+                  </button>
+
+                  {/* Tombol Simpan */}
+                  <button
+                    type="submit"
+                    disabled={!isEditMode || saving}
+                    className={`px-5 py-2 font-medium rounded text-white transition ${
+                      isEditMode
+                        ? "bg-green-600 hover:bg-green-700"
+                        : "bg-gray-400 cursor-not-allowed"
                     }`}
                   >
-                    <option>ATK</option>
-                    <option>Elektronik</option>
-                    <option>Perabot</option>
-                  </select>
-                </div>
-
-                {/* Satuan */}
-                <div>
-                  <label className="font-medium text-gray-700">Satuan</label>
-                  <select
-                    disabled={!isEditMode}
-                    className={`w-full border rounded px-3 py-2 mt-1 transition ${
-                      isEditMode
-                        ? "border-gray-300 bg-white text-gray-800"
-                        : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
-                    }`}
-                  >
-                    <option>Rim</option>
-                    <option>Pack</option>
-                  </select>
-                </div>
-
-                {/*Spesifikasi */}
-                <div>
-                  <label className="font-medium text-gray-700">Spesifikasi</label>
-                  <input
-                    type="text"
-                    defaultValue="A4"
-                    disabled={!isEditMode}
-                    className={`w-full border rounded px-3 py-2 mt-1 transition ${
-                      isEditMode
-                        ? "border-gray-300 bg-white text-gray-800"
-                        : "border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed"
-                    }`}
-                  />
-                </div>
-
-                {/* Stok */}
-                <div>
-                  <label className="font-medium text-gray-700">Stok</label>
-                  <input
-                    type="number"
-                    defaultValue="70"
-                    disabled
-                    className="w-full border rounded px-3 py-2 mt-1 transition border-gray-300 bg-gray-300 text-gray-800"
-                  />
+                    {saving ? "Menyimpan..." : "Simpan"}
+                  </button>
                 </div>
               </div>
-
-              {/* Tombol Hapus, Ubah, Simpan */}
-<div className="flex justify-end mt-8 gap-2">
-
-                {/* Tombol Hapus */}
-                <button
-                  className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded"
-                  onClick={() => alert("Yakin ingin menghapus barang ini?")}
-                >
-                  Hapus
-                </button>
-
-                {/* Tombol Ubah / Batal */}
-                <button
-                  onClick={handleEditToggle}
-                  className={`${
-                    isEditMode
-                      ? "bg-gray-600 hover:bg-gray-700"
-                      : "bg-blue-600 hover:bg-blue-700"
-                  } text-white px-5 py-2 rounded`}
-                >
-                  {isEditMode ? "Batal" : "Ubah"}
-                </button>
-
-                {/* Tombol Simpan */}
-                <button
-                  disabled={!isEditMode}
-                  className={`px-5 py-2 font-medium rounded text-white transition ${
-                    isEditMode
-                      ? "bg-green-600 hover:bg-green-700"
-                      : "bg-gray-400 cursor-not-allowed"
-                  }`}
-                >
-                  Simpan
-                </button>
-              </div>
-            </div>
+            </form>
 
             {/* Garis bawah hijau */}
             <div className="h-1 bg-teal-600 w-full"></div>

@@ -51,7 +51,7 @@ export default function ListPemesananPage() {
 
         {/* Main Content */}
         <main className="flex-1 p-8 bg-gray-200">
-          <h2 className="text-3xl font-semibold mb-6">Riwayat</h2>
+          <h2 className="text-3xl text-black font-semibold mb-6">Riwayat</h2>
 
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             {/* Header */}
@@ -64,13 +64,13 @@ export default function ListPemesananPage() {
             {/* FILTER TANGGAL */}
             <div className="flex flex-wrap items-center px-6 py-4 border-b bg-white">
               <div className="flex items-center gap-3 flex-wrap">
-                <label className="font-medium text-gray-700">Dari Tanggal:</label>
+                <label className="font-medium text-black">Dari Tanggal:</label>
                 <input
                   type="date"
                   className="border border-gray-300 rounded px-2 py-1 text-x1"
                 />
 
-                <label className="font-medium text-gray-700">Sampai Tanggal:</label>
+                <label className="font-medium text-black">Sampai Tanggal:</label>
                 <input
                   type="date"
                   className="border border-gray-300 rounded px-2 py-1 text-x1"
@@ -79,7 +79,7 @@ export default function ListPemesananPage() {
             </div>
 
             {/* TABLE */}
-            <table className="w-full border-collapse text-x1">
+            <table className="w-full text-black border-collapse text-x1">
               <thead>
                 <tr className="bg-white text-left">
                   <th className="px-6 py-3 font-semibold">No</th>

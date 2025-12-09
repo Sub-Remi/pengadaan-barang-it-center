@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
+import { FaUpload, FaTrash, FaExchangeAlt, FaFilePdf, FaFileImage } from "react-icons/fa";
 
 export default function DokumenPemesananPage() {
   const searchParams = useSearchParams();
@@ -223,10 +224,18 @@ export default function DokumenPemesananPage() {
 
   const getStatusColor = (jenis) => {
     const dokumen = getDokumenByJenis(jenis);
-    if (!dokumen) return "status-pending";
-    if (dokumen.is_valid === 1) return "status-valid";
-    if (dokumen.is_valid === 0) return "status-ditolak";
-    return "status-pending";
+    if (!dokumen) return "text-yellow-600";
+    if (dokumen.is_valid === 1) return "text-green-600";
+    if (dokumen.is_valid === 0) return "text-red-600";
+    return "text-yellow-600";
+  };
+
+  const getStatusBgColor = (jenis) => {
+    const dokumen = getDokumenByJenis(jenis);
+    if (!dokumen) return "bg-yellow-100";
+    if (dokumen.is_valid === 1) return "bg-green-100";
+    if (dokumen.is_valid === 0) return "bg-red-100";
+    return "bg-yellow-100";
   };
 
   // Get dokumen by jenis
@@ -286,14 +295,14 @@ export default function DokumenPemesananPage() {
         )}
 
         {/* Preview File */}
-        <div className="flex items-start gap-4">
+        <div className="flex flex-col md:flex-row items-start gap-4">
           <div className="flex-1">
             {isImage ? (
               <div className="relative group">
                 <img
                   src={fileUrl}
                   alt={dokumen.jenis_dokumen}
-                  className="w-40 h-40 object-cover rounded border border-gray-300 shadow-sm cursor-pointer hover:opacity-80"
+                  className="w-full max-w-xs h-auto object-cover rounded border border-gray-300 shadow-sm cursor-pointer hover:opacity-80"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = "/placeholder-image.jpg";
@@ -308,7 +317,7 @@ export default function DokumenPemesananPage() {
               </div>
             ) : isPDF ? (
               <div
-                className="w-40 h-40 border border-gray-300 rounded shadow-sm flex items-center justify-center cursor-pointer hover:bg-gray-100"
+                className="w-full max-w-xs h-40 border border-gray-300 rounded shadow-sm flex items-center justify-center cursor-pointer hover:bg-gray-100"
                 onClick={() => window.open(fileUrl, "_blank")}
               >
                 <div className="text-center">
@@ -338,33 +347,39 @@ export default function DokumenPemesananPage() {
           </div>
 
           {/* Tombol Aksi - Nonaktifkan jika dokumen sudah divalidasi */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-row md:flex-col gap-2">
             <button
               onClick={() => triggerFileInput(jenis)}
               disabled={uploading[jenis] || deleting || dokumen.is_valid === 1}
-              className={`px-3 py-1 rounded text-sm ${
+              className={`flex items-center gap-1 px-3 py-2 rounded text-sm transition-colors ${
                 dokumen.is_valid === 1
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700 text-white"
               }`}
             >
-              {uploading[jenis]
-                ? "Mengganti..."
-                : dokumen.is_valid === 1
-                ? "Tidak Bisa Diganti"
-                : "Ganti File"}
+              {uploading[jenis] ? (
+                <>
+                  <span className="animate-spin">⟳</span> Mengganti...
+                </>
+              ) : dokumen.is_valid === 1 ? (
+                <>Tidak Bisa Diganti</>
+              ) : (
+                <>
+                  <FaExchangeAlt /> Ganti
+                </>
+              )}
             </button>
 
             <button
               onClick={() => handleDeleteDokumen(dokumen.id, jenis)}
               disabled={uploading[jenis] || deleting || dokumen.is_valid === 1}
-              className={`px-3 py-1 rounded text-sm ${
+              className={`flex items-center gap-1 px-3 py-2 rounded text-sm transition-colors ${
                 dokumen.is_valid === 1
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-red-600 hover:bg-red-700 text-white"
               }`}
             >
-              {deleting ? "Menghapus..." : "Hapus"}
+              {deleting ? "Menghapus..." : <><FaTrash /> Hapus</>}
             </button>
           </div>
         </div>
@@ -374,8 +389,12 @@ export default function DokumenPemesananPage() {
 
   // Render upload form
   const renderUploadForm = (jenis) => {
+    const dokumenName = jenis === "nota" ? "Nota" : 
+                       jenis === "po" ? "Purchase Order (PO)" : 
+                       "Form Penerimaan";
+    
     return (
-      <div>
+      <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
         <input
           ref={
             jenis === "nota"
@@ -390,15 +409,35 @@ export default function DokumenPemesananPage() {
           className="hidden"
         />
 
+        <div className="text-center mb-4">
+          <div className="text-gray-500 mb-2">
+            {jenis === "po" ? <FaFilePdf size={32} className="inline text-red-500" /> :
+             jenis === "nota" ? <FaFileImage size={32} className="inline text-blue-500" /> :
+             <FaFilePdf size={32} className="inline text-green-500" />}
+          </div>
+          <h4 className="font-medium text-gray-700 mb-1">{dokumenName}</h4>
+          <p className="text-sm text-gray-500 mb-4">
+            Upload {dokumenName.toLowerCase()} untuk validasi
+          </p>
+        </div>
+
         <button
           onClick={() => triggerFileInput(jenis)}
           disabled={uploading[jenis]}
-          className="border border-gray-400 rounded-md px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+          className="flex items-center justify-center gap-2 w-full bg-teal-600 hover:bg-teal-700 text-white font-medium py-2 px-4 rounded transition-colors disabled:opacity-50"
         >
-          {uploading[jenis] ? "Mengupload..." : `Upload ${jenis.toUpperCase()}`}
+          {uploading[jenis] ? (
+            <>
+              <span className="animate-spin">⟳</span> Mengupload...
+            </>
+          ) : (
+            <>
+              <FaUpload /> Upload File
+            </>
+          )}
         </button>
 
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-gray-500 mt-3 text-center">
           Format: JPG, PNG, PDF (max 10MB)
         </p>
       </div>
@@ -434,126 +473,166 @@ export default function DokumenPemesananPage() {
   }
 
   return (
-    <div className="flex h-screen font-poppins bg-gray-100 overflow-hidden">
-      <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1 fixed top-0 left-0 h-full">
-        <div className="h-20 border-b border-white flex items-center justify-center bg-white">
-          <img
-            src="/logo/ItCenter.png"
-            alt="IT Center"
-            className="w-32 border-white"
-          />
+    <div className="flex flex-col h-screen font-poppins bg-gray-100">
+      {/* Header - Tetap fixed di atas */}
+      <header className="fixed top-0 left-0 right-0 z-50 flex bg-white shadow-sm items-center h-16">
+        <div className="bg-white w-60 h-16 flex items-center justify-center border-r border-gray-200">
+          <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
         </div>
-        <nav className="flex-1 mt-6 overflow-y-auto">
-          <ul className="space-y-1 pb-6">
-            <Link href="/GA/dashboard_ga">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Dashboard
-              </li>
-            </Link>
-            <hr className="border-t border-white/30 my-2" />
-            {/* DATA MASTER */}
-            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-              DATA MASTER
-            </li>
+        <div className="flex-1 h-16 flex items-center px-8">
+          {/* Kosong untuk saat ini, bisa diisi dengan user profile dll */}
+        </div>
+      </header>
 
-            <Link href="/GA/data_permintaan">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Permintaan
-              </li>
-            </Link>
+      <div className="flex flex-1 overflow-hidden pt-16">
+        {/* Sidebar - Fixed dengan tinggi yang tepat dan scrollable */}
+        <aside className="w-60 bg-blue-900 text-white flex flex-col fixed left-0 top-16 bottom-0">
+          {/* Container scrollable untuk menu */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <style jsx>{`
+              /* Custom scrollbar untuk semua browser */
+              .custom-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: #3b82f6 #1e3a8a;
+              }
+              
+              /* Untuk WebKit browsers (Chrome, Safari, Edge) */
+              .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-track {
+                background: #1e3a8a; /* blue-900 */
+                border-radius: 4px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: #3b82f6; /* blue-500 */
+                border-radius: 4px;
+                border: 2px solid #1e3a8a;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background-color: #60a5fa; /* blue-400 */
+              }
+            `}</style>
+            
+            <nav className="p-2">
+              <ul className="space-y-1">
+                <Link href="/GA/dashboard_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Dashboard
+                  </li>
+                </Link>
 
-            <Link href="/GA/data_barang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Barang
-              </li>
-            </Link>
+                <hr className="border-t border-white/30 my-2" />
 
-            <Link href="/GA/data_kategoribarang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Kategori Barang
-              </li>
-            </Link>
+                {/* DATA MASTER */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  DATA MASTER
+                </li>
 
-            <Link href="/GA/data_satuanbarang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Satuan Barang
-              </li>
-            </Link>
+                <Link href="/GA/data_permintaan">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Permintaan
+                  </li>
+                </Link>
 
-            <Link href="/GA/data_stokbarang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Stok Barang
-              </li>
-            </Link>
+                <Link href="/GA/data_barang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Barang
+                  </li>
+                </Link>
 
-            <Link href="/GA/data_divisi">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Divisi
-              </li>
-            </Link>
+                <Link href="/GA/data_kategoribarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Kategori Barang
+                  </li>
+                </Link>
 
-            <Link href="/GA/manajemen_user">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Manajemen User
-              </li>
-            </Link>
+                <Link href="/GA/data_satuanbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Satuan Barang
+                  </li>
+                </Link>
 
-            <hr className="border-t border-white/30 my-2" />
+                <Link href="/GA/data_stokbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Stok Barang
+                  </li>
+                </Link>
 
-            {/* MONITORING */}
-            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-              MONITORING
-            </li>
+                <Link href="/GA/data_divisi">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Divisi
+                  </li>
+                </Link>
 
-            <Link href="/GA/laporan_ga">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Laporan
-              </li>
-            </Link>
+                <Link href="/GA/manajemen_user">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Manajemen User
+                  </li>
+                </Link>
 
-            <Link href="/GA/riwayat_ga">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Riwayat
-              </li>
-            </Link>
+                <hr className="border-t border-white/30 my-2" />
 
-            <hr className="border-t border-white/30 my-2" />
+                {/* MONITORING */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  MONITORING
+                </li>
 
-            {/* PEMESANAN */}
-            <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-              PEMESANAN
-            </li>
+                <Link href="/GA/laporan_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Laporan
+                  </li>
+                </Link>
 
-            <Link href="/GA/list_pemesanan">
-              <li className="bg-blue-500 px-5 py-2 cursor-pointer">
-                List Pemesanan
-              </li>
-            </Link>
+                <Link href="/GA/riwayat_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Riwayat
+                  </li>
+                </Link>
 
-            <Link href="/GA/form_penerimaanbarang">
-              <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                Form Penerimaan
-              </li>
-            </Link>
-          </ul>
-        </nav>
-      </aside>
+                <hr className="border-t border-white/30 my-2" />
 
-      {/* Konten Utama */}
-      <div className="flex flex-col flex-1 ml-60 h-full">
-        <header className="flex bg-white shadow-sm items-center h-20 fixed top-0 left-60 right-0 z-10"></header>
+                {/* PEMESANAN */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  PEMESANAN
+                </li>
 
-        <main className="flex-1 mt-20 overflow-y-auto bg-gray-200 p-8">
-          <h2 className="text-3xl font-semibold mb-6">Pemesanan</h2>
+                <Link href="/GA/list_pemesanan">
+                  <li className="bg-blue-500 px-5 py-2 cursor-pointer rounded">
+                    List Pemesanan
+                  </li>
+                </Link>
 
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="flex justify-between items-center px-6 py-5 border-b-4 border-b-gray-300">
+                <Link href="/GA/form_penerimaanbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Form Penerimaan
+                  </li>
+                </Link>
+              </ul>
+            </nav>
+          </div>
+        </aside>
+
+        {/* Main Content - Scrollable dengan padding yang lebih baik */}
+        <main className="flex-1 text-black p-6 bg-gray-200 overflow-y-auto ml-60">
+          {/* Fixed header untuk judul halaman */}
+          <div className="bg-gray-200 pt-4 pb-4 mb-6">
+            <h2 className="text-2xl text-black font-semibold">Pemesanan</h2>
+          </div>
+
+          {/* Card container */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+            {/* Header atas card */}
+            <div className="flex justify-between items-center px-6 py-4 border-b">
               <h3 className="text-xl font-semibold text-teal-600">
                 Dokumen Pemesanan -{" "}
                 {pemesanan.permintaan?.nomor_permintaan || "N/A"}
               </h3>
               <Link href="/GA/list_pemesanan">
-                <button className="bg-teal-600 hover:bg-green-600 text-white px-4 py-1.5 rounded">
+                <button className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded text-sm transition-colors">
                   &lt; Kembali
                 </button>
               </Link>
@@ -562,7 +641,7 @@ export default function DokumenPemesananPage() {
             {/* Catatan Penolakan dari Validator */}
             {pemesanan?.catatan_penolakan &&
               pemesanan.catatan_penolakan.length > 0 && (
-                <div className="px-6 py-4 border-b-4 border-b-yellow-400 bg-yellow-50">
+                <div className="px-6 py-4 border-b bg-yellow-50">
                   <div className="flex items-start mb-3">
                     <div className="mr-3">
                       <span className="text-2xl">⚠️</span>
@@ -624,14 +703,14 @@ export default function DokumenPemesananPage() {
               )}
 
             {/* Data Barang */}
-            <div className="px-6 py-4 border-b-4 border-b-gray-300">
+            <div className="px-6 py-6 border-b bg-white">
               <h4 className="text-lg font-semibold mb-4 text-gray-800">
                 Data Barang
               </h4>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-sm text-gray-700 mb-1">
                     Kategori Barang
                   </label>
                   <input
@@ -642,49 +721,49 @@ export default function DokumenPemesananPage() {
                       "-"
                     }
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-sm text-gray-700 mb-1">
                     Nama Barang
                   </label>
                   <input
                     type="text"
                     value={pemesanan.barang?.nama_barang || "-"}
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Satuan</label>
+                  <label className="font-medium text-sm text-gray-700 mb-1">Satuan</label>
                   <input
                     type="text"
                     value={pemesanan.barang?.nama_satuan || "-"}
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Jumlah</label>
+                  <label className="font-medium text-sm text-gray-700 mb-1">Jumlah</label>
                   <input
                     type="text"
                     value={pemesanan.barang?.jumlah || "-"}
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm"
                   />
                 </div>
               </div>
 
               <div className="mt-4">
-                <label className="font-medium text-gray-700">Keterangan</label>
+                <label className="font-medium text-sm text-gray-700 mb-1">Keterangan</label>
                 <textarea
                   disabled
                   value={pemesanan.barang?.keterangan || "-"}
-                  className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm"
                   rows="3"
                 />
               </div>
@@ -696,192 +775,148 @@ export default function DokumenPemesananPage() {
                 Dokumen Pembelian
               </h4>
 
-              {/* NOTA */}
-              <div className="mb-8 p-4 border border-gray-200 rounded-lg">
-                <div className="flex justify-between items-center mb-3">
-                  <h5 className="font-medium text-gray-700">Nota Pembelian</h5>
-                  <span
-                    className={`text-xs px-2 py-1 rounded ${
-                      getDokumenByJenis("nota")
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {getDokumenByJenis("nota")
-                      ? "Sudah diupload"
-                      : "Belum diupload"}
-                  </span>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* NOTA */}
+                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <div className="flex justify-between items-center mb-3">
+                    <h5 className="font-medium text-gray-700">Nota Pembelian</h5>
+                    <span
+                      className={`text-xs px-2 py-1 rounded ${getStatusBgColor("nota")} ${getStatusColor("nota")}`}
+                    >
+                      {getDokumenByJenis("nota")
+                        ? "Sudah diupload"
+                        : "Belum diupload"}
+                    </span>
+                  </div>
+
+                  {getDokumenByJenis("nota")
+                    ? renderPreviewWithActions(getDokumenByJenis("nota"), "nota")
+                    : renderUploadForm("nota")}
                 </div>
 
-                {getDokumenByJenis("nota")
-                  ? renderPreviewWithActions(getDokumenByJenis("nota"), "nota")
-                  : renderUploadForm("nota")}
+                {/* PO */}
+                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <div className="flex justify-between items-center mb-3">
+                    <h5 className="font-medium text-gray-700">
+                      Purchase Order (PO)
+                    </h5>
+                    <span
+                      className={`text-xs px-2 py-1 rounded ${getStatusBgColor("po")} ${getStatusColor("po")}`}
+                    >
+                      {getDokumenByJenis("po")
+                        ? "Sudah diupload"
+                        : "Belum diupload"}
+                    </span>
+                  </div>
+
+                  {getDokumenByJenis("po")
+                    ? renderPreviewWithActions(getDokumenByJenis("po"), "po")
+                    : renderUploadForm("po")}
+                </div>
+
+                {/* FORM PENERIMAAN */}
+                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <div className="flex justify-between items-center mb-3">
+                    <h5 className="font-medium text-gray-700">
+                      Form Penerimaan Barang
+                    </h5>
+                    <span
+                      className={`text-xs px-2 py-1 rounded ${getStatusBgColor("form_penerimaan")} ${getStatusColor("form_penerimaan")}`}
+                    >
+                      {getDokumenByJenis("form_penerimaan")
+                        ? "Sudah diupload"
+                        : "Belum diupload"}
+                    </span>
+                  </div>
+
+                  {getDokumenByJenis("form_penerimaan")
+                    ? renderPreviewWithActions(
+                        getDokumenByJenis("form_penerimaan"),
+                        "form_penerimaan"
+                      )
+                    : renderUploadForm("form_penerimaan")}
+                </div>
               </div>
 
-              {/* PO */}
-              <div className="mb-8 p-4 border border-gray-200 rounded-lg">
-                <div className="flex justify-between items-center mb-3">
-                  <h5 className="font-medium text-gray-700">
-                    Purchase Order (PO)
-                  </h5>
-                  <span
-                    className={`text-xs px-2 py-1 rounded ${
-                      getDokumenByJenis("po")
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {getDokumenByJenis("po")
-                      ? "Sudah diupload"
-                      : "Belum diupload"}
-                  </span>
-                </div>
-
-                {getDokumenByJenis("po")
-                  ? renderPreviewWithActions(getDokumenByJenis("po"), "po")
-                  : renderUploadForm("po")}
-              </div>
-
-              {/* FORM PENERIMAAN */}
-              <div className="mb-8 p-4 border border-gray-200 rounded-lg">
-                <div className="flex justify-between items-center mb-3">
-                  <h5 className="font-medium text-gray-700">
-                    Form Penerimaan Barang
-                  </h5>
-                  <span
-                    className={`text-xs px-2 py-1 rounded ${
-                      getDokumenByJenis("form_penerimaan")
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {getDokumenByJenis("form_penerimaan")
-                      ? "Sudah diupload"
-                      : "Belum diupload"}
-                  </span>
-                </div>
-
-                {getDokumenByJenis("form_penerimaan")
-                  ? renderPreviewWithActions(
-                      getDokumenByJenis("form_penerimaan"),
-                      "form_penerimaan"
-                    )
-                  : renderUploadForm("form_penerimaan")}
-                <div className="mt-4 text-sm text-gray-600">
-                  <p>
-                    📝 <strong>Catatan:</strong> Anda bisa mengganti dokumen
-                    kapan saja sebelum divalidasi oleh Finance.
-                  </p>
-                  <p className="mt-1">
-                    ⚠️ <strong>Perhatian:</strong> Dokumen yang sudah divalidasi
-                    tidak bisa diganti. Jika ada catatan penolakan, mohon
-                    perbaiki dan upload ulang.
-                  </p>
-                  {pemesanan?.catatan_penolakan &&
-                    pemesanan.catatan_penolakan.length > 0 && (
-                      <p className="mt-1 text-red-600">
-                        🚨{" "}
-                        <strong>
-                          Ada {pemesanan.catatan_penolakan.length} dokumen yang
-                          ditolak.
-                        </strong>
-                        Silakan cek catatan penolakan di atas.
-                      </p>
-                    )}
-                </div>
+              {/* Informasi */}
+              <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h5 className="font-medium text-gray-700 mb-3 flex items-center">
+                  <span className="mr-2">📝</span> Informasi Penting
+                </h5>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>Anda bisa mengganti dokumen kapan saja sebelum divalidasi oleh Finance.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>Dokumen yang sudah divalidasi tidak bisa diganti atau dihapus.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>Jika ada catatan penolakan, mohon perbaiki dan upload ulang dokumen yang sesuai.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>Pastikan dokumen yang diupload jelas dan dapat dibaca.</span>
+                  </li>
+                </ul>
               </div>
 
               {/* Ringkasan Status */}
-              <div className="mt-8 p-6 bg-blue-50 rounded-lg">
-                <h5 className="font-medium text-gray-700 mb-3">
+              <div className="mt-8">
+                <h5 className="font-medium text-gray-700 mb-4">
                   Ringkasan Status Dokumen
                 </h5>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Status Nota */}
-                  <div className="text-center p-3 bg-white rounded shadow">
-                    <div className="text-sm font-medium text-gray-600">
+                  <div className="text-center p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <div className="text-sm font-medium text-gray-600 mb-2">
                       Nota
                     </div>
-                    <div
-                      className={`text-lg font-bold mt-1 ${getStatusColor(
-                        "nota"
-                      )}`}
-                    >
+                    <div className={`text-lg font-bold ${getStatusColor("nota")}`}>
                       {getDokumenStatusText("nota")}
                     </div>
                     {getDokumenByJenis("nota")?.catatan_validator && (
-                      <div className="text-xs text-red-500 mt-1">
-                        Catatan:{" "}
-                        {getDokumenByJenis("nota").catatan_validator.substring(
-                          0,
-                          20
-                        )}
-                        ...
+                      <div className="text-xs text-red-500 mt-2 truncate">
+                        {getDokumenByJenis("nota").catatan_validator}
                       </div>
                     )}
                   </div>
 
                   {/* Status PO */}
-                  <div className="text-center p-3 bg-white rounded shadow">
-                    <div className="text-sm font-medium text-gray-600">PO</div>
-                    <div
-                      className={`text-lg font-bold mt-1 ${getStatusColor(
-                        "po"
-                      )}`}
-                    >
+                  <div className="text-center p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <div className="text-sm font-medium text-gray-600 mb-2">PO</div>
+                    <div className={`text-lg font-bold ${getStatusColor("po")}`}>
                       {getDokumenStatusText("po")}
                     </div>
                     {getDokumenByJenis("po")?.catatan_validator && (
-                      <div className="text-xs text-red-500 mt-1">
-                        Catatan:{" "}
-                        {getDokumenByJenis("po").catatan_validator.substring(
-                          0,
-                          20
-                        )}
-                        ...
+                      <div className="text-xs text-red-500 mt-2 truncate">
+                        {getDokumenByJenis("po").catatan_validator}
                       </div>
                     )}
                   </div>
 
                   {/* Status Form Penerimaan */}
-                  <div className="text-center p-3 bg-white rounded shadow">
-                    <div className="text-sm font-medium text-gray-600">
+                  <div className="text-center p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <div className="text-sm font-medium text-gray-600 mb-2">
                       Form Penerimaan
                     </div>
-                    <div
-                      className={`text-lg font-bold mt-1 ${getStatusColor(
-                        "form_penerimaan"
-                      )}`}
-                    >
+                    <div className={`text-lg font-bold ${getStatusColor("form_penerimaan")}`}>
                       {getDokumenStatusText("form_penerimaan")}
                     </div>
-                    {getDokumenByJenis("form_penerimaan")
-                      ?.catatan_validator && (
-                      <div className="text-xs text-red-500 mt-1">
-                        Catatan:{" "}
-                        {getDokumenByJenis(
-                          "form_penerimaan"
-                        ).catatan_validator.substring(0, 20)}
-                        ...
+                    {getDokumenByJenis("form_penerimaan")?.catatan_validator && (
+                      <div className="text-xs text-red-500 mt-2 truncate">
+                        {getDokumenByJenis("form_penerimaan").catatan_validator}
                       </div>
                     )}
                   </div>
                 </div>
-
-                {/* Tambahkan helper functions */}
-                <style jsx>{`
-                  .status-ditolak {
-                    color: #dc2626;
-                  }
-                  .status-valid {
-                    color: #16a34a;
-                  }
-                  .status-pending {
-                    color: #d97706;
-                  }
-                `}</style>
               </div>
             </div>
+
+            {/* Garis bawah hijau */}
+            <div className="h-1 bg-teal-600 w-full"></div>
           </div>
         </main>
       </div>

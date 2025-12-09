@@ -142,6 +142,7 @@ export default function DataPemesananPage() {
       start_date: "",
       end_date: "",
       search: "",
+      status: "",
     };
     setFilters(resetFilters);
     fetchPemesananForValidator(1, resetFilters);
@@ -192,67 +193,104 @@ export default function DataPemesananPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen font-poppins bg-gray-100">
-      {/* Header */}
-      <header className="flex bg-white shadow-sm items-center">
-        <div className="bg-white w-60 h-20 flex items-center justify-center border-r border-white">
+    <div className="flex flex-col h-screen font-poppins bg-gray-100">
+      {/* Header - Tetap fixed di atas */}
+      <header className="fixed top-0 left-0 right-0 z-50 flex bg-white shadow-sm items-center h-16">
+        <div className="bg-white w-60 h-16 flex items-center justify-center border-r border-white">
           <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
         </div>
-        <div className="flex-1 h-20 flex items-center px-8"></div>
+        <div className="flex-1 h-16 flex items-center px-8">
+          {/* Kosong untuk saat ini, bisa diisi dengan user profile dll */}
+        </div>
       </header>
 
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1">
-          <nav className="flex-1 mt-6">
-            <ul className="space-y-1">
-              <Link href="/finance/dashboard_finance">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Dashboard
+      <div className="flex flex-1 overflow-hidden pt-16">
+        {/* Sidebar - Fixed dengan tinggi yang tepat dan scrollable */}
+        <aside className="w-60 bg-blue-900 text-white flex flex-col fixed left-0 top-16 bottom-0">
+          {/* Container scrollable untuk menu */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <style jsx>{`
+              /* Custom scrollbar untuk semua browser */
+              .custom-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: #3b82f6 #1e3a8a;
+              }
+              
+              /* Untuk WebKit browsers (Chrome, Safari, Edge) */
+              .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-track {
+                background: #1e3a8a; /* blue-900 */
+                border-radius: 4px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: #3b82f6; /* blue-500 */
+                border-radius: 4px;
+                border: 2px solid #1e3a8a;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background-color: #60a5fa; /* blue-400 */
+              }
+            `}</style>
+            
+            <nav className="p-2">
+              <ul className="space-y-1">
+                <Link href="/finance/dashboard_finance">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Dashboard
+                  </li>
+                </Link>
+
+                <hr className="border-t border-white/30 my-2" />
+
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  PEMESANAN
                 </li>
-              </Link>
 
-              <hr className="border-t border-white/30 my-2" />
+                <Link href="/finance/data_pemesanan">
+                  <li className="bg-blue-500 px-5 py-2 cursor-pointer rounded">
+                    Data Pemesanan
+                  </li>
+                </Link>
 
-              <li className="px-5 py-2 font-semibold text-gray-200">
-                PEMESANAN
-              </li>
-
-              <Link href="/finance/data_pemesanan">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
-                  Data Pemesanan
-                </li>
-              </Link>
-
-              <Link href="/finance/riwayat_finance">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Riwayat
-                </li>
-              </Link>
-            </ul>
-          </nav>
+                <Link href="/finance/riwayat_finance">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Riwayat
+                  </li>
+                </Link>
+              </ul>
+            </nav>
+          </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="text-black flex-1 p-8 bg-gray-200">
-          <h2 className="text-3xl font-semibold mb-6">Pemesanan</h2>
+        {/* Main Content - Scrollable dengan padding yang lebih baik */}
+        <main className="flex-1 text-black p-6 bg-gray-200 overflow-y-auto ml-60">
+          {/* Fixed header untuk judul halaman */}
+          <div className="bg-gray-200 mb-6">
+            <h2 className="text-2xl text-black font-semibold">Pemesanan</h2>
+          </div>
 
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            {/* Header */}
-            <div className="flex justify-between items-center px-6 py-5 border-b">
+          {/* Card container */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+            {/* Header atas card */}
+            <div className="flex justify-between items-center px-6 py-4 border-b">
               <h3 className="text-xl font-semibold text-teal-600">
                 Data Pemesanan
               </h3>
             </div>
 
-            {/* FILTER - DIUBAH SESUAI GAYA */}
+            {/* Filter section */}
             <div className="px-6 py-4 border-b bg-white">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
                 {/* Filter Status */}
                 <div>
                   <label
                     htmlFor="status"
-                    className="block font-medium text-gray-700 mb-1"
+                    className="block font-medium text-x1 text-gray-700 mb-1"
                   >
                     Status
                   </label>
@@ -261,7 +299,7 @@ export default function DataPemesananPage() {
                     name="status"
                     value={filters.status}
                     onChange={handleFilterChange}
-                    className="border border-gray-300 rounded px-3 py-2 w-full"
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
                   >
                     <option value="">Semua Status</option>
                     <option value="diproses">Diproses</option>
@@ -269,11 +307,12 @@ export default function DataPemesananPage() {
                     <option value="ditolak">Ditolak</option>
                   </select>
                 </div>
+
                 {/* Search */}
                 <div>
                   <label
                     htmlFor="search"
-                    className="block font-medium text-gray-700 mb-1"
+                    className="block font-medium text-x1 mb-1"
                   >
                     Search
                   </label>
@@ -284,36 +323,15 @@ export default function DataPemesananPage() {
                     value={filters.search}
                     onChange={handleFilterChange}
                     placeholder="Cari ID PB atau nama..."
-                    className="border border-gray-300 rounded px-3 py-2 w-full"
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
                   />
                 </div>
 
-                {/* Filter Jenis Dokumen */}
-                <div>
-                  <label
-                    htmlFor="jenis_dokumen"
-                    className="block font-medium text-gray-700 mb-1"
-                  >
-                    Jenis Dokumen
-                  </label>
-                  <select
-                    id="jenis_dokumen"
-                    name="jenis_dokumen"
-                    value={filters.jenis_dokumen}
-                    onChange={handleFilterChange}
-                    className="border border-gray-300 rounded px-3 py-2 w-full"
-                  >
-                    <option value="">Semua</option>
-                    <option value="PO">Purchase Order (PO)</option>
-                    <option value="Invoice">Invoice</option>
-                    <option value="Quotation">Quotation</option>
-                    <option value="Lainnya">Lainnya</option>
-                  </select>
-                </div>
+              
 
                 {/* Filter Start Date */}
                 <div>
-                  <label className="block font-medium text-gray-700 mb-1">
+                  <label className="block font-medium text-sm text-gray-700 mb-1">
                     Dari Tanggal
                   </label>
                   <input
@@ -321,13 +339,13 @@ export default function DataPemesananPage() {
                     name="start_date"
                     value={filters.start_date}
                     onChange={handleFilterChange}
-                    className="border border-gray-300 rounded px-3 py-2 w-full"
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
                   />
                 </div>
 
                 {/* Filter End Date */}
                 <div>
-                  <label className="block font-medium text-gray-700 mb-1">
+                  <label className="block font-medium text-sm text-gray-700 mb-1">
                     Sampai Tanggal
                   </label>
                   <input
@@ -335,12 +353,9 @@ export default function DataPemesananPage() {
                     name="end_date"
                     value={filters.end_date}
                     onChange={handleFilterChange}
-                    className="border border-gray-300 rounded px-3 py-2 w-full"
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
                   />
                 </div>
-
-                {/* Empty column for alignment */}
-                <div></div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -348,13 +363,13 @@ export default function DataPemesananPage() {
                   <div className="flex gap-2 items-end">
                     <button
                       onClick={handleFilterSubmit}
-                      className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded w-full"
+                      className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded w-full text-sm"
                     >
                       Terapkan Filter
                     </button>
                     <button
                       onClick={handleResetFilter}
-                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-4 py-2 rounded w-full"
+                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-4 py-2 rounded w-full text-sm"
                     >
                       Reset Filter
                     </button>
@@ -363,172 +378,169 @@ export default function DataPemesananPage() {
               </div>
             </div>
 
-            {/* TABLE */}
-            {loading ? (
-              <div className="px-6 py-8 text-center">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-600"></div>
-                <p className="mt-2 text-gray-600">Memuat data...</p>
-              </div>
-            ) : (
-              <>
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="bg-gray-50 text-left">
-                      <th className="px-6 py-3 font-semibold">No</th>
-                      <th className="px-6 py-3 font-semibold">ID PB</th>
-                      <th className="px-6 py-3 font-semibold">Tanggal</th>
-                      <th className="px-6 py-3 font-semibold">Nama Barang</th>
-                      <th className="px-6 py-3 font-semibold">Jenis Dokumen</th>
-                      <th className="px-6 py-3 font-semibold">
-                        Status Pemesanan
-                      </th>
-                      <th className="px-6 py-3 font-semibold text-center">
-                        Aksi
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {data.map((row, index) => (
-                      <tr
-                        key={row.id || index}
-                        className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
-                      >
-                        <td className="px-6 py-3">
-                          {(pagination.currentPage - 1) *
-                            pagination.itemsPerPage +
-                            index +
-                            1}
-                        </td>
-                        <td className="px-6 py-3 font-medium">
-                          {row.nomor_permintaan || `PB-${row.id || index}`}
-                        </td>
-                        <td className="px-6 py-3">
-                          {formatDate(
-                            row.tanggal ||
-                              row.created_at ||
-                              row.dokumen_created_at
-                          )}
-                        </td>
-                        <td className="px-6 py-3 font-medium text-gray-800">
-                          {row.nama_barang || row.barang || "-"}
-                        </td>
-                        <td className="px-6 py-3">
-                          {row.jenis_dokumen || row.dokumen_jenis || "-"}
-                        </td>
-                        <td className="px-6 py-3">
-                          <span
-                            className={`px-2 py-1 rounded text-sm font-medium ${getStatusColor(
-                              row.status || row.is_valid
-                            )}`}
-                          >
-                            {row.status ||
-                              (row.is_valid === true
-                                ? "Validated"
-                                : row.is_valid === false
-                                ? "Ditolak"
-                                : "Menunggu Validasi")}
-                          </span>
-                        </td>
-                        <td className="px-6 py-3 text-center">
-                          <Link
-                            href={`/finance/dokumen_pemesanan?id=${
-                              row.id || row.dokumen_id || index
-                            }`}
-                          >
-                            <button
-                              className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded"
-                              title="Lihat Detail"
-                            >
-                              <FaEye />
-                            </button>
-                          </Link>
-                        </td>
+            {/* Tabel - Container dengan overflow untuk tabel panjang */}
+            <div className="overflow-x-auto">
+              {loading ? (
+                <div className="px-6 py-8 text-center">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-600"></div>
+                  <p className="mt-2 text-gray-600">Memuat data...</p>
+                </div>
+              ) : (
+                <>
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 text-left">
+                        <th className="px-4 py-3 font-semibold text-sm">No</th>
+                        <th className="px-4 py-3 font-semibold text-sm">ID PB</th>
+                        <th className="px-4 py-3 font-semibold text-sm">Tanggal</th>
+                        <th className="px-4 py-3 font-semibold text-sm">Nama Barang</th>
+                        <th className="px-4 py-3 font-semibold text-sm">Jenis Dokumen</th>
+                        <th className="px-4 py-3 font-semibold text-sm">Status Pemesanan</th>
+                        <th className="px-4 py-3 font-semibold text-sm text-center">Aksi</th>
                       </tr>
-                    ))}
-
-                    {data.length === 0 && (
-                      <tr>
-                        <td
-                          colSpan="7"
-                          className="px-6 py-8 text-center text-gray-500"
+                    </thead>
+                    <tbody>
+                      {data.map((row, index) => (
+                        <tr
+                          key={row.id || index}
+                          className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
                         >
-                          Tidak ada data pemesanan untuk divalidasi
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-
-                {/* Pagination */}
-                {pagination.totalPages > 1 && (
-                  <div className="flex justify-between items-center px-6 py-4 bg-white border-t">
-                    <div className="text-sm text-gray-600">
-                      Menampilkan {data.length} dari {pagination.totalItems}{" "}
-                      data
-                    </div>
-                    <div className="inline-flex text-sm border rounded-md overflow-hidden">
-                      <button
-                        onClick={() =>
-                          handlePageChange(pagination.currentPage - 1)
-                        }
-                        disabled={pagination.currentPage === 1}
-                        className={`px-3 py-1 border-r ${
-                          pagination.currentPage === 1
-                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                            : "bg-white hover:bg-gray-100"
-                        }`}
-                      >
-                        Previous
-                      </button>
-
-                      {[...Array(pagination.totalPages)].map((_, i) => {
-                        const pageNum = i + 1;
-                        if (
-                          pageNum === 1 ||
-                          pageNum === pagination.totalPages ||
-                          (pageNum >= pagination.currentPage - 1 &&
-                            pageNum <= pagination.currentPage + 1)
-                        ) {
-                          return (
-                            <button
-                              key={pageNum}
-                              onClick={() => handlePageChange(pageNum)}
-                              className={`px-3 py-1 border-r ${
-                                pageNum === pagination.currentPage
-                                  ? "bg-teal-600 text-white"
-                                  : "bg-white hover:bg-gray-100"
-                              }`}
+                          <td className="px-4 py-3 text-sm">
+                            {(pagination.currentPage - 1) *
+                              pagination.itemsPerPage +
+                              index +
+                              1}
+                          </td>
+                          <td className="px-4 py-3 text-sm font-medium">
+                            {row.nomor_permintaan || `PB-${row.id || index}`}
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            {formatDate(
+                              row.tanggal ||
+                                row.created_at ||
+                                row.dokumen_created_at
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-sm font-medium">
+                            {row.nama_barang || row.barang || "-"}
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            {row.jenis_dokumen || row.dokumen_jenis || "-"}
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                                row.status || row.is_valid
+                              )}`}
                             >
-                              {pageNum}
-                            </button>
-                          );
-                        }
-                        return null;
-                      })}
+                              {row.status ||
+                                (row.is_valid === true
+                                  ? "Validated"
+                                  : row.is_valid === false
+                                  ? "Ditolak"
+                                  : "Menunggu Validasi")}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <div className="flex justify-center space-x-2">
+                              <Link
+                                href={`/finance/dokumen_pemesanan?id=${
+                                  row.id || row.dokumen_id || index
+                                }`}
+                              >
+                                <button
+                                  className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded text-sm"
+                                  title="Lihat Detail"
+                                >
+                                  <FaEye size={14} />
+                                </button>
+                              </Link>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {data.length === 0 && (
+                        <tr>
+                          <td
+                            colSpan="7"
+                            className="px-6 py-8 text-center text-gray-500"
+                          >
+                            Tidak ada data pemesanan untuk divalidasi
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
 
-                      <button
-                        onClick={() =>
-                          handlePageChange(pagination.currentPage + 1)
-                        }
-                        disabled={
-                          pagination.currentPage === pagination.totalPages
-                        }
-                        className={`px-3 py-1 ${
-                          pagination.currentPage === pagination.totalPages
-                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                            : "bg-white hover:bg-gray-100"
-                        }`}
-                      >
-                        Next
-                      </button>
+                  {/* Pagination */}
+                  {pagination.totalPages > 1 && (
+                    <div className="flex justify-between items-center px-6 py-4 bg-white border-t">
+                      <div className="text-sm text-gray-600">
+                        Menampilkan {data.length} dari {pagination.totalItems} data
+                      </div>
+                      <div className="inline-flex text-sm border rounded-md overflow-hidden">
+                        <button
+                          onClick={() =>
+                            handlePageChange(pagination.currentPage - 1)
+                          }
+                          disabled={pagination.currentPage === 1}
+                          className={`px-3 py-1 border-r text-sm ${
+                            pagination.currentPage === 1
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : "bg-white hover:bg-gray-100"
+                          }`}
+                        >
+                          Previous
+                        </button>
+
+                        {[...Array(pagination.totalPages)].map((_, i) => {
+                          const pageNum = i + 1;
+                          if (
+                            pageNum === 1 ||
+                            pageNum === pagination.totalPages ||
+                            (pageNum >= pagination.currentPage - 1 &&
+                              pageNum <= pagination.currentPage + 1)
+                          ) {
+                            return (
+                              <button
+                                key={pageNum}
+                                onClick={() => handlePageChange(pageNum)}
+                                className={`px-3 py-1 border-r text-sm ${
+                                  pageNum === pagination.currentPage
+                                    ? "bg-teal-600 text-white"
+                                    : "bg-white hover:bg-gray-100"
+                                }`}
+                              >
+                                {pageNum}
+                              </button>
+                            );
+                          }
+                          return null;
+                        })}
+
+                        <button
+                          onClick={() =>
+                            handlePageChange(pagination.currentPage + 1)
+                          }
+                          disabled={
+                            pagination.currentPage === pagination.totalPages
+                          }
+                          className={`px-3 py-1 text-sm ${
+                            pagination.currentPage === pagination.totalPages
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : "bg-white hover:bg-gray-100"
+                          }`}
+                        >
+                          Next
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </>
-            )}
+                  )}
+                </>
+              )}
+            </div>
 
-            {/* Garis bawah */}
+            {/* Garis bawah hijau */}
             <div className="h-1 bg-teal-600 w-full"></div>
           </div>
         </main>

@@ -57,6 +57,13 @@ import {
   getPemesananDetail,
 } from "../controller/pemesananController.js";
 
+import {
+  getLaporan,
+  getStatistik,
+  exportExcel,
+  exportPDF,
+} from "../controller/laporanController.js";
+
 import { authenticate } from "../middleware/auth.js";
 import { requireAdmin } from "../middleware/roleAuth.js";
 import {
@@ -82,6 +89,12 @@ router.post(
   uploadBuktiPenerimaan.single("foto_bukti"),
   createPenerimaanBarang
 );
+
+// ===== LAPORAN & EXPORT =====
+router.get("/permintaan/laporan", authenticate, requireAdmin, getLaporan);
+router.get("/permintaan/statistik", authenticate, requireAdmin, getStatistik);
+router.get("/permintaan/export/excel", authenticate, requireAdmin, exportExcel);
+router.get("/permintaan/export/pdf", authenticate, requireAdmin, exportPDF);
 
 // ===== STOK MANAGEMENT =====
 router.get("/stok", getAllStok);

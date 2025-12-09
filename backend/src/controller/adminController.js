@@ -297,6 +297,76 @@ StokBarang.findByNamaAndSpesifikasi = async (nama_barang, spesifikasi) => {
   return rows[0];
 };
 
+// Contoh controller di backend
+const getDashboardStats = async (req, res) => {
+  try {
+    const [
+      permintaanBaru,
+      permintaanDiproses,
+      totalBarang,
+      totalPemesanan,
+      totalDivisi,
+      totalUser
+    ] = await Promise.all([
+      Permintaan.count({ where: { status: 'menunggu' } }),
+      Permintaan.count({ where: { status: 'diproses' } }),
+      Barang.count(),
+      Pemesanan.count(),
+      Divisi.count(),
+      User.count()
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        permintaanBaru,
+        permintaanDiproses,
+        totalBarang,
+        totalPemesanan,
+        totalDivisi,
+        totalUser
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+// Endpoint: GET /api/finance/dashboard/stats
+const getFinanceDashboardStats = async (req, res) => {
+  try {
+    const [
+      totalPemesanan,
+      pemesananDiproses,
+      pemesananSelesai,
+      pemesananDitolak
+    ] = await Promise.all([
+      Pemesanan.count(),
+      Pemesanan.count({ where: { status: 'diproses' } }),
+      Pemesanan.count({ where: { status: 'selesai' } }),
+      Pemesanan.count({ where: { status: 'ditolak' } })
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        totalPemesanan,
+        pemesananDiproses,
+        pemesananSelesai,
+        pemesananDitolak
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
 export default {
   getAllPermintaan,
   getPermintaanDetail,

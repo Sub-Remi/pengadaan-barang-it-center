@@ -250,27 +250,97 @@ export default function DokumenPenerimaanPage() {
   }
 
   return (
-    <div className="flex h-screen font-poppins bg-gray-100">
-      {/* Sidebar tetap sama */}
-      {/* ... */}
+    <div className="flex flex-col h-screen font-poppins bg-gray-100">
+      {/* Header - Tetap fixed di atas */}
+      <header className="fixed top-0 left-0 right-0 z-50 flex bg-white shadow-sm items-center h-16">
+        <div className="bg-white w-60 h-16 flex items-center justify-center border-r border-gray-200">
+          <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
+        </div>
+        <div className="flex-1 h-16 flex items-center px-8">
+          {/* Kosong untuk saat ini, bisa diisi dengan user profile dll */}
+        </div>
+      </header>
 
-      {/* Main wrapper */}
-      <div className="flex flex-col flex-1 ml-60 h-full">
-        <header className="flex bg-white shadow-sm items-center h-20 fixed top-0 left-60 right-0 z-10"></header>
+      <div className="flex flex-1 overflow-hidden pt-16">
+        {/* Sidebar - Fixed dengan tinggi yang tepat dan scrollable */}
+        <aside className="w-60 bg-blue-900 text-white flex flex-col fixed left-0 top-16 bottom-0">
+          {/* Container scrollable untuk menu */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <style jsx>{`
+              /* Custom scrollbar untuk semua browser */
+              .custom-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: #3b82f6 #1e3a8a;
+              }
+              
+              /* Untuk WebKit browsers (Chrome, Safari, Edge) */
+              .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-track {
+                background: #1e3a8a; /* blue-900 */
+                border-radius: 4px;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: #3b82f6; /* blue-500 */
+                border-radius: 4px;
+                border: 2px solid #1e3a8a;
+              }
+              
+              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background-color: #60a5fa; /* blue-400 */
+              }
+            `}</style>
+            
+            <nav className="p-2">
+              <ul className="space-y-1">
+                <Link href="/finance/dashboard_finance">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Dashboard
+                  </li>
+                </Link>
 
-        <main className="flex-1 mt-20 overflow-y-auto bg-gray-200 p-8">
-          <h2 className="text-3xl font-semibold mb-6">
-            Validasi Dokumen Pemesanan
-          </h2>
+                <hr className="border-t border-white/30 my-2" />
 
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="flex justify-between items-center px-6 py-5 border-b-4 border-b-gray-300">
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  PEMESANAN
+                </li>
+
+                <Link href="/finance/data_pemesanan">
+                  <li className="bg-blue-500 px-5 py-2 cursor-pointer rounded">
+                    Data Pemesanan
+                  </li>
+                </Link>
+
+                <Link href="/finance/riwayat_finance">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Riwayat
+                  </li>
+                </Link>
+              </ul>
+            </nav>
+          </div>
+        </aside>
+
+        {/* Main Content - Scrollable dengan padding yang lebih baik */}
+        <main className="flex-1 text-black p-6 bg-gray-200 overflow-y-auto ml-60">
+          {/* Fixed header untuk judul halaman */}
+          <div className="bg-gray-200 pt-4 pb-4 mb-6">
+            <h2 className="text-2xl text-black font-semibold">Validasi Dokumen Pemesanan</h2>
+          </div>
+
+          {/* Card container */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+            {/* Header atas card */}
+            <div className="flex justify-between items-center px-6 py-4 border-b">
               <h3 className="text-xl font-semibold text-teal-600">
                 Cek Dokumen Pemesanan -{" "}
                 {pemesanan.permintaan?.nomor_permintaan || "N/A"}
               </h3>
               <Link href="/finance/data_pemesanan">
-                <button className="bg-teal-600 hover:bg-green-600 text-white px-4 py-1.5 rounded">
+                <button className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded text-sm transition-colors">
                   &lt; Kembali
                 </button>
               </Link>
@@ -284,7 +354,7 @@ export default function DokumenPenerimaanPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-sm text-gray-700 mb-1">
                     Kategori Barang
                   </label>
                   <input
@@ -295,49 +365,49 @@ export default function DokumenPenerimaanPage() {
                       "-"
                     }
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">
+                  <label className="font-medium text-sm text-gray-700 mb-1">
                     Nama Barang
                   </label>
                   <input
                     type="text"
                     value={pemesanan.barang?.nama_barang || "-"}
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Satuan</label>
+                  <label className="font-medium text-sm text-gray-700 mb-1">Satuan</label>
                   <input
                     type="text"
                     value={pemesanan.barang?.nama_satuan || "-"}
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="font-medium text-gray-700">Jumlah</label>
+                  <label className="font-medium text-sm text-gray-700 mb-1">Jumlah</label>
                   <input
                     type="text"
                     value={pemesanan.barang?.jumlah || "-"}
                     disabled
-                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                    className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm"
                   />
                 </div>
               </div>
 
               <div className="mt-4">
-                <label className="font-medium text-gray-700">Keterangan</label>
+                <label className="font-medium text-sm text-gray-700 mb-1">Keterangan</label>
                 <textarea
                   disabled
                   value={pemesanan.barang?.keterangan || "-"}
-                  className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                  className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1 text-sm"
                   rows="3"
                 />
               </div>
@@ -459,17 +529,17 @@ export default function DokumenPenerimaanPage() {
               {/* Catatan penolakan */}
               {showRejectNote && (
                 <div className="mt-6 px-2 py-4 bg-yellow-50 rounded">
-                  <label className="font-medium text-gray-700 block mb-2">
+                  <label className="font-medium text-gray-700 block mb-2 text-sm">
                     Catatan Alasan Ditolak
                   </label>
                   <textarea
                     value={rejectNote}
                     onChange={(e) => setRejectNote(e.target.value)}
-                    className="w-full border border-gray-300 rounded px-3 py-2"
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                     rows="3"
                     placeholder="Masukkan alasan penolakan..."
                   />
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 mt-1">
                     Catatan ini akan dikirim ke admin dan pemohon.
                   </p>
                 </div>
@@ -480,7 +550,7 @@ export default function DokumenPenerimaanPage() {
                 {!showRejectNote ? (
                   <>
                     <button
-                      className="bg-red-600 hover:bg-red-700 text-white font-medium px-5 py-2 rounded disabled:opacity-50"
+                      className="bg-red-600 hover:bg-red-700 text-white font-medium px-5 py-2 rounded text-sm disabled:opacity-50 transition-colors"
                       onClick={() => setShowRejectNote(true)}
                       disabled={validating || dokumenList.length === 0}
                     >
@@ -488,7 +558,7 @@ export default function DokumenPenerimaanPage() {
                     </button>
 
                     <button
-                      className="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2 rounded disabled:opacity-50"
+                      className="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2 rounded text-sm disabled:opacity-50 transition-colors"
                       onClick={() => handleValidation(true)}
                       disabled={validating || dokumenList.length === 0}
                     >
@@ -498,7 +568,7 @@ export default function DokumenPenerimaanPage() {
                 ) : (
                   <>
                     <button
-                      className="bg-red-600 hover:bg-red-700 text-white font-medium px-5 py-2 rounded disabled:opacity-50"
+                      className="bg-red-600 hover:bg-red-700 text-white font-medium px-5 py-2 rounded text-sm disabled:opacity-50 transition-colors"
                       onClick={() => handleValidation(false)}
                       disabled={validating || !rejectNote.trim()}
                     >
@@ -506,7 +576,7 @@ export default function DokumenPenerimaanPage() {
                     </button>
 
                     <button
-                      className="bg-gray-500 hover:bg-gray-600 text-white font-medium px-5 py-2 rounded"
+                      className="bg-gray-500 hover:bg-gray-600 text-white font-medium px-5 py-2 rounded text-sm transition-colors"
                       onClick={() => {
                         setShowRejectNote(false);
                         setRejectNote("");
@@ -524,18 +594,18 @@ export default function DokumenPenerimaanPage() {
             <div className="px-6 py-4 bg-gray-50 border-t">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium text-gray-700 mb-2">
+                  <h4 className="font-medium text-gray-700 mb-2 text-sm">
                     Status Pemesanan:
                   </h4>
                   <div className="flex items-center space-x-4">
                     <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                      className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
                         getPemesananStatus()
                       )}`}
                     >
                       {getPemesananStatus()}
                     </span>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-xs text-gray-600">
                       {dokumenList.length > 0
                         ? `${
                             dokumenList.filter((d) => d.is_valid === 1).length
@@ -546,10 +616,10 @@ export default function DokumenPenerimaanPage() {
                 </div>
 
                 <div className="text-right">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs text-gray-600">
                     ID Pemesanan: {pemesananId}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs text-gray-600">
                     Nomor Permintaan:{" "}
                     {pemesanan?.permintaan?.nomor_permintaan || "-"}
                   </p>
@@ -559,10 +629,10 @@ export default function DokumenPenerimaanPage() {
 
             {/* Status Validasi */}
             <div className="px-6 py-4 bg-gray-50">
-              <h4 className="font-medium text-gray-700 mb-2">
+              <h4 className="font-medium text-gray-700 mb-2 text-sm">
                 Status Validasi:
               </h4>
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-wrap items-center gap-4">
                 {dokumenList.map((dokumen) => (
                   <div
                     key={`${dokumen.id}-${dokumen.jenis_dokumen}`}
@@ -577,7 +647,7 @@ export default function DokumenPenerimaanPage() {
                           : "bg-yellow-500"
                       }`}
                     ></span>
-                    <span className="text-sm">
+                    <span className="text-xs">
                       {dokumen.jenis_dokumen}:{" "}
                       {dokumen.is_valid === 1
                         ? "Valid"
@@ -590,6 +660,7 @@ export default function DokumenPenerimaanPage() {
               </div>
             </div>
 
+            {/* Garis bawah hijau */}
             <div className="h-1 bg-teal-600 w-full"></div>
           </div>
         </main>

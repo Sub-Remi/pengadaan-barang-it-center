@@ -148,13 +148,13 @@ export default function FormPermintaanBarangPage() {
     const loadUserData = async () => {
       const user = authService.getCurrentUser();
       if (!user) {
-        router.push("/login");
+        router.push("/login/login");
         return;
       }
 
       setUserData(user);
 
-      // Set default date (TODAY) - PERBAIKAN DI SINI
+      // Set default date (TODAY)
       const today = new Date();
       const formattedDate = today.toISOString().split("T")[0];
 
@@ -663,6 +663,22 @@ export default function FormPermintaanBarangPage() {
     }
   };
 
+  // Fungsi untuk mendapatkan nama divisi
+  const getDivisiName = () => {
+    // Cek jika userData memiliki nama_divisi langsung
+    if (userData?.nama_divisi) {
+      return userData.nama_divisi;
+    }
+    // Fallback: tampilkan Divisi + ID
+    else if (userData?.divisi_id) {
+      return `Divisi ${userData.divisi_id}`;
+    }
+    // Default jika tidak ada data
+    else {
+      return "Belum ditentukan";
+    }
+  };
+
   return (
     <ProtectedRoute allowedRoles={["pemohon"]}>
       <div className="flex h-screen font-poppins bg-gray-100 overflow-hidden">
@@ -762,7 +778,7 @@ export default function FormPermintaanBarangPage() {
                       type="text"
                       value={userData?.nama_lengkap || userData?.username || ""}
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                     />
                   </div>
 
@@ -772,7 +788,7 @@ export default function FormPermintaanBarangPage() {
                       type="text"
                       value={userData?.email || ""}
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                     />
                   </div>
 
@@ -780,26 +796,22 @@ export default function FormPermintaanBarangPage() {
                     <label className="font-medium text-gray-700">Divisi</label>
                     <input
                       type="text"
-                      value={
-                        userData?.divisi_id
-                          ? `Divisi ${userData.divisi_id}`
-                          : "Belum ditentukan"
-                      }
+                      value={getDivisiName()}
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                     />
                   </div>
 
                   <div>
                     <label className="font-medium text-gray-700">
-                      Tanggal permintaan
+                      Tanggal Kebutuhan
                     </label>
                     <input
                       type="date"
                       name="tanggal_kebutuhan"
                       value={formData.tanggal_kebutuhan}
                       onChange={handleInputChange}
-                      className="w-full border border-gray-300 rounded px-3 py-2 mt-1 text-black"
+                      className="w-full border text-black border-gray-300 rounded px-3 py-2 mt-1 text-black"
                       required
                     />
                   </div>

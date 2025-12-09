@@ -496,6 +496,66 @@ const Permintaan = {
     ]);
     return result.affectedRows;
   },
+
+  // Di dalam file models/permintaan.js, tambahkan fungsi ini:
+
+findAllWithFiltersForExport: async (filters = {}) => {
+  let query = `
+    SELECT 
+      p.*, 
+      u.nama_lengkap, 
+      d.nama_divisi,
+      (SELECT COUNT(*) 
+       FROM barang_permintaan bp 
+       WHERE bp.permintaan_id = p.id) as jumlah_barang
+    FROM permintaan p 
+    JOIN users u ON p.user_id = u.id 
+    JOIN divisi d ON u.divisi_id = d.id 
+    WHERE 1=1
+  `;
+
+  const values = [];
+
+  // Filter by status - default exclude draft untuk admin
+  if (filters.status && filters.status !== "semua") {
+    query += " AND p.status = ?";
+    values.push(filters.status);
+  } else {
+    query += " AND p.status != 'draft'";
+  }
+
+  // Filter by divisi
+  if (filters.divisi_id) {
+    query += " AND u.divisi_id = ?";
+    values.push(filters.divisi_id);
+  }
+
+  // Filter by date range
+  if (filters.start_date && filters.end_date) {
+    query += " AND DATE(p.created_at) BETWEEN ? AND ?";
+    values.push(filters.start_date, filters.end_date);
+  }
+
+  // Search by nomor permintaan atau nama pemohon
+  if (filters.search) {
+    query += " AND (p.nomor_permintaan LIKE ? OR u.nama_lengkap LIKE ?)";
+    const searchTerm = `%${filters.search}%`;
+    values.push(searchTerm, searchTerm);
+  }
+
+  query += " ORDER BY p.created_at DESC";
+
+  console.log("🔍 Export query:", query);
+  console.log("📊 Export query values:", values);
+
+  try {
+    const [rows] = await dbPool.execute(query, values);
+    return rows;
+  } catch (error) {
+    console.error("💥 Export find all error:", error);
+    throw error;
+  }
+},
 };
 
 export default Permintaan;
