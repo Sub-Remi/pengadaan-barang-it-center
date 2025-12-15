@@ -14,6 +14,7 @@ export default function DataPermintaanPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [sortOrder, setSortOrder] = useState("terbaru"); // State baru untuk urutan
   const [divisiList, setDivisiList] = useState([]);
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -83,7 +84,8 @@ export default function DataPermintaanPage() {
       const result = await adminPermintaanService.getAllPermintaan(
         page,
         pagination.itemsPerPage,
-        filters
+        filters,
+        sortOrder // Kirim parameter sortOrder ke service
       );
 
       setData(result.data);
@@ -135,7 +137,22 @@ export default function DataPermintaanPage() {
     setStatusFilter("");
     setStartDate("");
     setEndDate("");
+    setSortOrder("terbaru"); // Reset ke default
     fetchPermintaan(1, {});
+  };
+
+  // Handle sort order change
+  const handleSortChange = (e) => {
+    const newSortOrder = e.target.value;
+    setSortOrder(newSortOrder);
+    // Fetch ulang dengan sortOrder baru
+    fetchPermintaan(1, {
+      search,
+      status: statusFilter,
+      divisi_id: divisiFilter,
+      start_date: startDate,
+      end_date: endDate,
+    });
   };
 
   // Handle pagination
@@ -233,28 +250,28 @@ export default function DataPermintaanPage() {
                 scrollbar-width: thin;
                 scrollbar-color: #3b82f6 #1e3a8a;
               }
-              
+
               /* Untuk WebKit browsers (Chrome, Safari, Edge) */
               .custom-scrollbar::-webkit-scrollbar {
                 width: 8px;
               }
-              
+
               .custom-scrollbar::-webkit-scrollbar-track {
                 background: #1e3a8a; /* blue-900 */
                 border-radius: 4px;
               }
-              
+
               .custom-scrollbar::-webkit-scrollbar-thumb {
                 background-color: #3b82f6; /* blue-500 */
                 border-radius: 4px;
                 border: 2px solid #1e3a8a;
               }
-              
+
               .custom-scrollbar::-webkit-scrollbar-thumb:hover {
                 background-color: #60a5fa; /* blue-400 */
               }
             `}</style>
-            
+
             <nav className="p-2">
               <ul className="space-y-1">
                 <Link href="/GA/dashboard_ga">
@@ -436,6 +453,24 @@ export default function DataPermintaanPage() {
                   </select>
                 </div>
 
+                <div>
+                  <label
+                    htmlFor="sort"
+                    className="block font-medium text-x1 text-gray-700 mb-1"
+                  >
+                    Urutkan
+                  </label>
+                  <select
+                    id="sort"
+                    value={sortOrder}
+                    onChange={handleSortChange}
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
+                  >
+                    <option value="terbaru">Terlama</option>
+                    <option value="terlama">Terbaru</option>
+                  </select>
+                </div>
+
                 {/* Date Range Filter */}
                 <div>
                   <label className="block font-medium text-x1 text-gray-700 mb-1">
@@ -495,12 +530,24 @@ export default function DataPermintaanPage() {
                     <thead>
                       <tr className="bg-gray-50 text-left">
                         <th className="px-4 py-3 font-semibold text-x1">No</th>
-                        <th className="px-4 py-3 font-semibold text-x1">ID PB</th>
-                        <th className="px-4 py-3 font-semibold text-x1">Divisi</th>
-                        <th className="px-4 py-3 font-semibold text-x1">Nama Pemohon</th>
-                        <th className="px-4 py-3 font-semibold text-x1">Jumlah Barang</th>
-                        <th className="px-4 py-3 font-semibold text-x1">Tanggal</th>
-                        <th className="px-4 py-3 font-semibold text-x1">Status</th>
+                        <th className="px-4 py-3 font-semibold text-x1">
+                          ID PB
+                        </th>
+                        <th className="px-4 py-3 font-semibold text-x1">
+                          Divisi
+                        </th>
+                        <th className="px-4 py-3 font-semibold text-x1">
+                          Nama Pemohon
+                        </th>
+                        <th className="px-4 py-3 font-semibold text-x1">
+                          Jumlah Barang
+                        </th>
+                        <th className="px-4 py-3 font-semibold text-x1">
+                          Tanggal
+                        </th>
+                        <th className="px-4 py-3 font-semibold text-x1">
+                          Status
+                        </th>
                         <th className="px-4 py-3 font-semibold text-x1 text-center">
                           Aksi
                         </th>
@@ -510,7 +557,9 @@ export default function DataPermintaanPage() {
                       {data.map((row, index) => (
                         <tr
                           key={row.id}
-                          className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                          className={
+                            index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                          }
                         >
                           <td className="px-4 py-3 text-x1">
                             {(pagination.currentPage - 1) *
@@ -521,8 +570,12 @@ export default function DataPermintaanPage() {
                           <td className="px-4 py-3 text-x1 font-medium">
                             {row.nomor_permintaan || `PB-${row.id}`}
                           </td>
-                          <td className="px-4 py-3 text-x1">{row.nama_divisi || "-"}</td>
-                          <td className="px-4 py-3 text-x1">{row.nama_lengkap || "-"}</td>
+                          <td className="px-4 py-3 text-x1">
+                            {row.nama_divisi || "-"}
+                          </td>
+                          <td className="px-4 py-3 text-x1">
+                            {row.nama_lengkap || "-"}
+                          </td>
                           <td className="px-4 py-3 text-x1">
                             {row.jumlah_barang > 0
                               ? `${row.jumlah_barang} jenis barang`
@@ -570,7 +623,8 @@ export default function DataPermintaanPage() {
                   {/* Pagination */}
                   <div className="flex justify-between items-center px-6 py-4 bg-white border-t">
                     <div className="text-sm text-gray-600">
-                      Menampilkan {data.length} dari {pagination.totalItems} data
+                      Menampilkan {data.length} dari {pagination.totalItems}{" "}
+                      data
                     </div>
                     <div className="inline-flex text-sm border rounded-md overflow-hidden">
                       <button

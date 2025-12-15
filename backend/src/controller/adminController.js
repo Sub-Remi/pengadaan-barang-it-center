@@ -9,6 +9,7 @@ export const getAllPermintaan = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    const sort = req.query.sort || "terbaru"; // Tambah parameter sort
 
     // Filters
     const filters = {
@@ -19,9 +20,18 @@ export const getAllPermintaan = async (req, res) => {
       search: req.query.search,
     };
 
-    console.log("📋 Admin getting all permintaan with filters:", filters);
+    console.log("📋 Admin getting all permintaan with filters:", {
+      ...filters,
+      sort,
+    });
 
-    const result = await Permintaan.findAllWithFilters(filters, page, limit);
+    // Kirim parameter sort ke model
+    const result = await Permintaan.findAllWithFilters(
+      filters,
+      page,
+      limit,
+      sort
+    );
 
     res.json({
       message: "Daftar permintaan berhasil diambil.",
