@@ -89,12 +89,12 @@ const Permintaan = {
   },
 
   // Get permintaan by user ID dengan pagination, filter, dan search - UPDATE
-  // Get permintaan by user ID dengan pagination, filter, dan search - UPDATE
   findByUserIdWithPagination: async (
     userId,
     page = 1,
     limit = 5,
-    filters = {}
+    filters = {},
+    sort = "terbaru"
   ) => {
     const offset = (page - 1) * limit;
     const pageNum = parseInt(page);
@@ -107,6 +107,7 @@ const Permintaan = {
       limitNum,
       offsetNum,
       filters,
+      sort,
     });
 
     let query = `
@@ -133,8 +134,6 @@ const Permintaan = {
     const values = [userId];
     const countValues = [userId];
 
-    // ✅ PERBAIKAN: Default exclude status draft untuk halaman permintaan
-    // Jika tidak ada filter status atau status adalah "semua", exclude draft
     let shouldExcludeDraft = true;
 
     // Filter by status
@@ -143,7 +142,7 @@ const Permintaan = {
       countQuery += " AND p.status = ?";
       values.push(filters.status);
       countValues.push(filters.status);
-      shouldExcludeDraft = false; // Jika ada filter status spesifik, jangan exclude draft
+      shouldExcludeDraft = false;
     }
 
     // Exclude draft jika tidak ada filter status atau filter "semua"
@@ -183,7 +182,13 @@ const Permintaan = {
       countValues.push(filters.start_date, filters.end_date);
     }
 
-    query += " ORDER BY p.created_at DESC";
+    // Tentukan order berdasarkan parameter sort
+    let orderBy = "p.created_at DESC"; // default terbaru
+    if (sort === "terlama") {
+      orderBy = "p.created_at ASC";
+    }
+
+    query += ` ORDER BY ${orderBy}`;
     query += ` LIMIT ${limitNum} OFFSET ${offsetNum}`;
 
     console.log("🔍 Query dengan filter:", query);
@@ -512,8 +517,8 @@ WHERE 1=1
 
   // Di dalam file models/permintaan.js, tambahkan fungsi ini:
 
-findAllWithFiltersForExport: async (filters = {}) => {
-  let query = `
+  findAllWithFiltersForExport: async (filters = {}) => {
+    let query = `
     SELECT 
       p.*, 
       u.nama_lengkap, 
@@ -527,48 +532,48 @@ findAllWithFiltersForExport: async (filters = {}) => {
     WHERE 1=1
   `;
 
-  const values = [];
+    const values = [];
 
-  // Filter by status - default exclude draft untuk admin
-  if (filters.status && filters.status !== "semua") {
-    query += " AND p.status = ?";
-    values.push(filters.status);
-  } else {
-    query += " AND p.status != 'draft'";
-  }
+    // Filter by status - default exclude draft untuk admin
+    if (filters.status && filters.status !== "semua") {
+      query += " AND p.status = ?";
+      values.push(filters.status);
+    } else {
+      query += " AND p.status != 'draft'";
+    }
 
-  // Filter by divisi
-  if (filters.divisi_id) {
-    query += " AND u.divisi_id = ?";
-    values.push(filters.divisi_id);
-  }
+    // Filter by divisi
+    if (filters.divisi_id) {
+      query += " AND u.divisi_id = ?";
+      values.push(filters.divisi_id);
+    }
 
-  // Filter by date range
-  if (filters.start_date && filters.end_date) {
-    query += " AND DATE(p.created_at) BETWEEN ? AND ?";
-    values.push(filters.start_date, filters.end_date);
-  }
+    // Filter by date range
+    if (filters.start_date && filters.end_date) {
+      query += " AND DATE(p.created_at) BETWEEN ? AND ?";
+      values.push(filters.start_date, filters.end_date);
+    }
 
-  // Search by nomor permintaan atau nama pemohon
-  if (filters.search) {
-    query += " AND (p.nomor_permintaan LIKE ? OR u.nama_lengkap LIKE ?)";
-    const searchTerm = `%${filters.search}%`;
-    values.push(searchTerm, searchTerm);
-  }
+    // Search by nomor permintaan atau nama pemohon
+    if (filters.search) {
+      query += " AND (p.nomor_permintaan LIKE ? OR u.nama_lengkap LIKE ?)";
+      const searchTerm = `%${filters.search}%`;
+      values.push(searchTerm, searchTerm);
+    }
 
-  query += " ORDER BY p.created_at DESC";
+    query += " ORDER BY p.created_at DESC";
 
-  console.log("🔍 Export query:", query);
-  console.log("📊 Export query values:", values);
+    console.log("🔍 Export query:", query);
+    console.log("📊 Export query values:", values);
 
-  try {
-    const [rows] = await dbPool.execute(query, values);
-    return rows;
-  } catch (error) {
-    console.error("💥 Export find all error:", error);
-    throw error;
-  }
-},
+    try {
+      const [rows] = await dbPool.execute(query, values);
+      return rows;
+    } catch (error) {
+      console.error("💥 Export find all error:", error);
+      throw error;
+    }
+  },
 };
 
 export default Permintaan;

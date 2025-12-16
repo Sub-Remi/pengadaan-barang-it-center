@@ -38,6 +38,7 @@ export const getPermintaanByUser = async (req, res) => {
     const user_id = req.user.id;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
+    const sort = req.query.sort || "terbaru";
 
     // Filters dari query parameters
     const filters = {
@@ -52,6 +53,7 @@ export const getPermintaanByUser = async (req, res) => {
       page,
       limit,
       filters,
+      sort,
     });
 
     // Validasi parameter
@@ -66,11 +68,12 @@ export const getPermintaanByUser = async (req, res) => {
       user_id,
       page,
       limit,
-      filters
+      filters,
+      sort
     );
 
-    // ✅ Format data untuk frontend - tambah jumlah_item
-    const formattedData = result.data.map(item => ({
+    // ✅ Format data untuk frontend
+    const formattedData = result.data.map((item) => ({
       ...item,
       jumlah_item: item.jumlah_barang || 0, // Jumlah jenis barang
     }));
@@ -85,6 +88,7 @@ export const getPermintaanByUser = async (req, res) => {
         itemsPerPage: result.limit,
       },
       filters: filters, // Kirim kembali filter yang digunakan
+      sort: sort, // Kirim kembali sort yang digunakan
     });
   } catch (error) {
     console.error("💥 Get permintaan by user error:", error);
@@ -411,16 +415,16 @@ export const updateDraftPermintaan = async (req, res) => {
     const user_id = req.user.id;
     let { tanggal_kebutuhan, catatan, barang_list } = req.body;
 
-    console.log("✏️ Updating draft permintaan:", { 
-      id, 
+    console.log("✏️ Updating draft permintaan:", {
+      id,
       user_id,
-      tanggal_kebutuhan // Log nilai asli
+      tanggal_kebutuhan, // Log nilai asli
     });
 
     // ✅ KONVERSI TANGGAL: Ubah format ISO ke YYYY-MM-DD
-    if (tanggal_kebutuhan && tanggal_kebutuhan.includes('T')) {
+    if (tanggal_kebutuhan && tanggal_kebutuhan.includes("T")) {
       const dateObj = new Date(tanggal_kebutuhan);
-      tanggal_kebutuhan = dateObj.toISOString().split('T')[0];
+      tanggal_kebutuhan = dateObj.toISOString().split("T")[0];
       console.log("📅 Tanggal dikonversi ke:", tanggal_kebutuhan);
     }
 
@@ -465,7 +469,7 @@ export const updateDraftPermintaan = async (req, res) => {
           keterangan,
           stok_barang_id,
           kategori_barang_id,
-          satuan_barang_id
+          satuan_barang_id,
         } = barang;
 
         const insertQuery = `
@@ -473,7 +477,7 @@ export const updateDraftPermintaan = async (req, res) => {
           (permintaan_id, kategori_barang, nama_barang, spesifikasi, jumlah, keterangan, stok_barang_id)
           VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
-        
+
         await session.execute(insertQuery, [
           id,
           kategori_barang,
@@ -481,7 +485,7 @@ export const updateDraftPermintaan = async (req, res) => {
           spesifikasi || "",
           jumlah,
           keterangan || "",
-          stok_barang_id || null
+          stok_barang_id || null,
         ]);
       }
     }
@@ -489,17 +493,17 @@ export const updateDraftPermintaan = async (req, res) => {
     await session.commit();
     session.release();
 
-    res.json({ 
+    res.json({
       message: "Draft permintaan berhasil diupdate.",
-      data: { id }
+      data: { id },
     });
   } catch (error) {
     await session.rollback();
     if (session) session.release();
     console.error("💥 Update draft permintaan error:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: "Terjadi kesalahan server.",
-      details: error.message 
+      details: error.message,
     });
   }
 };
@@ -543,9 +547,9 @@ export const getDraftPermintaan = async (req, res) => {
     );
 
     // Format data untuk frontend
-    const formattedData = result.data.map(item => ({
+    const formattedData = result.data.map((item) => ({
       ...item,
-      jumlah_item: item.jumlah_item_barang || 0,    // Jumlah jenis barang
+      jumlah_item: item.jumlah_item_barang || 0, // Jumlah jenis barang
     }));
 
     res.json({

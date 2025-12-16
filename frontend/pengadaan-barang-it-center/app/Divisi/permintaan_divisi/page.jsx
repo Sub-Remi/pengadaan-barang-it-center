@@ -17,6 +17,7 @@ export default function PermintaanPage() {
     end_date: "",
     status: "",
   });
+  const [sortOrder, setSortOrder] = useState("terbaru");
 
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -27,7 +28,7 @@ export default function PermintaanPage() {
 
   useEffect(() => {
     fetchData();
-  }, [filters, pagination.currentPage]);
+  }, [filters, pagination.currentPage, sortOrder]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -36,6 +37,7 @@ export default function PermintaanPage() {
         ...filters,
         page: pagination.currentPage,
         limit: pagination.itemsPerPage,
+        sort: sortOrder,
       });
       setData(response.data);
       setPagination(response.pagination);
@@ -48,10 +50,13 @@ export default function PermintaanPage() {
     }
   };
 
-  // Tambahkan useEffect untuk mark as read saat halaman dibuka
+  // Reset ke halaman 1 ketika sortOrder berubah
   useEffect(() => {
-    // Mark notifications as read when page is opened
-    markAsRead();
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
+  }, [sortOrder]);
+
+  useEffect(() => {
+    markAsRead(); // Tambahkan useEffect untuk mark as read saat halaman dibuka
   }, []);
 
   const handleFilterChange = (e) => {
@@ -62,6 +67,12 @@ export default function PermintaanPage() {
     }));
     // Reset ke halaman 1 saat filter berubah
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
+  };
+
+  // Handle sort order change
+  const handleSortChange = (e) => {
+    const newSortOrder = e.target.value;
+    setSortOrder(newSortOrder);
   };
 
   const handlePageChange = (newPage) => {
@@ -134,28 +145,28 @@ export default function PermintaanPage() {
                   scrollbar-width: thin;
                   scrollbar-color: #3b82f6 #1e3a8a;
                 }
-                
+
                 /* Untuk WebKit browsers (Chrome, Safari, Edge) */
                 .custom-scrollbar::-webkit-scrollbar {
                   width: 8px;
                 }
-                
+
                 .custom-scrollbar::-webkit-scrollbar-track {
                   background: #1e3a8a; /* blue-900 */
                   border-radius: 4px;
                 }
-                
+
                 .custom-scrollbar::-webkit-scrollbar-thumb {
                   background-color: #3b82f6; /* blue-500 */
                   border-radius: 4px;
                   border: 2px solid #1e3a8a;
                 }
-                
+
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
                   background-color: #60a5fa; /* blue-400 */
                 }
               `}</style>
-              
+
               <nav className="p-2 text-x1">
                 <ul className="space-y-1">
                   <Link href="/Divisi/dashboard_divisi">
@@ -259,6 +270,21 @@ export default function PermintaanPage() {
                     </select>
                   </div>
 
+                  {/* TAMBAH: Dropdown Urutan */}
+                  <div>
+                    <label className="block font-medium text-sm text-gray-700 mb-1">
+                      Urutkan
+                    </label>
+                    <select
+                      value={sortOrder}
+                      onChange={handleSortChange}
+                      className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
+                    >
+                      <option value="terbaru">Terbaru</option>
+                      <option value="terlama">Terlama</option>
+                    </select>
+                  </div>
+
                   {/* Filter Tanggal Mulai */}
                   <div>
                     <label className="block font-medium text-sm text-gray-700 mb-1">
@@ -287,8 +313,6 @@ export default function PermintaanPage() {
                     />
                   </div>
                 </div>
-
-        
               </div>
 
               {/* Tabel - Container dengan overflow untuk tabel panjang */}
@@ -307,20 +331,36 @@ export default function PermintaanPage() {
                     <table className="w-full border-collapse">
                       <thead>
                         <tr className="bg-gray-50 text-left">
-                          <th className="px-4 py-3 font-semibold text-x1">No</th>
-                          <th className="px-4 py-3 font-semibold text-x1">Nomor Permintaan</th>
-                          <th className="px-4 py-3 font-semibold text-x1">Judul</th>
-                          <th className="px-4 py-3 font-semibold text-x1">Tanggal Dibuat</th>
-                          <th className="px-4 py-3 font-semibold text-x1">Jumlah Barang</th>
-                          <th className="px-4 py-3 font-semibold text-x1">Status</th>
-                          <th className="px-4 py-3 font-semibold text-x1 text-center">Aksi</th>
+                          <th className="px-4 py-3 font-semibold text-x1">
+                            No
+                          </th>
+                          <th className="px-4 py-3 font-semibold text-x1">
+                            Nomor Permintaan
+                          </th>
+                          <th className="px-4 py-3 font-semibold text-x1">
+                            Judul
+                          </th>
+                          <th className="px-4 py-3 font-semibold text-x1">
+                            Tanggal Dibuat
+                          </th>
+                          <th className="px-4 py-3 font-semibold text-x1">
+                            Jumlah Barang
+                          </th>
+                          <th className="px-4 py-3 font-semibold text-x1">
+                            Status
+                          </th>
+                          <th className="px-4 py-3 font-semibold text-x1 text-center">
+                            Aksi
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {data.map((row, index) => (
                           <tr
                             key={index}
-                            className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                            className={
+                              index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                            }
                           >
                             <td className="px-4 py-3 text-x1">
                               {(pagination.currentPage - 1) *
@@ -331,9 +371,7 @@ export default function PermintaanPage() {
                             <td className="px-4 py-3 text-x1 font-medium">
                               {row.nomor_permintaan}
                             </td>
-                            <td className="px-4 py-3 text-x1">
-                              {row.catatan}
-                            </td>
+                            <td className="px-4 py-3 text-x1">{row.catatan}</td>
                             <td className="px-4 py-3 text-x1">
                               {new Date(row.created_at).toLocaleDateString(
                                 "id-ID"
@@ -345,7 +383,9 @@ export default function PermintaanPage() {
                                   {row.jumlah_item} item
                                 </span>
                               ) : (
-                                <span className="text-gray-400 text-x1">0 item</span>
+                                <span className="text-gray-400 text-x1">
+                                  0 item
+                                </span>
                               )}
                             </td>
                             <td className="px-4 py-3 text-x1">
@@ -379,7 +419,8 @@ export default function PermintaanPage() {
                     {/* Pagination */}
                     <div className="flex justify-between items-center px-6 py-4 bg-white border-t">
                       <div className="text-sm text-gray-600">
-                        Menampilkan {data.length} dari {pagination.totalItems} data
+                        Menampilkan {data.length} dari {pagination.totalItems}{" "}
+                        data
                       </div>
                       <div className="inline-flex text-sm border rounded-md overflow-hidden">
                         <button

@@ -135,7 +135,9 @@ const permintaanService = {
   // Menghapus permintaan (draft)
   deletePermintaan: async (permintaanId) => {
     try {
-      const response = await apiClient.delete(`/pemohon/permintaan/${permintaanId}`);
+      const response = await apiClient.delete(
+        `/pemohon/permintaan/${permintaanId}`
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: "Terjadi kesalahan" };
@@ -163,7 +165,9 @@ const permintaanService = {
   // Menghapus semua barang dari permintaan (untuk keperluan update draft)
   deleteAllBarangFromPermintaan: async (permintaanId) => {
     try {
-      const response = await apiClient.delete(`/pemohon/permintaan/${permintaanId}/barang/all`);
+      const response = await apiClient.delete(
+        `/pemohon/permintaan/${permintaanId}/barang/all`
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: "Terjadi kesalahan" };
@@ -183,7 +187,9 @@ const permintaanService = {
   // Delete barang dari permintaan
   deleteBarangPermintaan: async (permintaanId, barangId) => {
     try {
-      const response = await apiClient.delete(`/pemohon/permintaan/${permintaanId}/barang/${barangId}`);
+      const response = await apiClient.delete(
+        `/pemohon/permintaan/${permintaanId}/barang/${barangId}`
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: "Terjadi kesalahan" };
@@ -195,7 +201,9 @@ const permintaanService = {
   // Mengambil total jumlah untuk dashboard
   getDashboardCounts: async () => {
     try {
-      const response = await apiClient.get("/pemohon/permintaan/dashboard/counts");
+      const response = await apiClient.get(
+        "/pemohon/permintaan/dashboard/counts"
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: "Terjadi kesalahan" };
@@ -205,9 +213,12 @@ const permintaanService = {
   // Mengecek perubahan status terbaru
   checkStatusChanges: async (lastChecked) => {
     try {
-      const response = await apiClient.get("/pemohon/permintaan/status-changes", {
-        params: { lastChecked }
-      });
+      const response = await apiClient.get(
+        "/pemohon/permintaan/status-changes",
+        {
+          params: { lastChecked },
+        }
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: "Terjadi kesalahan" };
@@ -217,7 +228,9 @@ const permintaanService = {
   // Mengambil summary status untuk dashboard
   getStatusSummary: async () => {
     try {
-      const response = await apiClient.get("/pemohon/permintaan/status-summary");
+      const response = await apiClient.get(
+        "/pemohon/permintaan/status-summary"
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: "Terjadi kesalahan" };
@@ -256,7 +269,7 @@ const permintaanService = {
   markStatusChangesAsRead: async (permintaanIds = []) => {
     try {
       const response = await apiClient.post("/pemohon/permintaan/mark-read", {
-        permintaanIds
+        permintaanIds,
       });
       return response.data;
     } catch (error) {
@@ -277,7 +290,9 @@ const permintaanService = {
   // Get latest updates untuk notifikasi
   getLatestUpdates: async () => {
     try {
-      const response = await apiClient.get("/pemohon/permintaan/latest-updates");
+      const response = await apiClient.get(
+        "/pemohon/permintaan/latest-updates"
+      );
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: "Terjadi kesalahan" };
@@ -293,11 +308,11 @@ const permintaanService = {
           params.append(key, filters[key]);
         }
       });
-      
+
       const response = await apiClient.get(
         `/pemohon/permintaan/export/excel?${params.toString()}`,
         {
-          responseType: 'blob' // Penting untuk download file
+          responseType: "blob", // Penting untuk download file
         }
       );
       return response.data;
@@ -315,11 +330,11 @@ const permintaanService = {
           params.append(key, filters[key]);
         }
       });
-      
+
       const response = await apiClient.get(
         `/pemohon/permintaan/export/pdf?${params.toString()}`,
         {
-          responseType: 'blob'
+          responseType: "blob",
         }
       );
       return response.data;
@@ -332,13 +347,13 @@ const permintaanService = {
   getPermintaanByStatuses: async (statuses = []) => {
     try {
       const response = await apiClient.get("/pemohon/permintaan/by-status", {
-        params: { statuses: statuses.join(",") }
+        params: { statuses: statuses.join(",") },
       });
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: "Terjadi kesalahan" };
     }
-  }
+  },
 };
 
 export default permintaanService;
