@@ -90,11 +90,7 @@ router.post(
   createPenerimaanBarang
 );
 
-// ===== LAPORAN & EXPORT =====
-router.get("/permintaan/laporan", authenticate, requireAdmin, getLaporan);
-router.get("/permintaan/statistik", authenticate, requireAdmin, getStatistik);
-router.get("/permintaan/export/excel", authenticate, requireAdmin, exportExcel);
-router.get("/permintaan/export/pdf", authenticate, requireAdmin, exportPDF);
+
 
 // ===== STOK MANAGEMENT =====
 router.get("/stok", getAllStok);
@@ -279,4 +275,76 @@ router.get("/pemesanan", authenticate, requireAdmin, async (req, res) => {
     res.status(500).json({ error: "Terjadi kesalahan server." });
   }
 });
+
+// ===== LAPORAN & EXPORT =====
+router.get("/permintaan/laporan", authenticate, requireAdmin, getLaporan);
+router.get("/permintaan/statistik", authenticate, requireAdmin,async (req, res) => {
+  try {
+    const filters = {
+      status: req.query.status || "",
+      divisi_id: req.query.divisi_id || "",
+      start_date: req.query.start_date || "",
+      end_date: req.query.end_date || "",
+      search: req.query.search || "",
+    };
+    
+    // Ambil semua data permintaan untuk hitung statistik
+    const query = `
+      SELECT 
+        COUNT(*) as total_permintaan,
+        SUM(CASE WHEN status = 'selesai' THEN 1 ELSE 0 END) as selesai,
+        SUM(CASE WHEN status = 'diproses' THEN 1 ELSE 0 END) as diproses,
+        SUM(CASE WHEN status = 'menunggu' THEN 1 ELSE 0 END) as menunggu,
+        SUM(CASE WHEN status = 'ditolak' THEN 1 ELSE 0 END) as ditolak
+      FROM permintaan p
+      JOIN users u ON p.user_id = u.id
+      WHERE p.status != 'draft'
+    `;
+    
+    let values = [];
+    let conditions = [];
+    
+    if (filters.status && filters.status !== "semua") {
+      conditions.push("p.status = ?");
+      values.push(filters.status);
+    }
+    
+    if (filters.divisi_id) {
+      conditions.push("u.divisi_id = ?");
+      values.push(filters.divisi_id);
+    }
+    
+    if (filters.start_date && filters.end_date) {
+      conditions.push("DATE(p.created_at) BETWEEN ? AND ?");
+      values.push(filters.start_date, filters.end_date);
+    }
+    
+    let fullQuery = query;
+    if (conditions.length > 0) {
+      fullQuery += " AND " + conditions.join(" AND ");
+    }
+    
+    const [rows] = await dbPool.execute(fullQuery, values);
+    
+    res.json({
+      success: true,
+      message: "Statistik berhasil diambil",
+      data: rows[0] || {
+        total_permintaan: 0,
+        selesai: 0,
+        diproses: 0,
+        menunggu: 0,
+        ditolak: 0
+      }
+    });
+  } catch (error) {
+    console.error("💥 Get statistik error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Terjadi kesalahan server."
+    });
+  }
+});
+router.get("/permintaan/export/excel", authenticate, requireAdmin, exportExcel);
+router.get("/permintaan/export/pdf", authenticate, requireAdmin, exportPDF);
 export default router;

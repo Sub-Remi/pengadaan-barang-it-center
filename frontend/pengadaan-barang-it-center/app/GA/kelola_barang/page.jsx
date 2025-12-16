@@ -15,10 +15,11 @@ export default function DetailBarangPage() {
   const [formData, setFormData] = useState({
     kode_barang: "",
     nama_barang: "",
-    kategori_id: "",
-    satuan_id: "",
+    kategori_barang_id: "",
+    satuan_barang_id: "",
     spesifikasi: "",
     stok: "",
+    stok_minimum: 0,
   });
   const [kategoriList, setKategoriList] = useState([]);
   const [satuanList, setSatuanList] = useState([]);
@@ -45,10 +46,11 @@ export default function DetailBarangPage() {
         setFormData({
           kode_barang: result.data.kode_barang || "",
           nama_barang: result.data.nama_barang || "",
-          kategori_id: result.data.kategori_id ? result.data.kategori_id.toString() : "",
-          satuan_id: result.data.satuan_id ? result.data.satuan_id.toString() : "",
+          kategori_barang_id: result.data.kategori_barang_id ? result.data.kategori_barang_id.toString() : "",
+          satuan_barang_id: result.data.satuan_barang_id ? result.data.satuan_barang_id.toString() : "",
           spesifikasi: result.data.spesifikasi || "",
-          stok: result.data.stok || "",
+          stok: result.data.stok || "0",
+          stok_minimum: result.data.stok_minimum ? result.data.stok_minimum.toString() : "0",
         });
       } else {
         throw new Error(result.error);
@@ -120,11 +122,11 @@ export default function DetailBarangPage() {
       alert("Nama barang harus diisi");
       return false;
     }
-    if (!formData.kategori_id) {
+    if (!formData.kategori_barang_id) {
       alert("Kategori harus dipilih");
       return false;
     }
-    if (!formData.satuan_id) {
+    if (!formData.satuan_barang_id) {
       alert("Satuan harus dipilih");
       return false;
     }
@@ -147,9 +149,10 @@ export default function DetailBarangPage() {
       // Pastikan data dikirim dengan format yang benar
       const updateData = {
         nama_barang: formData.nama_barang.trim(),
-        kategori_id: parseInt(formData.kategori_id), // Konversi ke number
-        satuan_id: parseInt(formData.satuan_id), // Konversi ke number
+        kategori_barang_id: parseInt(formData.kategori_barang_id), // Konversi ke number
+        satuan_barang_id: parseInt(formData.satuan_barang_id), // Konversi ke number
         spesifikasi: formData.spesifikasi.trim(),
+        stok_minimum: 0,
         // kode_barang dan stok biasanya tidak diupdate, tapi jika diperlukan:
         // kode_barang: formData.kode_barang,
         // stok: parseInt(formData.stok)
@@ -403,8 +406,8 @@ export default function DetailBarangPage() {
                   <div>
                     <label className="font-medium text-gray-700">Kategori Barang</label>
                     <select
-                      name="kategori_id"
-                      value={formData.kategori_id}
+                      name="kategori_barang_id"
+                      value={formData.kategori_barang_id}
                       onChange={handleChange}
                       disabled={!isEditMode}
                       className={`w-full border rounded px-3 py-2 mt-1 transition ${
@@ -427,8 +430,8 @@ export default function DetailBarangPage() {
                   <div>
                     <label className="font-medium text-gray-700">Satuan</label>
                     <select
-                      name="satuan_id"
-                      value={formData.satuan_id}
+                      name="satuan_barang_id"
+                      value={formData.satuan_barang_id}
                       onChange={handleChange}
                       disabled={!isEditMode}
                       className={`w-full border rounded px-3 py-2 mt-1 transition ${

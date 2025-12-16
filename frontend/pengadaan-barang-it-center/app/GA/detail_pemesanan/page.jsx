@@ -619,8 +619,8 @@ export default function DokumenPemesananPage() {
         {/* Main Content - Scrollable dengan padding yang lebih baik */}
         <main className="flex-1 text-black p-6 bg-gray-200 overflow-y-auto ml-60">
           {/* Fixed header untuk judul halaman */}
-          <div className="bg-gray-200 pt-4 pb-4 mb-6">
-            <h2 className="text-2xl text-black font-semibold">Pemesanan</h2>
+          <div className="bg-gray-200  mb-6">
+            <h2 className="text-3xl text-black font-semibold">Pemesanan</h2>
           </div>
 
           {/* Card container */}
@@ -629,7 +629,7 @@ export default function DokumenPemesananPage() {
             <div className="flex justify-between items-center px-6 py-4 border-b">
               <h3 className="text-xl font-semibold text-teal-600">
                 Dokumen Pemesanan -{" "}
-                {pemesanan.permintaan?.nomor_permintaan || "N/A"}
+                {pemesanan.permintaan?.nomor_permintaan}
               </h3>
               <Link href="/GA/list_pemesanan">
                 <button className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded text-sm transition-colors">

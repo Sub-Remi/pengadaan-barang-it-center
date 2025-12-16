@@ -14,6 +14,7 @@ export const getLaporan = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
 
     // Filters
     const filters = {
@@ -26,16 +27,87 @@ export const getLaporan = async (req, res) => {
 
     console.log("📊 Getting laporan with filters:", filters);
 
-    const result = await Permintaan.findAllWithFilters(filters, page, limit);
+    let query = `
+      SELECT 
+        p.*, 
+        u.nama_lengkap, 
+        d.nama_divisi,
+        (SELECT COUNT(*) 
+         FROM barang_permintaan bp 
+         WHERE bp.permintaan_id = p.id) as jumlah_barang
+      FROM permintaan p 
+      JOIN users u ON p.user_id = u.id 
+      JOIN divisi d ON u.divisi_id = d.id 
+      WHERE p.status != 'draft'
+    `;
+
+    let countQuery = `
+      SELECT COUNT(*) as total
+      FROM permintaan p 
+      JOIN users u ON p.user_id = u.id 
+      WHERE p.status != 'draft'
+    `;
+
+    const values = [];
+    const countValues = [];
+
+    // Filter by status
+    if (filters.status && filters.status !== "semua") {
+      query += " AND p.status = ?";
+      countQuery += " AND p.status = ?";
+      values.push(filters.status);
+      countValues.push(filters.status);
+    }
+
+    // Filter by divisi
+    if (filters.divisi_id) {
+      query += " AND u.divisi_id = ?";
+      countQuery += " AND u.divisi_id = ?";
+      values.push(filters.divisi_id);
+      countValues.push(filters.divisi_id);
+    }
+
+    // Filter by date range
+    if (filters.start_date && filters.end_date) {
+      query += " AND DATE(p.created_at) BETWEEN ? AND ?";
+      countQuery += " AND DATE(p.created_at) BETWEEN ? AND ?";
+      values.push(filters.start_date, filters.end_date);
+      countValues.push(filters.start_date, filters.end_date);
+    }
+
+    // Search by nomor permintaan atau nama pemohon
+    if (filters.search) {
+      query += " AND (p.nomor_permintaan LIKE ? OR u.nama_lengkap LIKE ?)";
+      countQuery += " AND (p.nomor_permintaan LIKE ? OR u.nama_lengkap LIKE ?)";
+      const searchTerm = `%${filters.search}%`;
+      values.push(searchTerm, searchTerm);
+      countValues.push(searchTerm, searchTerm);
+    }
+
+    query += " ORDER BY p.created_at DESC";
+    query += " LIMIT ? OFFSET ?";
+    values.push(limit, offset);
+
+    console.log("🔍 Laporan query:", query);
+    console.log("📊 Laporan values:", values);
+
+    const [rows] = await dbPool.execute(query, values);
+    const [countRows] = await dbPool.execute(countQuery, countValues);
+
+    const total = countRows[0].total;
+    const totalPages = Math.ceil(total / limit);
 
     res.json({
       message: "Laporan berhasil diambil.",
-      data: result.data,
+      data: rows.map(row => ({
+        ...row,
+        jumlah_barang: parseInt(row.jumlah_barang) || 0,
+      })),
       pagination: {
-        currentPage: result.page,
-        totalPages: result.totalPages,
-        totalItems: result.total,
-        itemsPerPage: result.limit,
+        currentPage: page,
+        totalPages,
+        totalItems: total,
+        itemsPerPage: limit,
       },
     });
   } catch (error) {
@@ -52,58 +124,94 @@ export const getStatistik = async (req, res) => {
     let query = `
       SELECT 
         COUNT(*) as total_permintaan,
-        SUM(CASE WHEN status = 'selesai' THEN 1 ELSE 0 END) as selesai,
-        SUM(CASE WHEN status = 'diproses' THEN 1 ELSE 0 END) as diproses,
-        SUM(CASE WHEN status = 'menunggu' THEN 1 ELSE 0 END) as menunggu,
-        SUM(CASE WHEN status = 'ditolak' THEN 1 ELSE 0 END) as ditolak
+        SUM(CASE WHEN p.status = 'selesai' THEN 1 ELSE 0 END) as selesai,
+        SUM(CASE WHEN p.status = 'diproses' THEN 1 ELSE 0 END) as diproses,
+        SUM(CASE WHEN p.status = 'menunggu' THEN 1 ELSE 0 END) as menunggu,
+        SUM(CASE WHEN p.status = 'ditolak' THEN 1 ELSE 0 END) as ditolak
       FROM permintaan p
       WHERE p.status != 'draft'
     `;
 
-    const params = [];
+    const values = [];
 
     if (start_date && end_date) {
       query += " AND DATE(p.created_at) BETWEEN ? AND ?";
-      params.push(start_date, end_date);
+      values.push(start_date, end_date);
     }
 
     if (divisi_id) {
       query += ` AND p.user_id IN (SELECT id FROM users WHERE divisi_id = ?)`;
-      params.push(divisi_id);
+      values.push(divisi_id);
     }
 
-    const [stats] = await dbPool.execute(query, params);
-
-    // Get total barang yang diminta
-    const barangQuery = `
-      SELECT 
-        COUNT(*) as total_barang,
-        SUM(jumlah) as total_jumlah
-      FROM barang_permintaan bp
-      JOIN permintaan p ON bp.permintaan_id = p.id
-      WHERE p.status != 'draft'
-      ${start_date && end_date ? "AND DATE(p.created_at) BETWEEN ? AND ?" : ""}
-    `;
-
-    const barangParams = [];
-    if (start_date && end_date) {
-      barangParams.push(start_date, end_date);
-    }
-
-    const [barangStats] = await dbPool.execute(barangQuery, barangParams);
+    const [stats] = await dbPool.execute(query, values);
 
     res.json({
       message: "Statistik berhasil diambil.",
       data: {
-        ...stats[0],
-        total_barang: barangStats[0].total_barang || 0,
-        total_jumlah: barangStats[0].total_jumlah || 0,
+        total_permintaan: stats[0].total_permintaan || 0,
+        selesai: stats[0].selesai || 0,
+        diproses: stats[0].diproses || 0,
+        menunggu: stats[0].menunggu || 0,
+        ditolak: stats[0].ditolak || 0,
       },
     });
   } catch (error) {
     console.error("💥 Get statistik error:", error);
     res.status(500).json({ error: "Terjadi kesalahan server." });
   }
+};
+
+// Helper function untuk mendapatkan data export
+const getExportData = async (filters) => {
+  let query = `
+    SELECT 
+      p.*, 
+      u.nama_lengkap, 
+      d.nama_divisi,
+      (SELECT COUNT(*) 
+       FROM barang_permintaan bp 
+       WHERE bp.permintaan_id = p.id) as jumlah_barang
+    FROM permintaan p 
+    JOIN users u ON p.user_id = u.id 
+    JOIN divisi d ON u.divisi_id = d.id 
+    WHERE p.status != 'draft'
+  `;
+
+  const values = [];
+
+  // Filter by status
+  if (filters.status && filters.status !== "semua") {
+    query += " AND p.status = ?";
+    values.push(filters.status);
+  }
+
+  // Filter by divisi
+  if (filters.divisi_id) {
+    query += " AND u.divisi_id = ?";
+    values.push(filters.divisi_id);
+  }
+
+  // Filter by date range
+  if (filters.start_date && filters.end_date) {
+    query += " AND DATE(p.created_at) BETWEEN ? AND ?";
+    values.push(filters.start_date, filters.end_date);
+  }
+
+  // Search by nomor permintaan atau nama pemohon
+  if (filters.search) {
+    query += " AND (p.nomor_permintaan LIKE ? OR u.nama_lengkap LIKE ?)";
+    const searchTerm = `%${filters.search}%`;
+    values.push(searchTerm, searchTerm);
+  }
+
+  query += " ORDER BY p.created_at DESC";
+
+  console.log("🔍 Export query:", query);
+  console.log("📊 Export values:", values);
+
+  const [rows] = await dbPool.execute(query, values);
+  return rows;
 };
 
 // Export ke Excel
@@ -119,8 +227,8 @@ export const exportExcel = async (req, res) => {
 
     console.log("📤 Export Excel dengan filter:", filters);
 
-    // Get all data tanpa pagination untuk export
-    const data = await Permintaan.findAllWithFiltersForExport(filters);
+    // Get all data untuk export
+    const data = await getExportData(filters);
 
     // Buat workbook baru
     const workbook = new ExcelJS.Workbook();
@@ -234,20 +342,8 @@ export const exportPDF = async (req, res) => {
 
     console.log("📤 Export PDF dengan filter:", filters);
 
-    // Get all data tanpa pagination untuk export
-    const data = await Permintaan.findAllWithFiltersForExport(filters);
-
-    // Get statistik
-    const [stats] = await dbPool.execute(`
-      SELECT 
-        COUNT(*) as total,
-        SUM(CASE WHEN status = 'selesai' THEN 1 ELSE 0 END) as selesai,
-        SUM(CASE WHEN status = 'diproses' THEN 1 ELSE 0 END) as diproses,
-        SUM(CASE WHEN status = 'menunggu' THEN 1 ELSE 0 END) as menunggu,
-        SUM(CASE WHEN status = 'ditolak' THEN 1 ELSE 0 END) as ditolak
-      FROM permintaan
-      WHERE status != 'draft'
-    `);
+    // Get all data untuk export
+    const data = await getExportData(filters);
 
     // Buat dokumen PDF
     const doc = new PDFDocument({ margin: 50, size: "A4" });
@@ -280,12 +376,21 @@ export const exportPDF = async (req, res) => {
       .text("STATISTIK", { underline: true })
       .moveDown(0.5);
 
+    // Hitung statistik
+    const stats = {
+      total: data.length,
+      selesai: data.filter(d => d.status === 'selesai').length,
+      diproses: data.filter(d => d.status === 'diproses').length,
+      menunggu: data.filter(d => d.status === 'menunggu').length,
+      ditolak: data.filter(d => d.status === 'ditolak').length,
+    };
+
     doc.fontSize(10);
-    doc.text(`Total Permintaan: ${stats[0].total || 0}`);
-    doc.text(`Selesai: ${stats[0].selesai || 0}`);
-    doc.text(`Diproses: ${stats[0].diproses || 0}`);
-    doc.text(`Menunggu: ${stats[0].menunggu || 0}`);
-    doc.text(`Ditolak: ${stats[0].ditolak || 0}`);
+    doc.text(`Total Permintaan: ${stats.total}`);
+    doc.text(`Selesai: ${stats.selesai}`);
+    doc.text(`Diproses: ${stats.diproses}`);
+    doc.text(`Menunggu: ${stats.menunggu}`);
+    doc.text(`Ditolak: ${stats.ditolak}`);
     doc.moveDown();
 
     // Tabel header

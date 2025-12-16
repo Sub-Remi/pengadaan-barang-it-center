@@ -314,11 +314,11 @@ export default function DokumenPenerimaanPage() {
                   </li>
                 </Link>
 
-                <Link href="/finance/riwayat_finance">
+                {/* <Link href="/finance/riwayat_finance">
                   <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
                     Riwayat
                   </li>
-                </Link>
+                </Link> */}
               </ul>
             </nav>
           </div>

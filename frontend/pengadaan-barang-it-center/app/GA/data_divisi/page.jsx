@@ -367,13 +367,7 @@ export default function DataDivisiSemuaPage() {
                           </td>
                           <td className="px-6 py-3 text-center">
                             <div className="flex justify-center gap-2">
-                              <button
-                                onClick={() => handleEdit(row.id)}
-                                className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded transition"
-                                title="Edit Divisi"
-                              >
-                                <FaEdit />
-                              </button>
+                              
                               <button
                                 onClick={() => handleDelete(row.id, row.nama_divisi)}
                                 className="bg-red-600 hover:bg-red-700 text-white p-2 rounded transition"

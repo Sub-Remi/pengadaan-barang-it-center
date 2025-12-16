@@ -8,6 +8,8 @@ const adminLaporanService = {
   getLaporan: async (page = 1, limit = 10, filters = {}) => {
     try {
       const token = localStorage.getItem('token');
+      console.log("🔍 Fetching laporan dengan filters:", filters);
+      
       const response = await axios.get(`${API_URL}/permintaan/laporan`, {
         params: {
           page,
@@ -18,8 +20,10 @@ const adminLaporanService = {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log("✅ Laporan response:", response.data);
       return response.data;
     } catch (error) {
+      console.error("❌ Error fetching laporan:", error);
       throw error.response ? error.response.data : error;
     }
   },
@@ -36,6 +40,7 @@ const adminLaporanService = {
       });
       return response.data;
     } catch (error) {
+      console.error("❌ Error fetching statistik:", error);
       throw error.response ? error.response.data : error;
     }
   },
@@ -53,6 +58,7 @@ const adminLaporanService = {
       });
       return response.data;
     } catch (error) {
+      console.error("❌ Error exporting Excel:", error);
       throw error.response ? error.response.data : error;
     }
   },
@@ -70,11 +76,10 @@ const adminLaporanService = {
       });
       return response.data;
     } catch (error) {
+      console.error("❌ Error exporting PDF:", error);
       throw error.response ? error.response.data : error;
     }
   },
 };
-
-
 
 export default adminLaporanService;
