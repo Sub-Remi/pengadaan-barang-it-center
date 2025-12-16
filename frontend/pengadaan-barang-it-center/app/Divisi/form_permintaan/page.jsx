@@ -711,7 +711,7 @@ export default function FormPermintaanBarangPage() {
                 </li>
               </Link>
 
-              <Link href="/Divisi/form_permintaan">
+              <Link href="/Divisi/permintaan_divisi">
                 <li className="bg-blue-500 px-5 py-2 cursor-pointer">
                   Permintaan
                 </li>

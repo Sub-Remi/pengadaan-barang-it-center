@@ -389,7 +389,7 @@ export default function DataPermintaanPage() {
 
             {/* Filter section */}
             <div className="px-6 py-4 border-b bg-white">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
                 {/* Search */}
                 <div>
                   <label
