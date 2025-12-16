@@ -2,11 +2,19 @@ import axiosInstance from "./axiosConfig";
 
 const adminPermintaanService = {
   // Get all permintaan untuk admin
-  getAllPermintaan: async (page = 1, limit = 10, filters = {}) => {
+  getAllPermintaan: async (
+    page = 1,
+    limit = 10,
+    filters = {},
+    sort = "terbaru"
+  ) => {
     try {
       const params = new URLSearchParams();
       params.append("page", page);
       params.append("limit", limit);
+
+      // Tambahkan parameter sort
+      params.append("sort", sort);
 
       if (filters.search) params.append("search", filters.search);
       if (filters.status && filters.status !== "semua")

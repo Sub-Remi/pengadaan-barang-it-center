@@ -258,31 +258,44 @@ const Permintaan = {
 
   // Di file models/permintaan.js, dalam fungsi findAllWithFilters:
 
-  findAllWithFilters: async (filters = {}, page = 1, limit = 10) => {
+  // Di file models/permintaan.js, dalam fungsi findAllWithFilters:
+
+  findAllWithFilters: async (
+    filters = {},
+    page = 1,
+    limit = 10,
+    sort = "terbaru"
+  ) => {
     const offset = (page - 1) * limit;
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
     const offsetNum = parseInt(offset);
 
+    // Tentukan order berdasarkan parameter sort
+    let orderBy = "p.created_at DESC"; // default terbaru
+    if (sort === "terlama") {
+      orderBy = "p.created_at ASC";
+    }
+
     let query = `
-  SELECT 
-    p.*, 
-    u.nama_lengkap, 
-    d.nama_divisi,
-    (SELECT COUNT(*) 
-     FROM barang_permintaan bp 
-     WHERE bp.permintaan_id = p.id) as jumlah_barang
-  FROM permintaan p 
-  JOIN users u ON p.user_id = u.id 
-  JOIN divisi d ON u.divisi_id = d.id 
-  WHERE 1=1
+SELECT 
+  p.*, 
+  u.nama_lengkap, 
+  d.nama_divisi,
+  (SELECT COUNT(*) 
+   FROM barang_permintaan bp 
+   WHERE bp.permintaan_id = p.id) as jumlah_barang
+FROM permintaan p 
+JOIN users u ON p.user_id = u.id 
+JOIN divisi d ON u.divisi_id = d.id 
+WHERE 1=1
 `;
 
     let countQuery = `
-  SELECT COUNT(*) as total 
-  FROM permintaan p 
-  JOIN users u ON p.user_id = u.id 
-  WHERE 1=1
+SELECT COUNT(*) as total 
+FROM permintaan p 
+JOIN users u ON p.user_id = u.id 
+WHERE 1=1
 `;
 
     const values = [];
@@ -325,7 +338,7 @@ const Permintaan = {
       countValues.push(searchTerm, searchTerm);
     }
 
-    query += " ORDER BY p.created_at DESC";
+    query += ` ORDER BY ${orderBy}`;
     query += ` LIMIT ${limitNum} OFFSET ${offsetNum}`;
 
     console.log("🔍 Admin query dengan jumlah_barang:", query);
