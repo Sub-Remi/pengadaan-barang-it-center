@@ -346,8 +346,8 @@ export default function ListPemesananPage() {
         {/* Main Content - Scrollable dengan padding yang lebih baik */}
         <main className="flex-1 text-black p-6 bg-gray-200 overflow-y-auto ml-60">
           {/* Fixed header untuk judul halaman */}
-          <div className="bg-gray-200 pt-4 pb-4 mb-6">
-            <h2 className="text-2xl text-black font-semibold">Pemesanan</h2>
+          <div className="bg-gray-200 mb-6">
+            <h2 className="text-3xl text-black font-semibold">Pemesanan</h2>
           </div>
 
           {/* Card container */}
