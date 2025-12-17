@@ -50,7 +50,7 @@ app.use(
       "http://localhost:3000", // NextJS dev server
       "http://localhost:5000", // Backend server
       "https://pengadaan-barang-it-center.vercel.app", // Deployed frontend
-      "http://192.168.137.1*", // Network IP frontend development
+      "http://172.16.10.242*", // Network IP frontend development
     ],
     credentials: true, // Izinkan cookies/auth headers
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
