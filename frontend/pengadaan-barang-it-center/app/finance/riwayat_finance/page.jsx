@@ -1,11 +1,12 @@
 "use client";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { FaEye, FaDownload } from "react-icons/fa";
+import { FaEye, FaDownload, FaFilter, FaRedo } from "react-icons/fa";
 
 export default function ListPemesananPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isFiltering, setIsFiltering] = useState(false);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -171,6 +172,7 @@ export default function ListPemesananPage() {
       setData([]);
     } finally {
       setLoading(false);
+      setIsFiltering(false);
     }
   };
 
@@ -186,8 +188,9 @@ export default function ListPemesananPage() {
   };
 
   // Handle filter submit
-  const handleFilterSubmit = () => {
-    fetchRiwayatPemesanan(1, filters);
+  const handleFilterSubmit = async () => {
+    setIsFiltering(true);
+    await fetchRiwayatPemesanan(1, filters);
   };
 
   // Handle reset filter
@@ -262,9 +265,9 @@ export default function ListPemesananPage() {
               </h3>
               <button
                 onClick={handleGenerateReport}
-                className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded flex items-center gap-2"
+                className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2.5 rounded-md text-sm transition duration-200 shadow-sm hover:shadow-md"
               >
-                <FaDownload />
+                <FaDownload className="text-sm" />
                 Generate Laporan
               </button>
             </div>
@@ -282,8 +285,8 @@ export default function ListPemesananPage() {
                     name="search"
                     value={filters.search}
                     onChange={handleFilterChange}
-                    placeholder="Cari..."
-                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
+                    placeholder="Cari nomor permintaan atau nama barang..."
+                    className="border border-gray-300 rounded-md px-3 py-2.5 w-full text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
                   />
                 </div>
 
@@ -297,7 +300,7 @@ export default function ListPemesananPage() {
                     name="start_date"
                     value={filters.start_date}
                     onChange={handleFilterChange}
-                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
+                    className="border border-gray-300 rounded-md px-3 py-2.5 w-full text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
                   />
                 </div>
 
@@ -311,7 +314,7 @@ export default function ListPemesananPage() {
                     name="end_date"
                     value={filters.end_date}
                     onChange={handleFilterChange}
-                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
+                    className="border border-gray-300 rounded-md px-3 py-2.5 w-full text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
                   />
                 </div>
 
@@ -320,14 +323,28 @@ export default function ListPemesananPage() {
                   <div className="flex gap-2 w-full">
                     <button
                       onClick={handleFilterSubmit}
-                      className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded w-full text-x1"
+                      disabled={isFiltering}
+                      className={`flex items-center justify-center gap-1.5 bg-teal-600 hover:bg-teal-700 text-white font-medium px-3 py-2 rounded-md w-full text-xs transition duration-150 ${
+                        isFiltering ? 'opacity-80 cursor-not-allowed' : ''
+                      }`}
                     >
-                      Terapkan Filter
+                      {isFiltering ? (
+                        <>
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                          Memproses...
+                        </>
+                      ) : (
+                        <>
+                          <FaFilter className="text-xs" />
+                          Terapkan Filter
+                        </>
+                      )}
                     </button>
                     <button
                       onClick={handleResetFilter}
-                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-4 py-2 rounded w-full text-x1"
+                      className="flex items-center justify-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-3 py-2 rounded-md w-full text-xs transition duration-150"
                     >
+                      <FaRedo className="text-xs" />
                       Reset
                     </button>
                   </div>
@@ -338,60 +355,61 @@ export default function ListPemesananPage() {
             {/* TABLE */}
             <div className="overflow-x-auto">
               {loading ? (
-                <div className="px-6 py-8 text-center">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-600"></div>
-                  <p className="mt-2 text-gray-600">Memuat data...</p>
+                <div className="px-6 py-12 text-center">
+                  <div className="inline-block animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-teal-600"></div>
+                  <p className="mt-3 text-gray-600 text-sm">Memuat data...</p>
                 </div>
               ) : (
                 <>
                   <table className="w-full border-collapse">
                     <thead>
-                      <tr className="bg-gray-50 text-left text-black">
-                        <th className="px-6 py-3 font-semibold text-x1">No</th>
-                        <th className="px-6 py-3 font-semibold text-x1">ID Permintaan</th>
-                        <th className="px-6 py-3 font-semibold text-x1">Tanggal Pemesanan</th>
-                        <th className="px-6 py-3 font-semibold text-x1">Nama Barang</th>
-                        <th className="px-6 py-3 font-semibold text-x1">Status</th>
-                        <th className="px-6 py-3 font-semibold text-x1 text-center">Aksi</th>
+                      <tr className="bg-gray-50 text-left">
+                        <th className="px-6 py-3 font-semibold text-sm text-gray-700">No</th>
+                        <th className="px-6 py-3 font-semibold text-sm text-gray-700">ID Permintaan</th>
+                        <th className="px-6 py-3 font-semibold text-sm text-gray-700">Tanggal Pemesanan</th>
+                        <th className="px-6 py-3 font-semibold text-sm text-gray-700">Nama Barang</th>
+                        <th className="px-6 py-3 font-semibold text-sm text-gray-700">Status</th>
+                        <th className="px-6 py-3 font-semibold text-sm text-gray-700 text-center">Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
                       {data.map((row, index) => (
                         <tr
                           key={row.id || index}
-                          className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                          className={index % 2 === 0 ? "bg-gray-50 hover:bg-gray-100" : "bg-white hover:bg-gray-50"}
                         >
-                          <td className="px-6 py-3 text-x1 text-black">
+                          <td className="px-6 py-4 text-sm text-gray-800">
                             {(pagination.currentPage - 1) * pagination.itemsPerPage + index + 1}
                           </td>
-                          <td className="px-6 py-3 text-x1 text-black font-medium">
+                          <td className="px-6 py-4 text-sm text-gray-800 font-medium">
                             {row.nomor_permintaan || `REQ-${row.id || index}`}
                           </td>
-                          <td className="px-6 py-3 text-x1 text-black">
+                          <td className="px-6 py-4 text-sm text-gray-800">
                             {formatDate(row.tanggal_pemesanan || row.tanggal || row.created_at)}
                           </td>
-                          <td className="px-6 py-3 text-x1 text-black font-medium">
+                          <td className="px-6 py-4 text-sm text-gray-800 font-medium">
                             {row.nama_barang || row.barang || "-"}
                           </td>
-                          <td className="px-6 py-3 text-x1 text-black">
+                          <td className="px-6 py-4 text-sm">
                             <span
-                              className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
                                 row.status
                               )}`}
                             >
                               {formatStatus(row.status)}
                             </span>
                           </td>
-                          <td className="px-6 py-3 text-center">
+                          <td className="px-6 py-4 text-center">
                             <div className="flex justify-center space-x-2">
                               <Link
                                 href={`/finance/detail_pemesanan?id=${row.id}`}
                               >
                                 <button
-                                  className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded text-sm"
+                                  className="flex items-center gap-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 font-medium px-3 py-1.5 rounded-md text-xs transition duration-200 border border-teal-200"
                                   title="Lihat Detail"
                                 >
-                                  <FaEye size={14} />
+                                  <FaEye size={12} />
+                                  <span>Detail</span>
                                 </button>
                               </Link>
                             </div>
@@ -402,9 +420,15 @@ export default function ListPemesananPage() {
                         <tr>
                           <td
                             colSpan="6"
-                            className="px-6 py-8 text-center text-gray-500"
+                            className="px-6 py-12 text-center text-gray-500 text-sm"
                           >
-                            Tidak ada data riwayat pemesanan
+                            <div className="flex flex-col items-center">
+                              <svg className="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                              </svg>
+                              <p className="text-gray-400">Tidak ada data riwayat pemesanan</p>
+                              <p className="text-gray-300 text-xs mt-1">Coba ubah filter atau cari dengan kata kunci lain</p>
+                            </div>
                           </td>
                         </tr>
                       )}
@@ -413,21 +437,21 @@ export default function ListPemesananPage() {
 
                   {/* Pagination */}
                   {pagination.totalPages > 1 && (
-                    <div className="flex justify-between items-center px-6 py-4 bg-white border-t">
+                    <div className="flex flex-col sm:flex-row justify-between items-center px-6 py-4 bg-white border-t space-y-3 sm:space-y-0">
                       <div className="text-sm text-gray-600">
-                        Menampilkan {data.length} dari {pagination.totalItems} data
+                        Menampilkan <span className="font-medium">{data.length}</span> dari <span className="font-medium">{pagination.totalItems}</span> data
                       </div>
-                      <div className="inline-flex text-sm border rounded-md overflow-hidden">
+                      <div className="inline-flex rounded-md shadow-sm">
                         <button
                           onClick={() => handlePageChange(pagination.currentPage - 1)}
                           disabled={pagination.currentPage === 1}
-                          className={`px-3 py-1 border-r text-sm ${
+                          className={`px-3 py-1.5 text-sm border border-gray-300 rounded-l-md ${
                             pagination.currentPage === 1
-                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                              : "bg-white hover:bg-gray-100"
+                              ? "bg-gray-50 text-gray-400 cursor-not-allowed"
+                              : "bg-white text-gray-700 hover:bg-gray-50"
                           }`}
                         >
-                          Previous
+                          Sebelumnya
                         </button>
 
                         {[...Array(pagination.totalPages)].map((_, i) => {
@@ -442,10 +466,12 @@ export default function ListPemesananPage() {
                               <button
                                 key={pageNum}
                                 onClick={() => handlePageChange(pageNum)}
-                                className={`px-3 py-1 border-r text-sm ${
+                                className={`px-3 py-1.5 text-sm border border-l-0 border-gray-300 ${
                                   pageNum === pagination.currentPage
-                                    ? "bg-teal-600 text-white"
-                                    : "bg-white hover:bg-gray-100"
+                                    ? "bg-teal-600 text-white border-teal-600"
+                                    : "bg-white text-gray-700 hover:bg-gray-50"
+                                } ${
+                                  pageNum === pagination.totalPages ? 'rounded-r-md' : ''
                                 }`}
                               >
                                 {pageNum}
@@ -458,13 +484,13 @@ export default function ListPemesananPage() {
                         <button
                           onClick={() => handlePageChange(pagination.currentPage + 1)}
                           disabled={pagination.currentPage === pagination.totalPages}
-                          className={`px-3 py-1 text-sm ${
+                          className={`px-3 py-1.5 text-sm border border-l-0 border-gray-300 rounded-r-md ${
                             pagination.currentPage === pagination.totalPages
-                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                              : "bg-white hover:bg-gray-100"
+                              ? "bg-gray-50 text-gray-400 cursor-not-allowed"
+                              : "bg-white text-gray-700 hover:bg-gray-50"
                           }`}
                         >
-                          Next
+                          Selanjutnya
                         </button>
                       </div>
                     </div>
@@ -474,7 +500,7 @@ export default function ListPemesananPage() {
             </div>
 
             {/* Garis bawah */}
-            <div className="h-1 bg-teal-600 w-full"></div>
+            <div className="h-1 bg-gradient-to-r from-teal-500 to-teal-600 w-full"></div>
           </div>
         </main>
       </div>

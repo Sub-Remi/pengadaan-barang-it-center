@@ -257,11 +257,11 @@ export default function DataPemesananPage() {
                   </li>
                 </Link>
 
-                {/* <Link href="/finance/riwayat_finance">
+                <Link href="/finance/riwayat_finance">
                   <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
                     Riwayat
                   </li>
-                </Link> */}
+                </Link>
               </ul>
             </nav>
           </div>
@@ -299,7 +299,7 @@ export default function DataPemesananPage() {
                     name="status"
                     value={filters.status}
                     onChange={handleFilterChange}
-                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-x1"
                   >
                     <option value="">Semua Status</option>
                     <option value="diproses">Diproses</option>
@@ -331,7 +331,7 @@ export default function DataPemesananPage() {
 
                 {/* Filter Start Date */}
                 <div>
-                  <label className="block font-medium text-sm text-gray-700 mb-1">
+                  <label className="block font-medium text-x1 text-gray-700 mb-1">
                     Dari Tanggal
                   </label>
                   <input
@@ -390,13 +390,13 @@ export default function DataPemesananPage() {
                   <table className="w-full border-collapse">
                     <thead>
                       <tr className="bg-gray-50 text-left">
-                        <th className="px-4 py-3 font-semibold text-sm">No</th>
-                        <th className="px-4 py-3 font-semibold text-sm">ID PB</th>
-                        <th className="px-4 py-3 font-semibold text-sm">Tanggal</th>
-                        <th className="px-4 py-3 font-semibold text-sm">Nama Barang</th>
-                        <th className="px-4 py-3 font-semibold text-sm">Jenis Dokumen</th>
-                        <th className="px-4 py-3 font-semibold text-sm">Status Pemesanan</th>
-                        <th className="px-4 py-3 font-semibold text-sm text-center">Aksi</th>
+                        <th className="px-4 py-3 font-semibold text-x1">No</th>
+                        <th className="px-4 py-3 font-semibold text-x1">ID PB</th>
+                        <th className="px-4 py-3 font-semibold text-x1">Tanggal</th>
+                        <th className="px-4 py-3 font-semibold text-x1">Nama Barang</th>
+                        <th className="px-4 py-3 font-semibold text-x1">Jenis Dokumen</th>
+                        <th className="px-4 py-3 font-semibold text-x1">Status Pemesanan</th>
+                        <th className="px-4 py-3 font-semibold text-x1 text-center">Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -405,31 +405,31 @@ export default function DataPemesananPage() {
                           key={row.id || index}
                           className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
                         >
-                          <td className="px-4 py-3 text-sm">
+                          <td className="px-4 py-3 text-x1">
                             {(pagination.currentPage - 1) *
                               pagination.itemsPerPage +
                               index +
                               1}
                           </td>
-                          <td className="px-4 py-3 text-sm font-medium">
+                          <td className="px-4 py-3 text-x1 font-medium">
                             {row.nomor_permintaan || `PB-${row.id || index}`}
                           </td>
-                          <td className="px-4 py-3 text-sm">
+                          <td className="px-4 py-3 text-x1">
                             {formatDate(
                               row.tanggal ||
                                 row.created_at ||
                                 row.dokumen_created_at
                             )}
                           </td>
-                          <td className="px-4 py-3 text-sm font-medium">
+                          <td className="px-4 py-3 text-x1 font-medium">
                             {row.nama_barang || row.barang || "-"}
                           </td>
-                          <td className="px-4 py-3 text-sm">
+                          <td className="px-4 py-3 text-x1">
                             {row.jenis_dokumen || row.dokumen_jenis || "-"}
                           </td>
-                          <td className="px-4 py-3 text-sm">
+                          <td className="px-4 py-3 text-x1">
                             <span
-                              className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                              className={`px-2 py-1 rounded text-x1 font-medium ${getStatusColor(
                                 row.status || row.is_valid
                               )}`}
                             >
@@ -449,7 +449,7 @@ export default function DataPemesananPage() {
                                 }`}
                               >
                                 <button
-                                  className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded text-sm"
+                                  className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded text-x1"
                                   title="Lihat Detail"
                                 >
                                   <FaEye size={14} />

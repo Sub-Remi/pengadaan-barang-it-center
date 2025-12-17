@@ -811,7 +811,7 @@ export default function FormPermintaanBarangPage() {
                       name="tanggal_kebutuhan"
                       value={formData.tanggal_kebutuhan}
                       onChange={handleInputChange}
-                      className="w-full border text-black border-gray-300 rounded px-3 py-2 mt-1 text-black"
+                      className="w-full border text-black border-gray-300 rounded px-3 py-2 mt-1"
                       required
                     />
                   </div>

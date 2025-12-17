@@ -776,7 +776,7 @@ export default function DetailPermintaanPage() {
                       <span className="font-semibold">Ditolak</span>
                     </div>
                   </div>
-                  <div className="bg-white p-3 rounded border">
+                  {/* <div className="bg-white p-3 rounded border">
                     <div className="font-medium text-blue-600">🔄 Diproses</div>
                     <div className="text-gray-600 mt-1">
                       Jika masih ada barang yang{" "}
@@ -784,7 +784,7 @@ export default function DetailPermintaanPage() {
                         Menunggu Validasi, Diproses, atau Dalam Pemesanan
                       </span>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -940,7 +940,7 @@ export default function DetailPermintaanPage() {
                     {barang.status === "menunggu validasi" && (
                       <>
                         <div className="flex flex-wrap gap-3">
-                          <button
+                          {/* <button
                             onClick={() =>
                               handleAjukanPembelian(barang.id, barang)
                             }
@@ -948,7 +948,7 @@ export default function DetailPermintaanPage() {
                             className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded flex items-center gap-2 transition"
                           >
                             <span>📋 Ajukan Pembelian</span>
-                          </button>
+                          </button> */}
 
                           <button
                             onClick={() => handleValidasiBarang(barang.id)}
@@ -996,7 +996,7 @@ export default function DetailPermintaanPage() {
                       </>
                     )}
 
-                    {/* Status: Diproses */}
+                    Status: Diproses
                     {barang.status === "diproses" && (
                       <div className="flex flex-wrap gap-3">
                         <button
@@ -1014,7 +1014,7 @@ export default function DetailPermintaanPage() {
                     {/* Status: Dalam Pemesanan */}
                     {barang.status === "dalam pemesanan" && (
                       <div className="flex flex-wrap gap-3">
-                        <button
+                        {/* <button
                           onClick={() =>
                             handleAjukanPembelian(barang.id, barang)
                           }
@@ -1022,7 +1022,7 @@ export default function DetailPermintaanPage() {
                           className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded transition"
                         >
                           Pantau Pemesanan
-                        </button>
+                        </button> */}
 
                         <button
                           onClick={() =>

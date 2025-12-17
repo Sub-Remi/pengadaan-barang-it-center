@@ -138,11 +138,11 @@ function DashboardFinance() {
                 </li>
               </Link>
 
-              {/* <Link href="/finance/riwayat_finance">
+              <Link href="/finance/riwayat_finance">
                 <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
                   Riwayat
                 </li>
-              </Link> */}
+              </Link>
             </ul>
           </nav>
         </aside>
