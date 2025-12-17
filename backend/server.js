@@ -50,6 +50,7 @@ app.use(
       "http://localhost:3000", // NextJS dev server
       "http://localhost:5000", // Backend server
       "https://pengadaan-barang-it-center.vercel.app", // Deployed frontend
+      "http://192.168.137.1*", // Network IP frontend development
     ],
     credentials: true, // Izinkan cookies/auth headers
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -150,6 +151,21 @@ app.get("/", (req, res) => {
   res.send("Server working, go to /route_name");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log("🚀 Server berjalan di:");
+  console.log(`   • Local: http://localhost:${PORT}`);
+  console.log(`   • Network: http://${getLocalIP()}:${PORT}`);
 });
+
+// Tambahkan fungsi untuk mendapatkan IP lokal
+function getLocalIP() {
+  const interfaces = require("os").networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === "IPv4" && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return "localhost";
+}
