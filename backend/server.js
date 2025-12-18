@@ -5,6 +5,7 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
+import os from "os";
 import dbPool from "./src/config/database.js";
 
 //import routes
@@ -159,7 +160,7 @@ app.listen(PORT, "0.0.0.0", () => {
 
 // Tambahkan fungsi untuk mendapatkan IP lokal
 function getLocalIP() {
-  const interfaces = require("os").networkInterfaces();
+  const interfaces = os.networkInterfaces();
   for (const name of Object.keys(interfaces)) {
     for (const iface of interfaces[name]) {
       if (iface.family === "IPv4" && !iface.internal) {
