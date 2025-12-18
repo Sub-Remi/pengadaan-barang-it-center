@@ -12,8 +12,6 @@ const adminPermintaanService = {
       const params = new URLSearchParams();
       params.append("page", page);
       params.append("limit", limit);
-
-      // Tambahkan parameter sort
       params.append("sort", sort);
 
       if (filters.search) params.append("search", filters.search);
@@ -29,6 +27,39 @@ const adminPermintaanService = {
       return response.data;
     } catch (error) {
       console.error("❌ [adminPermintaanService] Error:", error);
+      throw error;
+    }
+  },
+
+  // **TAMBAHKAN: Get permintaan riwayat khusus (hanya selesai dan ditolak)**
+  getPermintaanRiwayat: async (
+    page = 1,
+    limit = 10,
+    filters = {},
+    sort = "terbaru"
+  ) => {
+    try {
+      const params = new URLSearchParams();
+      params.append("page", page);
+      params.append("limit", limit);
+      params.append("sort", sort);
+
+      // Default filter untuk riwayat: hanya selesai dan ditolak
+      params.append("status", "selesai,ditolak");
+
+      if (filters.search) params.append("search", filters.search);
+      if (filters.divisi_id && filters.divisi_id !== "semua")
+        params.append("divisi_id", filters.divisi_id);
+      if (filters.start_date) params.append("start_date", filters.start_date);
+      if (filters.end_date) params.append("end_date", filters.end_date);
+
+      const url = `/admin/permintaan?${params.toString()}`;
+      console.log("📊 Fetching riwayat with URL:", url);
+      
+      const response = await axiosInstance.get(url);
+      return response.data;
+    } catch (error) {
+      console.error("❌ [adminPermintaanService] Riwayat Error:", error);
       throw error;
     }
   },

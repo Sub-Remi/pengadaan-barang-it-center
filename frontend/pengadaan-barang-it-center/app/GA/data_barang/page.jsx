@@ -112,7 +112,7 @@ export default function DataBarangPage() {
     <div className="flex flex-col h-screen font-poppins bg-gray-100">
       {/* Header - Tetap fixed di atas */}
       <header className="fixed top-0 left-0 right-0 z-50 flex bg-white shadow-sm items-center h-16">
-        <div className="bg-white w-60 h-16 flex items-center justify-center border-r border-gray-200">
+        <div className="bg-white w-60 h-16 flex items-center justify-center border-r border-white">
           <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
         </div>
         <div className="flex-1 h-16 flex items-center px-8"></div>
