@@ -47,13 +47,28 @@ createUploadsFolders();
 //middleware
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000", // NextJS dev server
-      "http://localhost:5000", // Backend server
-      "https://pengadaan-barang-it-center.vercel.app", // Deployed frontend
-      "http://172.16.10.242*", // Network IP frontend development
-    ],
-    credentials: true, // Izinkan cookies/auth headers
+    origin: function (origin, callback) {
+      // Izinkan request tanpa origin (seperti Postman, curl)
+      if (!origin) return callback(null, true);
+      
+      const allowedOrigins = [
+        "http://localhost:3000",
+        "http://localhost:5000",
+        "https://pengadaan-barang-it-center.vercel.app",
+      ];
+      
+      // Izinkan semua IP di subnet 172.16.10.x
+      if (origin.startsWith("http://192.168.1.")) {
+        return callback(null, true);
+      }
+      
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
