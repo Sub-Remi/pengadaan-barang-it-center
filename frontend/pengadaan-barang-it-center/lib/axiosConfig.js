@@ -1,9 +1,17 @@
 import axios from "axios";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3200/api";
+const getBaseURL = () => {
+  // Jika di development, gunakan URL dari .env.local
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+
+  // Fallback ke default
+  return "http://localhost:3200/api";
+};
 
 const axiosInstance = axios.create({
-  baseURL: baseURL,
+  baseURL: getBaseURL(),
   headers: {
     "Content-Type": "application/json",
   },

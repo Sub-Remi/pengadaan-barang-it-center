@@ -50,22 +50,26 @@ app.use(
     origin: function (origin, callback) {
       // Izinkan request tanpa origin (seperti Postman, curl)
       if (!origin) return callback(null, true);
-      
+
       const allowedOrigins = [
         "http://localhost:3000",
         "http://localhost:5000",
+        "http://localhost:3200",
         "https://pengadaan-barang-it-center.vercel.app",
+        `http://${getLocalIP()}:3000`,
+        `http://${getLocalIP()}:3200`,
       ];
-      
-      // Izinkan semua IP di subnet 172.16.10.x
-      if (origin.startsWith("http://192.168.1.")) {
+
+      // Izinkan semua IP di subnet lokal (contoh: 192.168.1.x)
+      const localRegex = /^http:\/\/192\.168\.\d+\.\d+(:\d+)?$/;
+      if (localRegex.test(origin)) {
         return callback(null, true);
       }
-      
+
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       } else {
-        return callback(new Error('Not allowed by CORS'));
+        return callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
