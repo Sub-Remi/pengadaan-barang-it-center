@@ -45,31 +45,35 @@ const createUploadsFolders = () => {
 createUploadsFolders();
 
 //middleware
+// Ganti bagian CORS dengan:
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Izinkan request tanpa origin (seperti Postman, curl)
+      // Izinkan request tanpa origin
       if (!origin) return callback(null, true);
 
+      // List semua kemungkinan origin
       const allowedOrigins = [
-        "http://localhost:3000",
-        "http://localhost:5000",
-        "http://localhost:3200",
+        "http://localhost:3000", //adress frontend
+        "http://localhost:3200", //address backend
         "https://pengadaan-barang-it-center.vercel.app",
-        `http://${getLocalIP()}:3000`,
-        `http://${getLocalIP()}:3200`,
       ];
 
-      // Izinkan semua IP di subnet lokal (contoh: 192.168.1.x)
-      const localRegex = /^http:\/\/192\.168\.\d+\.\d+(:\d+)?$/;
-      if (localRegex.test(origin)) {
+      // Izinkan semua IP di subnet WiFi Anda)
+      if (origin.startsWith("http://192.168.1.")) {
+        return callback(null, true);
+      }
+
+      // Izinkan juga localhost dengan port apa pun
+      if (origin.startsWith("http://localhost:")) {
         return callback(null, true);
       }
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       } else {
-        return callback(new Error("Not allowed by CORS"));
+        console.log("⚠️  Blocked by CORS:", origin);
+        return callback(new Error("Not allowed by CORS"), false);
       }
     },
     credentials: true,
@@ -77,7 +81,6 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -171,15 +174,51 @@ app.get("/", (req, res) => {
   res.send("Server working, go to /route_name");
 });
 
+// Tambahkan sebelum app.listen()
+app.get("/api/network-test", (req, res) => {
+  const clientIP = req.ip || req.connection.remoteAddress;
+  console.log("Client connected from:", clientIP);
+  res.json({
+    success: true,
+    message: "Connected successfully",
+    serverTime: new Date().toISOString(),
+    clientIP: clientIP,
+    serverIP: getLocalIP(),
+  });
+});
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log("🚀 Server berjalan di:");
   console.log(`   • Local: http://localhost:${PORT}`);
   console.log(`   • Network: http://${getLocalIP()}:${PORT}`);
 });
 
-// Tambahkan fungsi untuk mendapatkan IP lokal
+// Ganti fungsi getLocalIP() dengan ini:
 function getLocalIP() {
   const interfaces = os.networkInterfaces();
+
+  // Prioritaskan WiFi/WLAN adapter
+  const preferredAdapters = ["Wi-Fi", "wlan", "eth", "en", "Ethernet"];
+
+  for (const name of Object.keys(interfaces)) {
+    // Cek apakah ini adapter yang kita inginkan (WiFi)
+    const isPreferred = preferredAdapters.some((adapter) =>
+      name.toLowerCase().includes(adapter.toLowerCase())
+    );
+
+    if (isPreferred) {
+      for (const iface of interfaces[name]) {
+        if (iface.family === "IPv4" && !iface.internal) {
+          // Filter untuk IP di jaringan lokal
+          if (iface.address.startsWith("192.168.1.")) {
+            return iface.address;
+          }
+        }
+      }
+    }
+  }
+
+  // Fallback: ambil IP non-internal pertama yang ditemukan
   for (const name of Object.keys(interfaces)) {
     for (const iface of interfaces[name]) {
       if (iface.family === "IPv4" && !iface.internal) {
@@ -187,5 +226,6 @@ function getLocalIP() {
       }
     }
   }
+
   return "localhost";
 }

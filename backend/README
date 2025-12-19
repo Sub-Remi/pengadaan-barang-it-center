@@ -17,6 +17,7 @@
    A. Yang Diperlukan:
    ✅ Komputer/laptop dengan Windows 10/11
    ✅ Koneksi internet
+   ✅ Text editor (paling rekomended: Visual Studio Code)
    ✅ Waktu luang sekitar 1-2 jam
    ✅ Minuman hangat ☕ (opsional tapi recommended!)
    B. Persiapan Folder:
@@ -55,40 +56,51 @@
 4. DOWNLOAD FILE BACKEND📂
    A. Unduh File Backend:
       1. Buka browser
-      2. Kunjungi repository GitHub proyek: https://github.com/Sub-Remi/pengadaan-barang-it-center.git
+      2. Kunjungi repository GitHub aplikasi: https://github.com/Sub-Remi/pengadaan-barang-it-center.git
       3. Klik tombol "Code" dan pilih "Download ZIP"
    B. Ekstrak File:
       1. Buka folder tempat file ZIP diunduh
       2. Klik kanan pada file ZIP dan pilih "Extract All..."
-      3. Rename folder hasil ekstrak menjadi "backend"
+      3. Rename folder hasil ekstrak menjadi "web pengadaan_itcenter"
 
 5. SETUP DATABASE🗃️
    A. Buka MySQL Workbench
    B. Buat Database Baru:
       1. masukkan password mysql anda
-      2. cari file database_pengadaan_itcenter.sql di dalam folder backend yang sudah diekstrak
-      3. buka file tersebut dengan mysql workbench
+      2. Buat database baru
+      3. cari file pengadaan_barang_revisi.sql di dalam folder backend yang sudah diekstrak
+      3. copy isi dari file pengadaan_barang_revisi.sql lalu paste di query editor mysql workbench
       4. klik icon petir (execute) untuk menjalankan script sql tersebut
    C. Verifikasi Database:
       1. Setelah script dijalankan, refresh schema di MySQL Workbench
-      2. Pastikan database "database_pengadaan_itcenter" muncul di daftar schema di bagian kiri
+      2. Pastikan database yang sudah dibuaty muncul di daftar schema di bagian kiri
 6. SETUP APLIKASI⚙️
    A. Buka Folder Backend:
       1. Buka Command Prompt
       2. Arahkan ke folder backend yang sudah diekstrak dengan perintah:
-         cd path\to\PROYEK_PENGADAAN\backend
+         cd path\to\web pengadaan_itcenter\backend
    B. Install Dependencies:
       1. Di Command Prompt, ketik perintah:
          npm install
 7. SETUP FILE ENVIRONMENT (.env)🔧
-   A. Cari File .env:
-      1. Di dalam folder backend, cari file baru dengan nama ".env"
+   A. Buat File .env:
+      1. Di dalam folder backend, buat file baru dengan nama ".env"
    B. Isi File .env:
-      1. Buka file .env dengan text editor (Notepad, VSCode)
-      2. Tambahkan konfigurasi berikut (sesuaikan dengan pengaturan MySQL Anda):
-         DB_HOST=localhost
-         DB_USER=root
-         DB_PASSWORD=your_mysql_password
-         DB_NAME=database_pengadaan_itcenter 
-
-dan seterusnya, masih mo lanjut dan revisi
+      1. Untuk isi dari file .env, lihat contoh di file .env_example
+      2. Sesuaikan konfigurasi database sesuai dengan setup MySQL Anda (username, password, database name, dll)
+8. KONFIGURASI SERVER🖥️
+   A. Buka File server.js:
+      1. Di dalam folder backend, buka file "server.js" menggunakan text editor (misalnya VSCode atau Notepad++)
+      2. Cari bagian konfigurasi CORS (biasanya di bagian atas file)
+   B. Sesuaikan Origin:
+      1. Pastikan origin yang diizinkan sesuai dengan alamat frontend dan backend Anda
+      2. Contoh:
+         const allowedOrigins = [
+           "http://localhost:3000", // alamat frontend
+           "http://localhost:3200", // alamat backend
+           "https://pengadaan-barang-it-center.vercel.app",
+         ];
+      3. Cari baris yang tertulis:  
+         if (origin.startsWith("http://192.168.1."))...  Sekitar baris 63
+         if (iface.address.startsWith("192.168.1."))...  Sekitar baris 213
+      4. Ubah "192.168.1." sesuai dengan subnet jaringan lokal Anda
