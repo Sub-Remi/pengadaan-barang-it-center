@@ -1,14 +1,16 @@
 "use client";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { FaEye } from "react-icons/fa";
+import { FaEye, FaSync } from "react-icons/fa";
 import adminPermintaanService from "../../../lib/adminPermintaanService";
+
 
 export default function RiwayatGAPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [divisiFilter, setDivisiFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState(""); // Tetap ada untuk filter
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [divisiList, setDivisiList] = useState([]);
@@ -42,32 +44,44 @@ export default function RiwayatGAPage() {
     }
   };
 
-  // Fetch data riwayat permintaan
-  const fetchPermintaanRiwayat = async (page = 1, filters = {}) => {
-    try {
-      setLoading(true);
-      
-      // Gunakan fungsi baru untuk riwayat
-      const result = await adminPermintaanService.getPermintaanRiwayat(
-        page,
-        pagination.itemsPerPage,
-        filters,
-        sortOrder
-      );
 
-      console.log("📊 Riwayat data fetched:", result.data);
-      
-      setData(result.data);
-      setPagination(result.pagination);
-    } catch (error) {
-      console.error("Error fetching riwayat:", error);
-      alert(
-        error.response?.data?.error || "Terjadi kesalahan saat mengambil data riwayat"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+// fetchRiwayatPermintaan - Gunakan service yang sudah diperbaiki
+const fetchRiwayatPermintaan = async (page = 1, filters = {}) => {
+  try {
+    setLoading(true);
+    
+    // Gunakan fungsi khusus riwayat
+    const result = await adminPermintaanService.getPermintaanRiwayat(
+      page,
+      pagination.itemsPerPage,
+      {
+        search: filters.search,
+        divisi_id: filters.divisi_id,
+        start_date: filters.start_date,
+        end_date: filters.end_date,
+      },
+      sortOrder
+    );
+
+    console.log("📊 Riwayat data fetched:", result.data);
+    console.log("📊 Total items:", result.pagination?.totalItems);
+    
+    setData(result.data);
+    setPagination(result.pagination || {
+      currentPage: page,
+      totalPages: 1,
+      totalItems: result.data.length,
+      itemsPerPage: pagination.itemsPerPage,
+    });
+  } catch (error) {
+    console.error("Error fetching riwayat:", error);
+    alert(
+      error.response?.data?.error || "Terjadi kesalahan saat mengambil data riwayat"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Handle search
   const handleSearch = (e) => {
@@ -76,7 +90,7 @@ export default function RiwayatGAPage() {
 
     // Debounce search
     const timeoutId = setTimeout(() => {
-      fetchPermintaanRiwayat(1, {
+      fetchRiwayatPermintaan(1, {
         search: value,
         divisi_id: divisiFilter,
         start_date: startDate,
@@ -89,7 +103,7 @@ export default function RiwayatGAPage() {
 
   // Handle filter
   const handleFilter = () => {
-    fetchPermintaanRiwayat(1, {
+    fetchRiwayatPermintaan(1, {
       search,
       divisi_id: divisiFilter,
       start_date: startDate,
@@ -104,16 +118,30 @@ export default function RiwayatGAPage() {
     setStartDate("");
     setEndDate("");
     setSortOrder("terbaru");
-    fetchPermintaanRiwayat(1, {});
+    setStatusFilter(""); // Reset status filter
+    fetchRiwayatPermintaan(1, {});
   };
 
   // Handle sort change
   const handleSortChange = (e) => {
     const newSortOrder = e.target.value;
     setSortOrder(newSortOrder);
-    fetchPermintaanRiwayat(1, {
+    fetchRiwayatPermintaan(1, {
       search,
       divisi_id: divisiFilter,
+      start_date: startDate,
+      end_date: endDate,
+    });
+  };
+
+  // Handle status filter change
+  const handleStatusFilterChange = (e) => {
+    const value = e.target.value;
+    setStatusFilter(value);
+    fetchRiwayatPermintaan(1, {
+      search,
+      divisi_id: divisiFilter,
+      status: value,
       start_date: startDate,
       end_date: endDate,
     });
@@ -122,7 +150,17 @@ export default function RiwayatGAPage() {
   // Handle pagination
   const handlePageChange = (page) => {
     if (page < 1 || page > pagination.totalPages) return;
-    fetchPermintaanRiwayat(page, {
+    fetchRiwayatPermintaan(page, {
+      search,
+      divisi_id: divisiFilter,
+      start_date: startDate,
+      end_date: endDate,
+    });
+  };
+
+  // Handle refresh
+  const handleRefresh = () => {
+    fetchRiwayatPermintaan(pagination.currentPage, {
       search,
       divisi_id: divisiFilter,
       start_date: startDate,
@@ -165,306 +203,422 @@ export default function RiwayatGAPage() {
     });
   };
 
+  // Format jumlah barang
+  const formatJumlahBarang = (jumlah) => {
+    if (!jumlah || jumlah === 0) return "0";
+    return `${jumlah} jenis barang`;
+  };
+
   // Initial fetch
   useEffect(() => {
-    fetchPermintaanRiwayat();
+    fetchRiwayatPermintaan();
     fetchDivisi();
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen font-poppins bg-gray-100">
-      {/* Header */}
-      <header className="flex bg-white shadow-sm items-center">
-        <div className="bg-white w-60 h-20 flex items-center justify-center border-r border-white">
+    <div className="flex flex-col h-screen font-poppins bg-gray-100">
+      {/* Header - Tetap fixed di atas */}
+      <header className="fixed top-0 left-0 right-0 z-50 flex bg-white shadow-sm items-center h-16">
+        <div className="bg-white w-60 h-16 flex items-center justify-center border-r border-gray-200">
           <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
+        </div>
+        <div className="flex-1 h-16 flex items-center px-8">
+          <button
+            onClick={handleRefresh}
+            className="ml-auto flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded text-sm"
+          >
+            <FaSync className={loading ? "animate-spin" : ""} />
+            Refresh
+          </button>
         </div>
       </header>
 
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <aside className="w-60 bg-blue-900 text-white flex flex-col text-2x1">
-          <nav className="flex-1 mt-6">
-            <ul className="space-y-1">
-              <Link href="/GA/dashboard_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">Dashboard</li>
-              </Link>
+      <div className="flex flex-1 overflow-hidden pt-16">
+        {/* Sidebar - Fixed dengan tinggi yang tepat dan scrollable */}
+        <aside className="w-60 bg-blue-900 text-white flex flex-col fixed left-0 top-16 bottom-0">
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <style jsx>{`
+              .custom-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: #3b82f6 #1e3a8a;
+              }
+              .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+              }
+              .custom-scrollbar::-webkit-scrollbar-track {
+                background: #1e3a8a;
+                border-radius: 4px;
+              }
+              .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: #3b82f6;
+                border-radius: 4px;
+                border: 2px solid #1e3a8a;
+              }
+              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background-color: #60a5fa;
+              }
+            `}</style>
 
-              <hr className="border-t border-white/30 my-2" />
+            <nav className="p-2">
+              <ul className="space-y-1">
+                <Link href="/GA/dashboard_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Dashboard
+                  </li>
+                </Link>
 
-              {/* DATA MASTER */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                DATA MASTER
-              </li>
+                <hr className="border-t border-white/30 my-2" />
 
-              <Link href="/GA/data_permintaan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Permintaan
+                {/* DATA MASTER */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  DATA MASTER
                 </li>
-              </Link>
 
-              <Link href="/GA/data_barang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Barang
+                <Link href="/GA/data_permintaan">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Permintaan
+                  </li>
+                </Link>
+
+                <Link href="/GA/data_barang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Barang
+                  </li>
+                </Link>
+
+                <Link href="/GA/data_kategoribarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Kategori Barang
+                  </li>
+                </Link>
+
+                <Link href="/GA/data_satuanbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Satuan Barang
+                  </li>
+                </Link>
+
+                <Link href="/GA/data_stokbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Stok Barang
+                  </li>
+                </Link>
+
+                <Link href="/GA/data_divisi">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Divisi
+                  </li>
+                </Link>
+
+                <Link href="/GA/manajemen_user">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Manajemen User
+                  </li>
+                </Link>
+
+                <hr className="border-t border-white/30 my-2" />
+
+                {/* MONITORING */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  MONITORING
                 </li>
-              </Link>
 
-              <Link href="/GA/data_kategoribarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Kategori Barang
+                <Link href="/GA/laporan_ga">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Laporan
+                  </li>
+                </Link>
+
+                <Link href="/GA/riwayat_ga">
+                  <li className="bg-blue-500 px-5 py-2 cursor-pointer rounded">
+                    Riwayat
+                  </li>
+                </Link>
+
+                <hr className="border-t border-white/30 my-2" />
+
+                {/* PEMESANAN */}
+                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  PEMESANAN
                 </li>
-              </Link>
 
-              <Link href="/GA/data_satuanbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Satuan Barang
-                </li>
-              </Link>
+                <Link href="/GA/list_pemesanan">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    List Pemesanan
+                  </li>
+                </Link>
 
-              <Link href="/GA/data_stokbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Stok Barang
-                </li>
-              </Link>
-
-              <Link href="/GA/data_divisi">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Divisi
-                </li>
-              </Link>
-
-              <Link href="/GA/manajemen_user">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Manajemen User
-                </li>
-              </Link>
-
-              <hr className="border-t border-white/30 my-2" />
-
-              {/* MONITORING */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                MONITORING
-              </li>
-
-              <Link href="/GA/laporan_ga">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Laporan
-                </li>
-              </Link>
-
-              <Link href="/GA/riwayat_ga">
-                <li className="bg-blue-500 px-5 py-2 cursor-pointer">
-                  Riwayat
-                </li>
-              </Link>
-
-              <hr className="border-t border-white/30 my-2" />
-
-              {/* PEMESANAN */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                PEMESANAN
-              </li>
-
-              <Link href="/GA/list_pemesanan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  List Pemesanan
-                </li>
-              </Link>
-
-              <Link href="/GA/form_penerimaanbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Form Penerimaan
-                </li>
-              </Link>
-            </ul>
-          </nav>
+                <Link href="/GA/form_penerimaanbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Form Penerimaan
+                  </li>
+                </Link>
+              </ul>
+            </nav>
+          </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 p-8 bg-gray-200">
-          <h2 className="text-3xl font-semibold mb-6">Riwayat</h2>
+        {/* Main Content - Scrollable dengan padding yang lebih baik */}
+        <main className="flex-1 text-black p-6 bg-gray-200 overflow-y-auto ml-60">
+          {/* Fixed header untuk judul halaman */}
+          <div className="bg-gray-200 mb-6">
+            <h2 className="text-3xl text-black font-semibold">Riwayat Permintaan</h2>
+            <p className="text-gray-600 text-sm mt-1">
+              Menampilkan permintaan dengan status Selesai dan Ditolak
+            </p>
+          </div>
 
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            {/* Header atas */}
-            <div className="flex justify-between items-center px-6 py-5 border-b">
+          {/* Card container */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+            {/* Header atas card */}
+            <div className="flex justify-between items-center px-6 py-4 border-b">
               <h3 className="text-xl font-semibold text-teal-600">
-                Riwayat Permintaan (Selesai & Ditolak)
+                Riwayat Permintaan
               </h3>
             </div>
 
-            {/* Filter dan tombol Excel/PDF */}
-            <div className="flex flex-col gap-4 px-6 py-4 border-b bg-white">
-              <div className="flex flex-wrap items-center gap-3">
-                <label htmlFor="search" className="text-gray-700 font-medium">
-                  Search
-                </label>
-                <input
-                  id="search"
-                  type="text"
-                  value={search}
-                  onChange={handleSearch}
-                  placeholder="Cari ID PB atau nama pemohon..."
-                  className="border border-gray-300 rounded px-2 py-1 text-sm"
-                />
+            {/* Filter section */}
+            <div className="px-6 py-4 border-b bg-white">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
+                {/* Search */}
+                <div>
+                  <label htmlFor="search" className="block font-medium text-sm mb-1">
+                    Search
+                  </label>
+                  <input
+                    id="search"
+                    type="text"
+                    value={search}
+                    onChange={handleSearch}
+                    placeholder="Cari ID PB atau nama..."
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
+                  />
+                </div>
 
-                <label className="font-medium text-gray-700">Divisi</label>
-                <select
-                  value={divisiFilter}
-                  onChange={(e) => setDivisiFilter(e.target.value)}
-                  className="border border-gray-300 rounded px-2 py-1 text-sm"
-                >
-                  <option value="">Semua Divisi</option>
-                  {divisiList.map((divisi) => (
-                    <option key={divisi.id} value={divisi.id}>
-                      {divisi.nama_divisi}
-                    </option>
-                  ))}
-                </select>
+                {/* Filter Status - Opsional untuk memfilter lebih spesifik */}
+                <div>
+                  <label htmlFor="status" className="block font-medium text-sm text-gray-700 mb-1">
+                    Status
+                  </label>
+                  <select
+                    id="status"
+                    value={statusFilter}
+                    onChange={handleStatusFilterChange}
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
+                  >
+                    <option value="">Semua Status (Selesai & Ditolak)</option>
+                    <option value="selesai">Selesai</option>
+                    <option value="ditolak">Ditolak</option>
+                  </select>
+                </div>
 
-                <label className="font-medium text-gray-700">Urutkan</label>
-                <select
-                  value={sortOrder}
-                  onChange={handleSortChange}
-                  className="border border-gray-300 rounded px-2 py-1 text-sm"
-                >
-                  <option value="terbaru">Terbaru</option>
-                  <option value="terlama">Terlama</option>
-                </select>
+                {/* Filter Divisi */}
+                <div>
+                  <label htmlFor="divisi" className="block font-medium text-sm text-gray-700 mb-1">
+                    Divisi
+                  </label>
+                  <select
+                    id="divisi"
+                    value={divisiFilter}
+                    onChange={(e) => setDivisiFilter(e.target.value)}
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
+                  >
+                    <option value="">Semua Divisi</option>
+                    {divisiList.map((divisi) => (
+                      <option key={divisi.id} value={divisi.id}>
+                        {divisi.nama_divisi}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-                <label className="font-medium text-gray-700">Dari Tanggal</label>
-                <input 
-                  type="date" 
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="border border-gray-300 rounded px-2 py-1 text-sm" 
-                />
+                {/* Sort Order */}
+                <div>
+                  <label htmlFor="sort" className="block font-medium text-sm text-gray-700 mb-1">
+                    Urutkan
+                  </label>
+                  <select
+                    id="sort"
+                    value={sortOrder}
+                    onChange={handleSortChange}
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
+                  >
+                    <option value="terbaru">Terbaru</option>
+                    <option value="terlama">Terlama</option>
+                  </select>
+                </div>
 
-                <label className="font-medium text-gray-700">Sampai Tanggal</label>
-                <input 
-                  type="date" 
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="border border-gray-300 rounded px-2 py-1 text-sm" 
-                />
+                {/* Date Range Filter */}
+                <div>
+                  <label className="block font-medium text-sm text-gray-700 mb-1">
+                    Dari Tanggal
+                  </label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
+                  />
+                </div>
 
-                <button
-                  onClick={handleFilter}
-                  className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-1 rounded text-sm"
-                >
-                  Filter
-                </button>
-                <button
-                  onClick={handleResetFilter}
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-4 py-1 rounded text-sm"
-                >
-                  Reset
-                </button>
+                <div>
+                  <label className="block font-medium text-sm text-gray-700 mb-1">
+                    Sampai Tanggal
+                  </label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
+                  />
+                </div>
               </div>
 
-              <div className="flex justify-end gap-2">
-                <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded text-sm">
-                  Excel
-                </button>
-                <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded text-sm">
-                  PDF
-                </button>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-start-3">
+                  <div className="flex gap-2 items-end">
+                    <button
+                      onClick={handleFilter}
+                      className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded w-full text-sm"
+                    >
+                      Terapkan Filter
+                    </button>
+                    <button
+                      onClick={handleResetFilter}
+                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-4 py-2 rounded w-full text-sm"
+                    >
+                      Reset Filter
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Tabel */}
-            {loading ? (
-              <div className="px-6 py-8 text-center">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-600"></div>
-                <p className="mt-2 text-gray-600">Memuat data riwayat...</p>
-              </div>
-            ) : (
-              <>
-                <table className="w-full border-collapse text-sm">
-                  <thead>
-                    <tr className="bg-white text-left border-b">
-                      <th className="px-6 py-3 font-semibold">No</th>
-                      <th className="px-6 py-3 font-semibold">ID PB</th>
-                      <th className="px-6 py-3 font-semibold">Divisi</th>
-                      <th className="px-6 py-3 font-semibold">Nama Pemohon</th>
-                      <th className="px-6 py-3 font-semibold">Tanggal</th>
-                      <th className="px-6 py-3 font-semibold">Status</th>
-                      <th className="px-6 py-3 font-semibold text-center">Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.map((row, index) => (
-                      <tr
-                        key={index}
-                        className={`${
-                          index % 2 === 0 ? "bg-gray-100" : "bg-white"
-                        }`}
-                      >
-                        <td className="px-6 py-3">
-                          {(pagination.currentPage - 1) * pagination.itemsPerPage + index + 1}
-                        </td>
-                        <td className="px-6 py-3 font-medium">
-                          {row.nomor_permintaan || `PB-${row.id}`}
-                        </td>
-                        <td className="px-6 py-3">
-                          {row.nama_divisi || "-"}
-                        </td>
-                        <td className="px-6 py-3">
-                          {row.nama_lengkap || "-"}
-                        </td>
-                        <td className="px-6 py-3">
-                          {formatDate(row.created_at)}
-                        </td>
-                        <td className="px-6 py-3">
-                          <span
-                            className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
-                              row.status
-                            )}`}
-                          >
-                            {getStatusText(row.status)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-3 text-center">
-                          <Link href={`/GA/detail_riwayatga?id=${row.id}`}>
-                            <button 
-                              className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded"
-                              title="Lihat Detail"
+            {/* Tabel - Container dengan overflow untuk tabel panjang */}
+            <div className="overflow-x-auto">
+              {loading ? (
+                <div className="px-6 py-8 text-center">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-600"></div>
+                  <p className="mt-2 text-gray-600">Memuat data riwayat...</p>
+                </div>
+              ) : (
+                <>
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 text-left">
+                        <th className="px-4 py-3 font-semibold text-sm">No</th>
+                        <th className="px-4 py-3 font-semibold text-sm">
+                          ID PB
+                        </th>
+                        <th className="px-4 py-3 font-semibold text-sm">
+                          Divisi
+                        </th>
+                        <th className="px-4 py-3 font-semibold text-sm">
+                          Nama Pemohon
+                        </th>
+                        <th className="px-4 py-3 font-semibold text-sm">
+                          Jumlah Barang
+                        </th>
+                        <th className="px-4 py-3 font-semibold text-sm">
+                          Tanggal Permintaan
+                        </th>
+                        <th className="px-4 py-3 font-semibold text-sm">
+                          Status
+                        </th>
+                        <th className="px-4 py-3 font-semibold text-sm text-center">
+                          Aksi
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.map((row, index) => (
+                        <tr
+                          key={row.id}
+                          className={
+                            index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                          }
+                        >
+                          <td className="px-4 py-3 text-sm">
+                            {(pagination.currentPage - 1) *
+                              pagination.itemsPerPage +
+                              index +
+                              1}
+                          </td>
+                          <td className="px-4 py-3 text-sm font-medium">
+                            {row.nomor_permintaan || `PB-${row.id}`}
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            {row.nama_divisi || "-"}
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            {row.nama_lengkap || "-"}
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            {formatJumlahBarang(row.jumlah_barang)}
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            {formatDate(row.created_at)}
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                                row.status
+                              )}`}
                             >
-                              <FaEye />
-                            </button>
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                    {data.length === 0 && (
-                      <tr>
-                        <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
-                          Tidak ada data riwayat permintaan
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                              {getStatusText(row.status)}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <div className="flex justify-center space-x-2">
+                              <Link href={`/GA/detail_riwayatga?id=${row.id}`}>
+                                <button
+                                  className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded text-sm"
+                                  title="Lihat Detail"
+                                >
+                                  <FaEye size={14} />
+                                </button>
+                              </Link>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {data.length === 0 && (
+                        <tr>
+                          <td
+                            colSpan="8"
+                            className="px-6 py-8 text-center text-gray-500"
+                          >
+                            Tidak ada data riwayat permintaan
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
 
-                {/* Pagination */}
-                {data.length > 0 && (
+                  {/* Pagination */}
                   <div className="flex justify-between items-center px-6 py-4 bg-white border-t">
                     <div className="text-sm text-gray-600">
-                      Menampilkan {data.length} dari {pagination.totalItems} data
+                      Menampilkan {data.length} dari {pagination.totalItems}{" "}
+                      data riwayat
                     </div>
                     <div className="inline-flex text-sm border rounded-md overflow-hidden">
                       <button
-                        onClick={() => handlePageChange(pagination.currentPage - 1)}
+                        onClick={() =>
+                          handlePageChange(pagination.currentPage - 1)
+                        }
                         disabled={pagination.currentPage === 1}
-                        className={`px-3 py-1 ${
+                        className={`px-3 py-1 border-r text-sm ${
                           pagination.currentPage === 1
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : "bg-white hover:bg-gray-100"
-                        } border-r`}
+                        }`}
                       >
                         Previous
                       </button>
-                      
+
                       {[...Array(pagination.totalPages)].map((_, i) => {
                         const pageNum = i + 1;
+                        // Show only current page, first, last, and neighbors
                         if (
                           pageNum === 1 ||
                           pageNum === pagination.totalPages ||
@@ -475,7 +629,7 @@ export default function RiwayatGAPage() {
                             <button
                               key={pageNum}
                               onClick={() => handlePageChange(pageNum)}
-                              className={`px-3 py-1 border-r ${
+                              className={`px-3 py-1 border-r text-sm ${
                                 pageNum === pagination.currentPage
                                   ? "bg-teal-600 text-white"
                                   : "bg-white hover:bg-gray-100"
@@ -487,11 +641,15 @@ export default function RiwayatGAPage() {
                         }
                         return null;
                       })}
-                      
+
                       <button
-                        onClick={() => handlePageChange(pagination.currentPage + 1)}
-                        disabled={pagination.currentPage === pagination.totalPages}
-                        className={`px-3 py-1 ${
+                        onClick={() =>
+                          handlePageChange(pagination.currentPage + 1)
+                        }
+                        disabled={
+                          pagination.currentPage === pagination.totalPages
+                        }
+                        className={`px-3 py-1 text-sm ${
                           pagination.currentPage === pagination.totalPages
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : "bg-white hover:bg-gray-100"
@@ -501,9 +659,9 @@ export default function RiwayatGAPage() {
                       </button>
                     </div>
                   </div>
-                )}
-              </>
-            )}
+                </>
+              )}
+            </div>
 
             {/* Garis bawah hijau */}
             <div className="h-1 bg-teal-600 w-full"></div>

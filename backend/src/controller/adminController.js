@@ -377,6 +377,48 @@ const getFinanceDashboardStats = async (req, res) => {
   }
 };
 
+// adminController.js - Tambahkan fungsi ini
+export const getRiwayatPermintaan = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const sort = req.query.sort || "terbaru";
+
+    // Filters khusus untuk riwayat (hanya selesai dan ditolak)
+    const filters = {
+      status: "selesai,ditolak", // Hardcode untuk riwayat
+      divisi_id: req.query.divisi_id,
+      start_date: req.query.start_date,
+      end_date: req.query.end_date,
+      search: req.query.search,
+    };
+
+    console.log("📋 Admin getting riwayat permintaan with filters:", filters);
+
+    // Gunakan fungsi yang sama tapi dengan status multiple
+    const result = await Permintaan.findAllRiwayatWithFilters(
+      filters,
+      page,
+      limit,
+      sort
+    );
+
+    res.json({
+      message: "Daftar riwayat permintaan berhasil diambil.",
+      data: result.data,
+      pagination: {
+        currentPage: result.page,
+        totalPages: result.totalPages,
+        totalItems: result.total,
+        itemsPerPage: result.limit,
+      },
+    });
+  } catch (error) {
+    console.error("💥 Get riwayat permintaan error:", error);
+    res.status(500).json({ error: "Terjadi kesalahan server." });
+  }
+};
+
 export default {
   getAllPermintaan,
   getPermintaanDetail,

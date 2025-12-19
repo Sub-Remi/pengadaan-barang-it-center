@@ -28,7 +28,7 @@ export default function LaporanGAPage() {
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
-    itemsPerPage: 10,
+    itemsPerPage: 5,
   });
 
   // Fetch data divisi untuk dropdown
@@ -443,7 +443,7 @@ export default function LaporanGAPage() {
                     type="date"
                     value={filters.start_date}
                     onChange={(e) => handleFilterChange("start_date", e.target.value)}
-                    className="border border-gray-300 rounded px-3 py-2 w-full text-x1"
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-xs"
                   />
                 </div>
 
@@ -456,7 +456,7 @@ export default function LaporanGAPage() {
                     type="date"
                     value={filters.end_date}
                     onChange={(e) => handleFilterChange("end_date", e.target.value)}
-                    className="border border-gray-300 rounded px-3 py-2 w-full text-x1"
+                    className="border border-gray-300 rounded px-3 py-2 w-full text-xs"
                   />
                 </div>
 

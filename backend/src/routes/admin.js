@@ -7,6 +7,7 @@ import {
   updatePermintaanStatus,
   updateBarangStatus,
   createPenerimaanBarang,
+  getRiwayatPermintaan, // ✅ TAMBAHKAN INI
 } from "../controller/adminController.js";
 import {
   getAllStok,
@@ -72,6 +73,9 @@ import {
   handleUploadError,
 } from "../middleware/upload.js";
 
+// ✅ IMPORT DATABASE POOL
+import dbPool from "../config/database.js"; // TAMBAHKAN INI
+
 const router = express.Router();
 
 // All routes require admin role
@@ -83,14 +87,15 @@ router.get("/permintaan/:id", getPermintaanDetail);
 router.put("/permintaan/:id/status", updatePermintaanStatus);
 router.put("/barang/:id/status", updateBarangStatus);
 
+// ✅ TAMBAHKAN ROUTE RIWAYAT
+router.get("/permintaan/riwayat", getRiwayatPermintaan);
+
 // ===== PENERIMAAN BARANG =====
 router.post(
   "/penerimaan-barang",
   uploadBuktiPenerimaan.single("foto_bukti"),
   createPenerimaanBarang
 );
-
-
 
 // ===== STOK MANAGEMENT =====
 router.get("/stok", getAllStok);
@@ -226,8 +231,6 @@ router.put("/stok/:id", authenticate, requireAdmin, updateStok);
 router.put("/stok/:id/tambah", authenticate, requireAdmin, tambahStok);
 router.delete("/stok/:id", authenticate, requireAdmin, deleteStok);
 
-// Di file admin.js, tambahkan routes untuk Data Barang:
-
 // ===== DATA BARANG =====
 // Get all barang untuk halaman Data Barang
 router.get("/barang", authenticate, requireAdmin, getAllBarang);
@@ -253,7 +256,7 @@ router.get("/pemesanan", authenticate, requireAdmin, getAllPemesananForAdmin);
 router.get("/pemesanan/:id", authenticate, requireAdmin, getPemesananDetail);
 
 // Temporary endpoint for pemesanan
-router.get("/pemesanan", authenticate, requireAdmin, async (req, res) => {
+router.get("/pemesanan-temp", authenticate, requireAdmin, async (req, res) => { // ✅ UBAH NAMA ROUTE UNTUK HINDARI DUPLIKASI
   try {
     console.log("📋 Admin getting pemesanan");
 
@@ -278,7 +281,12 @@ router.get("/pemesanan", authenticate, requireAdmin, async (req, res) => {
 
 // ===== LAPORAN & EXPORT =====
 router.get("/permintaan/laporan", authenticate, requireAdmin, getLaporan);
-router.get("/permintaan/statistik", authenticate, requireAdmin,async (req, res) => {
+
+// ✅ PERBAIKI ROUTE STATISTIK - HAPUS FUNGSI INLINE YANG DUPLIKAT
+router.get("/permintaan/statistik", authenticate, requireAdmin, getStatistik);
+
+// ✅ PERBAIKI FUNGSI STATISTIK INLINE JIKA PERLU (ATAU HAPUS JIKA SUDAH ADA DI CONTROLLER)
+router.get("/permintaan/statistik-inline", authenticate, requireAdmin, async (req, res) => {
   try {
     const filters = {
       status: req.query.status || "",
@@ -345,6 +353,11 @@ router.get("/permintaan/statistik", authenticate, requireAdmin,async (req, res) 
     });
   }
 });
+
+// Di file routes/admin.js - Tambahkan route ini
+router.get("/permintaan/riwayat", getRiwayatPermintaan);
+
 router.get("/permintaan/export/excel", authenticate, requireAdmin, exportExcel);
 router.get("/permintaan/export/pdf", authenticate, requireAdmin, exportPDF);
+
 export default router;
