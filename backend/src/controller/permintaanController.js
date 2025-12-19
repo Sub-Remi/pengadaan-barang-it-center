@@ -73,10 +73,16 @@ export const getPermintaanByUser = async (req, res) => {
     );
 
     // ✅ Format data untuk frontend
-    const formattedData = result.data.map((item) => ({
-      ...item,
-      jumlah_item: item.jumlah_barang || 0, // Jumlah jenis barang
-    }));
+    const formattedData = result.data.map((item) => {
+      // Pastikan jumlah_item ada nilainya
+      const jumlahItem = parseInt(item.jumlah_item) || 0;
+
+      return {
+        ...item,
+        jumlah_item: jumlahItem,
+        jumlah_item_barang: jumlahItem, // Juga tambahkan untuk kompatibilitas
+      };
+    });
 
     res.json({
       message: "Daftar permintaan berhasil diambil.",

@@ -115,21 +115,21 @@ const Permintaan = {
       sort,
     });
 
-  let query = `
-    SELECT 
-      p.*, 
-      u.nama_lengkap, 
-      u.email,
-      u.divisi_id,
-      d.nama_divisi,  -- INI YANG PENTING
-      (SELECT COUNT(*) 
-       FROM barang_permintaan bp 
-       WHERE bp.permintaan_id = p.id) as jumlah_item
-    FROM permintaan p 
-    JOIN users u ON p.user_id = u.id 
-    JOIN divisi d ON u.divisi_id = d.id  -- PASTIKAN JOIN KE DIVISI
-    WHERE p.user_id = ?
-  `;
+    let query = `
+  SELECT 
+    p.*, 
+    u.nama_lengkap, 
+    u.email,
+    u.divisi_id,
+    d.nama_divisi,
+    (SELECT COUNT(*) 
+     FROM barang_permintaan bp 
+     WHERE bp.permintaan_id = p.id) as jumlah_item
+  FROM permintaan p 
+  JOIN users u ON p.user_id = u.id 
+  JOIN divisi d ON u.divisi_id = d.id 
+  WHERE p.user_id = ?
+`;
 
     let countQuery = `
     SELECT COUNT(*) as total 
@@ -159,26 +159,32 @@ const Permintaan = {
     }
 
     // Search by nomor permintaan atau nama barang
+    // Di file models/permintaan.js, dalam fungsi findByUserIdWithPagination:
+
+    // Search by nomor permintaan, catatan (judul), atau nama barang
+    // Search by nomor permintaan, judul (catatan), atau nama barang
     if (filters.search) {
       query += ` AND (
-      p.nomor_permintaan LIKE ? OR 
-      p.id IN (
-        SELECT DISTINCT bp.permintaan_id 
-        FROM barang_permintaan bp 
-        WHERE bp.nama_barang LIKE ? OR bp.kategori_barang LIKE ?
-      )
-    )`;
+    p.nomor_permintaan LIKE ? OR 
+    p.catatan LIKE ? OR
+    p.id IN (
+      SELECT DISTINCT bp.permintaan_id 
+      FROM barang_permintaan bp 
+      WHERE bp.nama_barang LIKE ? OR bp.kategori_barang LIKE ?
+    )
+  )`;
       countQuery += ` AND (
-      p.nomor_permintaan LIKE ? OR 
-      p.id IN (
-        SELECT DISTINCT bp.permintaan_id 
-        FROM barang_permintaan bp 
-        WHERE bp.nama_barang LIKE ? OR bp.kategori_barang LIKE ?
-      )
-    )`;
+    p.nomor_permintaan LIKE ? OR 
+    p.catatan LIKE ? OR
+    p.id IN (
+      SELECT DISTINCT bp.permintaan_id 
+      FROM barang_permintaan bp 
+      WHERE bp.nama_barang LIKE ? OR bp.kategori_barang LIKE ?
+    )
+  )`;
       const searchTerm = `%${filters.search}%`;
-      values.push(searchTerm, searchTerm, searchTerm);
-      countValues.push(searchTerm, searchTerm, searchTerm);
+      values.push(searchTerm, searchTerm, searchTerm, searchTerm);
+      countValues.push(searchTerm, searchTerm, searchTerm, searchTerm);
     }
 
     // Filter by date range
@@ -582,24 +588,24 @@ WHERE 1=1
     }
   },
   // permintaan.js - Tambahkan fungsi ini
-findAllRiwayatWithFilters: async (
-  filters = {},
-  page = 1,
-  limit = 10,
-  sort = "terbaru"
-) => {
-  const offset = (page - 1) * limit;
-  const pageNum = parseInt(page);
-  const limitNum = parseInt(limit);
-  const offsetNum = parseInt(offset);
+  findAllRiwayatWithFilters: async (
+    filters = {},
+    page = 1,
+    limit = 10,
+    sort = "terbaru"
+  ) => {
+    const offset = (page - 1) * limit;
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const offsetNum = parseInt(offset);
 
-  // Tentukan order berdasarkan parameter sort
-  let orderBy = "p.created_at DESC"; // default terbaru
-  if (sort === "terlama") {
-    orderBy = "p.created_at ASC";
-  }
+    // Tentukan order berdasarkan parameter sort
+    let orderBy = "p.created_at DESC"; // default terbaru
+    if (sort === "terlama") {
+      orderBy = "p.created_at ASC";
+    }
 
-  let query = `
+    let query = `
     SELECT 
       p.*, 
       u.nama_lengkap, 
@@ -613,84 +619,81 @@ findAllRiwayatWithFilters: async (
     WHERE 1=1
   `;
 
-  let countQuery = `
+    let countQuery = `
     SELECT COUNT(*) as total 
     FROM permintaan p 
     JOIN users u ON p.user_id = u.id 
     WHERE 1=1
   `;
 
-  const values = [];
-  const countValues = [];
+    const values = [];
+    const countValues = [];
 
-  // Untuk riwayat, hanya tampilkan selesai dan ditolak
-  query += " AND p.status IN ('selesai', 'ditolak')";
-  countQuery += " AND p.status IN ('selesai', 'ditolak')";
+    // Untuk riwayat, hanya tampilkan selesai dan ditolak
+    query += " AND p.status IN ('selesai', 'ditolak')";
+    countQuery += " AND p.status IN ('selesai', 'ditolak')";
 
-  // Filter by divisi
-  if (filters.divisi_id) {
-    query += " AND u.divisi_id = ?";
-    countQuery += " AND u.divisi_id = ?";
-    values.push(filters.divisi_id);
-    countValues.push(filters.divisi_id);
-  }
+    // Filter by divisi
+    if (filters.divisi_id) {
+      query += " AND u.divisi_id = ?";
+      countQuery += " AND u.divisi_id = ?";
+      values.push(filters.divisi_id);
+      countValues.push(filters.divisi_id);
+    }
 
-  // Filter by date range
-  if (filters.start_date && filters.end_date) {
-    query += " AND DATE(p.created_at) BETWEEN ? AND ?";
-    countQuery += " AND DATE(p.created_at) BETWEEN ? AND ?";
-    values.push(filters.start_date, filters.end_date);
-    countValues.push(filters.start_date, filters.end_date);
-  }
+    // Filter by date range
+    if (filters.start_date && filters.end_date) {
+      query += " AND DATE(p.created_at) BETWEEN ? AND ?";
+      countQuery += " AND DATE(p.created_at) BETWEEN ? AND ?";
+      values.push(filters.start_date, filters.end_date);
+      countValues.push(filters.start_date, filters.end_date);
+    }
 
-  // Search by nomor permintaan atau nama pemohon
-  if (filters.search) {
-    query += " AND (p.nomor_permintaan LIKE ? OR u.nama_lengkap LIKE ?)";
-    countQuery += " AND (p.nomor_permintaan LIKE ? OR u.nama_lengkap LIKE ?)";
-    const searchTerm = `%${filters.search}%`;
-    values.push(searchTerm, searchTerm);
-    countValues.push(searchTerm, searchTerm);
-  }
+    // Search by nomor permintaan atau nama pemohon
+    if (filters.search) {
+      query += " AND (p.nomor_permintaan LIKE ? OR u.nama_lengkap LIKE ?)";
+      countQuery += " AND (p.nomor_permintaan LIKE ? OR u.nama_lengkap LIKE ?)";
+      const searchTerm = `%${filters.search}%`;
+      values.push(searchTerm, searchTerm);
+      countValues.push(searchTerm, searchTerm);
+    }
 
-  query += ` ORDER BY ${orderBy}`;
-  query += ` LIMIT ${limitNum} OFFSET ${offsetNum}`;
+    query += ` ORDER BY ${orderBy}`;
+    query += ` LIMIT ${limitNum} OFFSET ${offsetNum}`;
 
-  console.log("🔍 Riwayat query:", query);
-  console.log("📊 Riwayat query values:", values);
+    console.log("🔍 Riwayat query:", query);
+    console.log("📊 Riwayat query values:", values);
 
-  try {
-    const [rows] = await dbPool.execute(query, values);
-    const [countRows] = await dbPool.execute(countQuery, countValues);
+    try {
+      const [rows] = await dbPool.execute(query, values);
+      const [countRows] = await dbPool.execute(countQuery, countValues);
 
-    const total = countRows[0].total;
-    const totalPages = Math.ceil(total / limitNum);
+      const total = countRows[0].total;
+      const totalPages = Math.ceil(total / limitNum);
 
-    // Format jumlah_barang untuk memastikan selalu ada nilai
-    const formattedRows = rows.map((row) => ({
-      ...row,
-      jumlah_barang: parseInt(row.jumlah_barang) || 0,
-    }));
+      // Format jumlah_barang untuk memastikan selalu ada nilai
+      const formattedRows = rows.map((row) => ({
+        ...row,
+        jumlah_barang: parseInt(row.jumlah_barang) || 0,
+      }));
 
-    console.log(
-      "✅ Riwayat query berhasil. Total rows:",
-      formattedRows.length
-    );
+      console.log(
+        "✅ Riwayat query berhasil. Total rows:",
+        formattedRows.length
+      );
 
-    return {
-      data: formattedRows,
-      total: total,
-      page: pageNum,
-      limit: limitNum,
-      totalPages: totalPages,
-    };
-  } catch (error) {
-    console.error("💥 Riwayat find all error:", error);
-    throw error;
-  }
-},
+      return {
+        data: formattedRows,
+        total: total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: totalPages,
+      };
+    } catch (error) {
+      console.error("💥 Riwayat find all error:", error);
+      throw error;
+    }
+  },
 };
-
-
-
 
 export default Permintaan;
