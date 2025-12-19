@@ -207,7 +207,7 @@ export default function PermintaanPage() {
           <main className="flex-1 text-black p-6 bg-gray-200 overflow-y-auto ml-60">
             {/* Fixed header untuk judul halaman */}
             <div className="bg-gray-200 mb-6">
-              <h2 className="text-3xl text-black font-semibold">Permintaan</h2>
+              <h2 className="text-2xl text-black font-semibold">Permintaan</h2>
             </div>
 
             {/* Card container */}
@@ -227,7 +227,7 @@ export default function PermintaanPage() {
 
               {/* Filter section */}
               <div className="px-6 py-4 border-b bg-white">
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                   {/* Search */}
                   <div>
                     <label

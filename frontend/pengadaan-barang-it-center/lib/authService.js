@@ -64,6 +64,7 @@ const authService = {
             email: payload.email,
             role: payload.role,
             divisi_id: payload.divisi_id,
+            nama_divisi: payload.nama_divisi || null,
           };
         } catch (error) {
           console.error("Error decoding token:", error);
@@ -110,10 +111,11 @@ const authService = {
     return user?.email || null;
   },
 
-  // **TAMBAHKAN: Fungsi untuk mendapatkan nama divisi**
-  getUserDivisi: () => {
+  // Fungsi untuk mendapatkan nama divisi**
+  getUserDivisiName: () => {
     const user = authService.getCurrentUser();
     // Divisi ID bisa digunakan untuk mendapatkan nama divisi
+    if (user?.nama_divisi) return user.nama_divisi;
     return user?.divisi_id || null;
   },
 };

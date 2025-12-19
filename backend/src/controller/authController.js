@@ -1,6 +1,7 @@
 import User from "../models/user.js";
 import { generateToken } from "../config/auth.js";
 import bcrypt from "bcryptjs";
+import dbPool from "../config/database.js";
 
 export const login = async (req, res) => {
   try {
@@ -16,8 +17,15 @@ export const login = async (req, res) => {
       });
     }
 
-    // Cari user
-    const user = await User.findByUsername(username);
+    const query = `
+      SELECT u.*, d.nama_divisi 
+      FROM users u 
+      LEFT JOIN divisi d ON u.divisi_id = d.id 
+      WHERE u.username = ? AND u.is_active = true
+    `;
+    const [users] = await dbPool.execute(query, [username]);
+    const user = users[0];
+
     console.log("👤 User found:", user ? "Yes" : "No");
 
     if (!user) {
@@ -57,6 +65,7 @@ export const login = async (req, res) => {
       email: user.email,
       divisi_id: user.divisi_id,
       nama_lengkap: user.nama_lengkap,
+      nama_divisi: user.nama_divisi
     });
 
     // Response data user (tanpa password)
@@ -82,5 +91,48 @@ export const login = async (req, res) => {
     res.status(500).json({
       error: "Terjadi kesalahan server. Silahkan coba lagi.",
     });
+  }
+};
+
+export const getCurrentUser = async (req, res) => {
+  try {
+    // Query dengan JOIN ke divisi
+    const query = `
+      SELECT 
+        u.id, u.username, u.nama_lengkap, u.email, 
+        u.role, u.divisi_id, u.is_active, u.created_at,
+        d.nama_divisi
+      FROM users u 
+      LEFT JOIN divisi d ON u.divisi_id = d.id 
+      WHERE u.id = ?
+    `;
+    
+    const [users] = await dbPool.execute(query, [req.user.id]);
+    const user = users[0];
+    
+    if (!user) {
+      return res.status(404).json({ error: "User tidak ditemukan." });
+    }
+
+    // Format response
+    const userData = {
+      id: user.id,
+      username: user.username,
+      nama_lengkap: user.nama_lengkap,
+      email: user.email,
+      role: user.role,
+      divisi_id: user.divisi_id,
+      nama_divisi: user.nama_divisi,
+      is_active: user.is_active,
+      created_at: user.created_at,
+    };
+    
+    res.json({
+      message: "User data berhasil diambil.",
+      data: userData,
+    });
+  } catch (error) {
+    console.error("💥 Get current user error:", error);
+    res.status(500).json({ error: "Terjadi kesalahan server." });
   }
 };

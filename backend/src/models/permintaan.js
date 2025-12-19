@@ -6,7 +6,7 @@ const Permintaan = {
   create: async (permintaanData) => {
     let { user_id, tanggal_kebutuhan, catatan } = permintaanData;
 
-    // ✅ KONVERSI TANGGAL: Ubah format ISO ke YYYY-MM-DD jika perlu
+    // format ISO ke YYYY-MM-DD jika perlu
     if (
       tanggal_kebutuhan &&
       typeof tanggal_kebutuhan === "string" &&
@@ -53,12 +53,17 @@ const Permintaan = {
   // Get permintaan by ID and user ID (untuk memastikan user hanya akses permintaannya sendiri)
   findByIdAndUserId: async (id, userId) => {
     const query = `
-      SELECT p.*, u.nama_lengkap, d.nama_divisi 
-      FROM permintaan p 
-      JOIN users u ON p.user_id = u.id 
-      JOIN divisi d ON u.divisi_id = d.id 
-      WHERE p.id = ? AND p.user_id = ?
-    `;
+    SELECT 
+      p.*, 
+      u.nama_lengkap, 
+      u.email,
+      u.divisi_id,
+      d.nama_divisi  -- TAMBAHKAN INI
+    FROM permintaan p 
+    JOIN users u ON p.user_id = u.id 
+    JOIN divisi d ON u.divisi_id = d.id  -- TAMBAHKAN JOIN
+    WHERE p.id = ? AND p.user_id = ?
+  `;
     const [rows] = await dbPool.execute(query, [id, userId]);
     return rows[0];
   },
@@ -110,17 +115,19 @@ const Permintaan = {
       sort,
     });
 
-    let query = `
+  let query = `
     SELECT 
       p.*, 
       u.nama_lengkap, 
-      d.nama_divisi,
+      u.email,
+      u.divisi_id,
+      d.nama_divisi,  -- INI YANG PENTING
       (SELECT COUNT(*) 
        FROM barang_permintaan bp 
-       WHERE bp.permintaan_id = p.id) as jumlah_barang
+       WHERE bp.permintaan_id = p.id) as jumlah_item
     FROM permintaan p 
     JOIN users u ON p.user_id = u.id 
-    JOIN divisi d ON u.divisi_id = d.id 
+    JOIN divisi d ON u.divisi_id = d.id  -- PASTIKAN JOIN KE DIVISI
     WHERE p.user_id = ?
   `;
 

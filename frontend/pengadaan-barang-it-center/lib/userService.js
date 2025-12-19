@@ -1,6 +1,41 @@
 import axiosInstance from "./axiosConfig";
 
 const userService = {
+    // Get current user with complete data including divisi name
+  getCurrentUserComplete: async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return null;
+
+      // Panggil endpoint /auth/me yang sudah diperbaiki
+      const response = await axiosInstance.get("/auth/me");
+      
+      // Debug log untuk melihat response
+      console.log("📋 User complete data response:", response.data);
+      
+      return response.data.data;
+    } catch (error) {
+      console.error("❌ Error getting user complete data:", {
+        message: error.message,
+        response: error.response?.data,
+      });
+      
+      // Fallback: coba ambil dari localStorage
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          console.log("📋 Using fallback user data from localStorage:", user);
+          return user;
+        }
+      } catch (localError) {
+        console.error("❌ Error parsing localStorage user:", localError);
+      }
+      
+      return null;
+    }
+  },
+
   // Get all users dengan pagination dan filter - DIPERBAIKI
   getAllUsers: async (page = 1, limit = 10, filters = {}) => {
     try {

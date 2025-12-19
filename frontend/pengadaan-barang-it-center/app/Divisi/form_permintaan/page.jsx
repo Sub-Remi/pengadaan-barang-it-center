@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import debounce from "lodash/debounce";
 import permintaanService from "../../../lib/permintaanService";
 import authService from "../../../lib/authService";
+import userService from '../../../lib/userService';
 import dropdownService from "../../../lib/dropdownService";
 import ProtectedRoute from "../../../app/components/ProtectedRoute";
 
@@ -146,29 +147,119 @@ export default function FormPermintaanBarangPage() {
   // Di bagian useEffect untuk get user data
   useEffect(() => {
     const loadUserData = async () => {
-      const user = authService.getCurrentUser();
-      if (!user) {
-        router.push("/login/login");
-        return;
+      try {
+        setLoading(true);
+        
+        // 1. Coba ambil data user lengkap dari server terlebih dahulu
+        let user = await userService.getCurrentUserComplete();
+        
+        // Debug log untuk melihat data yang diterima
+        console.log("📋 User data from userService:", user);
+        
+        // 2. Jika gagal, coba ambil dari localStorage
+        if (!user) {
+          console.log("⚠️ User data from userService is null, trying localStorage...");
+          user = authService.getCurrentUser();
+          console.log("📋 User data from localStorage:", user);
+        }
+        
+        if (!user) {
+          console.log("❌ No user data found, redirecting to login");
+          router.push("/login/login");
+          return;
+        }
+
+        setUserData(user);
+
+        // 3. Jika user tidak memiliki nama_divisi, coba refresh data
+        if (!user.nama_divisi && user.divisi_id) {
+          console.log("⚠️ User doesn't have nama_divisi, trying to refresh...");
+          const refreshedUser = await authService.refreshCurrentUser();
+          if (refreshedUser?.nama_divisi) {
+            console.log("✅ Got divisi name from refresh:", refreshedUser.nama_divisi);
+            setUserData(refreshedUser);
+          }
+        }
+
+        // Set default date (TODAY)
+        const today = new Date();
+        const formattedDate = today.toISOString().split("T")[0];
+
+        setFormData((prev) => ({
+          ...prev,
+          tanggal_kebutuhan: formattedDate,
+        }));
+
+        // Load initial dropdown data
+        loadInitialDropdownData();
+        
+      } catch (error) {
+        console.error("❌ Error loading user data:", error);
+        setError("Gagal memuat data pengguna");
+      } finally {
+        setLoading(false);
       }
-
-      setUserData(user);
-
-      // Set default date (TODAY)
-      const today = new Date();
-      const formattedDate = today.toISOString().split("T")[0];
-
-      setFormData((prev) => ({
-        ...prev,
-        tanggal_kebutuhan: formattedDate,
-      }));
-
-      // Load initial dropdown data
-      loadInitialDropdownData();
     };
 
     loadUserData();
   }, [router]);
+
+    const getDivisiName = () => {
+    // Debug log untuk melihat data user
+    console.log("🔍 Getting divisi name from userData:", userData);
+    
+    // Priority 1: nama_divisi dari userData
+    if (userData?.nama_divisi) {
+      console.log("✅ Using nama_divisi from userData:", userData.nama_divisi);
+      return userData.nama_divisi;
+    }
+    
+    // Priority 2: nama_divisi dari token (jika ada)
+    if (userData?.divisi_name) {
+      console.log("✅ Using divisi_name from userData:", userData.divisi_name);
+      return userData.divisi_name;
+    }
+    
+    // Priority 3: cek localStorage langsung
+    try {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        const userFromStorage = JSON.parse(userStr);
+        if (userFromStorage?.nama_divisi) {
+          console.log("✅ Using nama_divisi from localStorage:", userFromStorage.nama_divisi);
+          return userFromStorage.nama_divisi;
+        }
+      }
+    } catch (error) {
+      console.error("Error reading from localStorage:", error);
+    }
+    
+    // Priority 4: jika hanya ada divisi_id, format dengan benar
+    if (userData?.divisi_id) {
+      console.log("⚠️ Only divisi_id found:", userData.divisi_id);
+      // Coba format yang lebih baik
+      const divisiMap = {
+        1: "Technology Division",
+        2: "Finance",
+        3: "HRD",
+        5: "Marketing",
+        6: "IT Support"
+      };
+      
+      const namaDivisi = divisiMap[userData.divisi_id];
+      if (namaDivisi) {
+        console.log("✅ Mapped divisi_id to name:", namaDivisi);
+        return namaDivisi;
+      }
+      
+      console.log("❌ No mapping found for divisi_id:", userData.divisi_id);
+      return `Divisi ${userData.divisi_id}`;
+    }
+    
+    // Default
+    console.log("❌ No divisi data available");
+    return "Belum ditentukan";
+  };
 
   // Load draft data untuk mode edit
   useEffect(() => {
@@ -660,22 +751,6 @@ export default function FormPermintaanBarangPage() {
       alert(error.error || "Gagal mengirim permintaan");
     } finally {
       setIsSaving(false);
-    }
-  };
-
-  // Fungsi untuk mendapatkan nama divisi
-  const getDivisiName = () => {
-    // Cek jika userData memiliki nama_divisi langsung
-    if (userData?.nama_divisi) {
-      return userData.nama_divisi;
-    }
-    // Fallback: tampilkan Divisi + ID
-    else if (userData?.divisi_id) {
-      return `Divisi ${userData.divisi_id}`;
-    }
-    // Default jika tidak ada data
-    else {
-      return "Belum ditentukan";
     }
   };
 
