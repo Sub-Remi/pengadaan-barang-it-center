@@ -309,7 +309,7 @@ export default function DetailPermintaanPage() {
 
           {/* Main Content */}
           <main className="flex-1 mt-20 overflow-y-auto bg-gray-200 p-8">
-            <h2 className="text-3xl font-semibold mb-6">Detail Permintaan</h2>
+            <h2 className="text-3xl text-black font-semibold mb-6">Detail Permintaan</h2>
 
             <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
               {/* Header */}
@@ -346,18 +346,18 @@ export default function DetailPermintaanPage() {
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="font-medium text-gray-700">
+                    <label className="font-medium text-black">
                       ID Permintaan
                     </label>
                     <input
                       type="text"
                       value={permintaan.nomor_permintaan || "N/A"}
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                     />
                   </div>
                   <div>
-                    <label className="font-medium text-gray-700">
+                    <label className="font-medium text-black">
                       Nama Pemohon
                     </label>
                     <input
@@ -368,12 +368,12 @@ export default function DetailPermintaanPage() {
                         "N/A"
                       }
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                     />
                   </div>
 
                   <div>
-                    <label className="font-medium text-gray-700">Divisi</label>
+                    <label className="font-medium text-black">Divisi</label>
                     <input
                       type="text"
                       value={
@@ -382,65 +382,65 @@ export default function DetailPermintaanPage() {
                         "N/A"
                       }
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                     />
                   </div>
 
                   <div>
-                    <label className="font-medium text-gray-700">Email</label>
+                    <label className="font-medium text-black">Email</label>
                     <input
                       type="text"
                       value={userData?.email || permintaan.email || "N/A"}
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                     />
                   </div>
 
                   <div>
-                    <label className="font-medium text-gray-700">
+                    <label className="font-medium text-black">
                       Judul Permintaan
                     </label>
                     <input
                       type="text"
                       value={permintaan.catatan || "Tidak ada judul"}
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                     />
                   </div>
 
                   <div>
-                    <label className="font-medium text-gray-700">
+                    <label className="font-medium text-black">
                       Tanggal Kebutuhan
                     </label>
                     <input
                       type="text"
                       value={formatDate(permintaan.tanggal_kebutuhan)}
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                     />
                   </div>
 
                   <div>
-                    <label className="font-medium text-gray-700">
+                    <label className="font-medium text-black">
                       Jumlah Barang Diminta
                     </label>
                     <input
                       type="text"
                       value={barangList.length}
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                     />
                   </div>
 
                   <div>
-                    <label className="font-medium text-gray-700">
+                    <label className="font-medium text-black">
                       Tanggal Dibuat
                     </label>
                     <input
                       type="text"
                       value={formatDate(permintaan.created_at)}
                       disabled
-                      className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                      className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                     />
                   </div>
                 </div>
@@ -458,7 +458,7 @@ export default function DetailPermintaanPage() {
                       className="px-6 py-4 border-b-4 border-b-gray-300"
                     >
                       <div className="flex justify-between items-center mb-4">
-                        <h4 className="text-lg font-semibold text-gray-800">
+                        <h4 className="text-lg font-semibold text-black">
                           Data Barang {index + 1}
                         </h4>
                         <span
@@ -470,31 +470,31 @@ export default function DetailPermintaanPage() {
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="font-medium text-gray-700">
+                          <label className="font-medium text-black">
                             Kategori Barang
                           </label>
                           <input
                             type="text"
                             value={barang.kategori_barang || "N/A"}
                             disabled
-                            className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                            className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                           />
                         </div>
 
                         <div>
-                          <label className="font-medium text-gray-700">
+                          <label className="font-medium text-black">
                             Nama Barang
                           </label>
                           <input
                             type="text"
                             value={barang.nama_barang || "N/A"}
                             disabled
-                            className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                            className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                           />
                         </div>
 
                         <div>
-                          <label className="font-medium text-gray-700">
+                          <label className="font-medium text-black">
                             Satuan
                           </label>
                           <input
@@ -505,24 +505,24 @@ export default function DetailPermintaanPage() {
                               "N/A"
                             }
                             disabled
-                            className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                            className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                           />
                         </div>
 
                         <div>
-                          <label className="font-medium text-gray-700">
+                          <label className="font-medium text-black">
                             Jumlah
                           </label>
                           <input
                             type="text"
                             value={barang.jumlah || 0}
                             disabled
-                            className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                            className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                           />
                         </div>
 
                         <div className="md:col-span-2">
-                          <label className="font-medium text-gray-700">
+                          <label className="font-medium text-black">
                             Spesifikasi
                           </label>
                           <input
@@ -532,19 +532,19 @@ export default function DetailPermintaanPage() {
                               "Tidak ada spesifikasi"
                             }
                             disabled
-                            className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                            className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                             rows="2"
                           />
                         </div>
 
                         <div className="md:col-span-2">
-                          <label className="font-medium text-gray-700">
+                          <label className="font-medium text-black">
                             Keterangan Pemohon
                           </label>
                           <textarea
                             value={barang.keterangan || "Tidak ada keterangan"}
                             disabled
-                            className="w-full border border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
+                            className="w-full border text-black border-gray-300 bg-gray-100 rounded px-3 py-2 mt-1"
                             rows="2"
                           />
                         </div>
