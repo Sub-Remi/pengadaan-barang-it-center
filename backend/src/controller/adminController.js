@@ -10,6 +10,7 @@ export const getAllPermintaan = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const sort = req.query.sort || "terbaru"; // Tambah parameter sort
+    const status = req.query.status;
 
     // Filters
     const filters = {
@@ -18,6 +19,7 @@ export const getAllPermintaan = async (req, res) => {
       start_date: req.query.start_date,
       end_date: req.query.end_date,
       search: req.query.search,
+      status: req.query.status,
     };
 
     console.log("📋 Admin getting all permintaan with filters:", {
@@ -26,7 +28,7 @@ export const getAllPermintaan = async (req, res) => {
     });
 
     // Kirim parameter sort ke model
-    const result = await Permintaan.findAllWithFilters(
+    const result = await Permintaan.findAllRiwayatWithFilters(
       filters,
       page,
       limit,
@@ -377,31 +379,41 @@ const getFinanceDashboardStats = async (req, res) => {
   }
 };
 
-// adminController.js - Tambahkan fungsi ini
+// adminController.js - Pastikan getRiwayatPermintaan sudah benar
 export const getRiwayatPermintaan = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
+    const limit = parseInt(req.query.limit) || 10;
     const sort = req.query.sort || "terbaru";
 
-    // Filters khusus untuk riwayat (hanya selesai dan ditolak)
+    // Filters untuk riwayat
     const filters = {
-      status: "selesai,ditolak", // Hardcode untuk riwayat
       divisi_id: req.query.divisi_id,
       start_date: req.query.start_date,
       end_date: req.query.end_date,
       search: req.query.search,
     };
 
-    console.log("📋 Admin getting riwayat permintaan with filters:", filters);
+    console.log("📋 Admin getting riwayat permintaan with filters:", {
+      ...filters,
+      sort,
+      page,
+      limit
+    });
 
-    // Gunakan fungsi yang sama tapi dengan status multiple
+    // Gunakan fungsi khusus untuk riwayat
     const result = await Permintaan.findAllRiwayatWithFilters(
       filters,
       page,
       limit,
       sort
     );
+
+    console.log("📊 Riwayat result:", {
+      total: result.total,
+      dataLength: result.data.length,
+      sample: result.data.length > 0 ? result.data[0] : 'No data'
+    });
 
     res.json({
       message: "Daftar riwayat permintaan berhasil diambil.",
@@ -415,7 +427,10 @@ export const getRiwayatPermintaan = async (req, res) => {
     });
   } catch (error) {
     console.error("💥 Get riwayat permintaan error:", error);
-    res.status(500).json({ error: "Terjadi kesalahan server." });
+    res.status(500).json({ 
+      error: "Terjadi kesalahan server.",
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 
@@ -425,4 +440,5 @@ export default {
   updatePermintaanStatus,
   updateBarangStatus,
   createPenerimaanBarang,
+  getRiwayatPermintaan,
 };

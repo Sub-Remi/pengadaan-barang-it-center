@@ -7,7 +7,7 @@ import {
   updatePermintaanStatus,
   updateBarangStatus,
   createPenerimaanBarang,
-  getRiwayatPermintaan, // ✅ TAMBAHKAN INI
+  getRiwayatPermintaan,
 } from "../controller/adminController.js";
 import {
   getAllStok,
@@ -83,12 +83,10 @@ router.use(authenticate, requireAdmin);
 
 // ===== PERMINTAAN MANAGEMENT =====
 router.get("/permintaan", getAllPermintaan);
+router.get("/permintaan/riwayat", getRiwayatPermintaan);
 router.get("/permintaan/:id", getPermintaanDetail);
 router.put("/permintaan/:id/status", updatePermintaanStatus);
 router.put("/barang/:id/status", updateBarangStatus);
-
-// ✅ TAMBAHKAN ROUTE RIWAYAT
-router.get("/permintaan/riwayat", getRiwayatPermintaan);
 
 // ===== PENERIMAAN BARANG =====
 router.post(
@@ -281,11 +279,7 @@ router.get("/pemesanan-temp", authenticate, requireAdmin, async (req, res) => { 
 
 // ===== LAPORAN & EXPORT =====
 router.get("/permintaan/laporan", authenticate, requireAdmin, getLaporan);
-
-// ✅ PERBAIKI ROUTE STATISTIK - HAPUS FUNGSI INLINE YANG DUPLIKAT
 router.get("/permintaan/statistik", authenticate, requireAdmin, getStatistik);
-
-// ✅ PERBAIKI FUNGSI STATISTIK INLINE JIKA PERLU (ATAU HAPUS JIKA SUDAH ADA DI CONTROLLER)
 router.get("/permintaan/statistik-inline", authenticate, requireAdmin, async (req, res) => {
   try {
     const filters = {
@@ -356,7 +350,6 @@ router.get("/permintaan/statistik-inline", authenticate, requireAdmin, async (re
 
 // Di file routes/admin.js - Tambahkan route ini
 router.get("/permintaan/riwayat", getRiwayatPermintaan);
-
 router.get("/permintaan/export/excel", authenticate, requireAdmin, exportExcel);
 router.get("/permintaan/export/pdf", authenticate, requireAdmin, exportPDF);
 

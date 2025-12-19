@@ -19,7 +19,7 @@ export default function RiwayatGAPage() {
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
-    itemsPerPage: 10,
+    itemsPerPage: 5,
   });
 
   // Fetch data divisi untuk filter
@@ -45,10 +45,17 @@ export default function RiwayatGAPage() {
   };
 
 
-// fetchRiwayatPermintaan - Gunakan service yang sudah diperbaiki
+// riwayat_ga.jsx
 const fetchRiwayatPermintaan = async (page = 1, filters = {}) => {
   try {
     setLoading(true);
+    
+    console.log("📥 Fetching riwayat with:", {
+      page,
+      itemsPerPage: pagination.itemsPerPage,
+      filters,
+      sortOrder
+    });
     
     // Gunakan fungsi khusus riwayat
     const result = await adminPermintaanService.getPermintaanRiwayat(
@@ -57,27 +64,51 @@ const fetchRiwayatPermintaan = async (page = 1, filters = {}) => {
       {
         search: filters.search,
         divisi_id: filters.divisi_id,
+        status: filters.status,
         start_date: filters.start_date,
         end_date: filters.end_date,
       },
       sortOrder
     );
 
-    console.log("📊 Riwayat data fetched:", result.data);
-    console.log("📊 Total items:", result.pagination?.totalItems);
+    console.log("📊 Riwayat API response:", {
+      dataLength: result.data?.length || 0,
+      statusFilter: filters.status || "all",
+      sampleData: result.data?.length > 0 ? {
+        id: result.data[0].id,
+        nomor_permintaan: result.data[0].nomor_permintaan,
+        status: result.data[0].status
+      } : 'No data'
+    });
     
-    setData(result.data);
+    setData(result.data || []);
     setPagination(result.pagination || {
       currentPage: page,
       totalPages: 1,
-      totalItems: result.data.length,
+      totalItems: result.data?.length || 0,
       itemsPerPage: pagination.itemsPerPage,
     });
   } catch (error) {
-    console.error("Error fetching riwayat:", error);
-    alert(
-      error.response?.data?.error || "Terjadi kesalahan saat mengambil data riwayat"
-    );
+    console.error("❌ Error fetching riwayat:", error);
+    console.error("❌ Error details:", error.response?.data);
+    
+    // Tampilkan alert yang lebih informatif
+    if (error.response?.data?.error) {
+      alert(`Error: ${error.response.data.error}`);
+    } else if (error.message) {
+      alert(`Error: ${error.message}`);
+    } else {
+      alert("Terjadi kesalahan saat mengambil data riwayat");
+    }
+    
+    // Tetap set data kosong jika error
+    setData([]);
+    setPagination({
+      currentPage: 1,
+      totalPages: 1,
+      totalItems: 0,
+      itemsPerPage: pagination.itemsPerPage,
+    });
   } finally {
     setLoading(false);
   }
@@ -106,6 +137,7 @@ const fetchRiwayatPermintaan = async (page = 1, filters = {}) => {
     fetchRiwayatPermintaan(1, {
       search,
       divisi_id: divisiFilter,
+      status: statusFilter,
       start_date: startDate,
       end_date: endDate,
     });
@@ -138,6 +170,8 @@ const fetchRiwayatPermintaan = async (page = 1, filters = {}) => {
   const handleStatusFilterChange = (e) => {
     const value = e.target.value;
     setStatusFilter(value);
+  
+    console.log("🔍 Status filter changed to:", value);
     fetchRiwayatPermintaan(1, {
       search,
       divisi_id: divisiFilter,
@@ -146,6 +180,7 @@ const fetchRiwayatPermintaan = async (page = 1, filters = {}) => {
       end_date: endDate,
     });
   };
+  
 
   // Handle pagination
   const handlePageChange = (page) => {
@@ -202,6 +237,18 @@ const fetchRiwayatPermintaan = async (page = 1, filters = {}) => {
       year: "numeric",
     });
   };
+
+  const filteredData = React.useMemo(() => {
+  if (!statusFilter || statusFilter === "") {
+    return data;
+  }
+  
+  console.log("🔍 Filtering data di frontend dengan status:", statusFilter);
+  const filtered = data.filter(item => item.status === statusFilter);
+  console.log("📊 Hasil filter:", filtered.length, "items");
+  
+  return filtered;
+}, [data, statusFilter]);
 
   // Format jumlah barang
   const formatJumlahBarang = (jumlah) => {
@@ -443,8 +490,8 @@ const fetchRiwayatPermintaan = async (page = 1, filters = {}) => {
                     onChange={handleSortChange}
                     className="border border-gray-300 rounded px-3 py-2 w-full text-sm"
                   >
-                    <option value="terbaru">Terbaru</option>
-                    <option value="terlama">Terlama</option>
+                    <option value="terbaru">Terlama</option>
+                    <option value="terlama">Terbaru</option>
                   </select>
                 </div>
 

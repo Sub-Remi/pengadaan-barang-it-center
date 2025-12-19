@@ -159,27 +159,29 @@ const Permintaan = {
     }
 
     // Search by nomor permintaan atau nama barang
-    if (filters.search) {
-      query += ` AND (
-      p.nomor_permintaan LIKE ? OR 
-      p.id IN (
-        SELECT DISTINCT bp.permintaan_id 
-        FROM barang_permintaan bp 
-        WHERE bp.nama_barang LIKE ? OR bp.kategori_barang LIKE ?
-      )
-    )`;
-      countQuery += ` AND (
-      p.nomor_permintaan LIKE ? OR 
-      p.id IN (
-        SELECT DISTINCT bp.permintaan_id 
-        FROM barang_permintaan bp 
-        WHERE bp.nama_barang LIKE ? OR bp.kategori_barang LIKE ?
-      )
-    )`;
-      const searchTerm = `%${filters.search}%`;
-      values.push(searchTerm, searchTerm, searchTerm);
-      countValues.push(searchTerm, searchTerm, searchTerm);
-    }
+if (filters.search) {
+  query += ` AND (
+    p.nomor_permintaan LIKE ? OR 
+    p.catatan LIKE ? OR
+    p.id IN (
+      SELECT DISTINCT bp.permintaan_id 
+      FROM barang_permintaan bp 
+      WHERE bp.nama_barang LIKE ? OR bp.kategori_barang LIKE ?
+    )
+  )`;
+  countQuery += ` AND (
+    p.nomor_permintaan LIKE ? OR 
+    p.catatan LIKE ? OR
+    p.id IN (
+      SELECT DISTINCT bp.permintaan_id 
+      FROM barang_permintaan bp 
+      WHERE bp.nama_barang LIKE ? OR bp.kategori_barang LIKE ?
+    )
+  )`;
+  const searchTerm = `%${filters.search}%`;
+  values.push(searchTerm, searchTerm, searchTerm, searchTerm);
+  countValues.push(searchTerm, searchTerm, searchTerm, searchTerm);
+}
 
     // Filter by date range
     if (filters.start_date && filters.end_date) {
@@ -582,6 +584,7 @@ WHERE 1=1
     }
   },
   // permintaan.js - Tambahkan fungsi ini
+// permintaan.js - Pastikan fungsi findAllRiwayatWithFilters sudah benar
 findAllRiwayatWithFilters: async (
   filters = {},
   page = 1,
@@ -623,9 +626,21 @@ findAllRiwayatWithFilters: async (
   const values = [];
   const countValues = [];
 
-  // Untuk riwayat, hanya tampilkan selesai dan ditolak
+  // ✅ UNTUK RIWAYAT: Hanya tampilkan selesai dan ditolak
   query += " AND p.status IN ('selesai', 'ditolak')";
   countQuery += " AND p.status IN ('selesai', 'ditolak')";
+
+    if (filters.status && filters.status !== "") {
+    // Jika filter status adalah "selesai" atau "ditolak" saja
+    query += " AND p.status = ?";
+    countQuery += " AND p.status = ?";
+    values.push(filters.status);
+    countValues.push(filters.status);
+  } else {
+    // Default: tampilkan kedua status riwayat
+    query += " AND p.status IN ('selesai', 'ditolak')";
+    countQuery += " AND p.status IN ('selesai', 'ditolak')";
+  }
 
   // Filter by divisi
   if (filters.divisi_id) {
@@ -673,7 +688,13 @@ findAllRiwayatWithFilters: async (
 
     console.log(
       "✅ Riwayat query berhasil. Total rows:",
-      formattedRows.length
+      formattedRows.length,
+      "Data sample:",
+      formattedRows.length > 0 ? {
+        id: formattedRows[0].id,
+        nomor_permintaan: formattedRows[0].nomor_permintaan,
+        status: formattedRows[0].status
+      } : 'No data'
     );
 
     return {
@@ -689,8 +710,5 @@ findAllRiwayatWithFilters: async (
   }
 },
 };
-
-
-
 
 export default Permintaan;
