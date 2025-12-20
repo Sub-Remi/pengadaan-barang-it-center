@@ -86,22 +86,24 @@ export default function DetailPermintaanPage() {
 
               <hr className="border-t border-white/30 my-2" />
 
-              {/* PEMESANAN */}
-              <li className="px-5 py-2 font-semibold text-gray-200 cursor-default">
-                PEMESANAN
-              </li>
+              {/* <hr className="border-t border-white/30 my-2" /> */}
 
-              <Link href="/GA/list_pemesanan">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  List Pemesanan
+                {/* PEMESANAN */}
+                {/* <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                  PEMESANAN
                 </li>
-              </Link>
 
-              <Link href="/GA/form_penerimaanbarang">
-                <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer">
-                  Form Penerimaan
-                </li>
-              </Link>
+                <Link href="/GA/list_pemesanan">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    List Pemesanan
+                  </li>
+                </Link>
+
+                <Link href="/GA/form_penerimaanbarang">
+                  <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
+                    Form Penerimaan
+                  </li>
+                </Link> */}
           </ul>
         </nav>
       </aside>

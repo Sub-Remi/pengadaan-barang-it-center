@@ -227,10 +227,10 @@ export default function DataBarangPage() {
                   </li>
                 </Link>
 
-                <hr className="border-t border-white/30 my-2" />
+                {/* <hr className="border-t border-white/30 my-2" /> */}
 
                 {/* PEMESANAN */}
-                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                {/* <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
                   PEMESANAN
                 </li>
 
@@ -244,7 +244,7 @@ export default function DataBarangPage() {
                   <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
                     Form Penerimaan
                   </li>
-                </Link>
+                </Link> */}
               </ul>
             </nav>
           </div>
@@ -257,7 +257,7 @@ export default function DataBarangPage() {
           {/* Card container */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
             {/* Header atas */}
-            <div className="flex justify-between items-center px-6 py-4 border-b">
+            <div className="flex justify-between items-center px-6 py-4 border-black border-b">
               <h3 className="text-xl font-semibold text-teal-600">
                 Data Barang
               </h3>
@@ -278,7 +278,7 @@ export default function DataBarangPage() {
             </div>
 
             {/* Filter */}
-            <div className="px-6 py-4 border-b text-x1 bg-white">
+            <div className="px-6 text-black py-4 border-b text-x1 bg-white">
               <form onSubmit={handleSearch} className="flex items-center gap-3">
                 <label htmlFor="search" className="text-gray-800 font-medium">
                   Search
@@ -323,7 +323,7 @@ export default function DataBarangPage() {
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-gray-50 text-left">
+                  <tr className="bg-gray-50 text-black text-left">
                     <th className="px-6 py-3 font-semibold text-x1">No</th>
                     <th className="px-6 py-3 font-semibold text-x1">Kode Barang</th>
                     <th className="px-6 py-3 font-semibold text-x1">Kategori</th>
@@ -337,14 +337,14 @@ export default function DataBarangPage() {
                   {data.map((row, index) => (
                     <tr
                       key={row.id}
-                      className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                      className={index % 2 === 0 ? "bg-gray-50 text-black" : "bg-white text-black"}
                     >
-                      <td className="px-6 py-3 text-x1">
+                      <td className=" text-black px-6 py-3 text-x1">
                         {(pagination.page - 1) * pagination.limit + index + 1}
                       </td>
                       <td className="px-6 py-3 text-x1">{row.kode_barang}</td>
                       <td className="px-6 py-3 text-x1">{row.nama_kategori}</td>
-                      <td className="px-6 py-3 text-x1 font-medium text-gray-800">
+                      <td className="px-6 py-3 text-x1 font-medium">
                         {row.nama_barang}
                       </td>
                       <td className="px-6 py-3 text-x1">{row.nama_satuan}</td>
@@ -373,7 +373,7 @@ export default function DataBarangPage() {
             </div>
 
             {/* Pagination */}
-            <div className="flex justify-between items-center px-6 py-4 bg-white border-t">
+            <div className="text-black flex justify-between items-center px-6 py-4 bg-white border-t">
               <div className="text-sm text-gray-600">
                 Menampilkan {data.length} dari {pagination.totalItems} data
               </div>

@@ -175,10 +175,10 @@ export default function TambahSatuanBarangPage() {
                   </li>
                 </Link>
 
-                <hr className="border-t border-white/30 my-2" />
+                {/* <hr className="border-t border-white/30 my-2" /> */}
 
                 {/* PEMESANAN */}
-                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                {/* <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
                   PEMESANAN
                 </li>
 
@@ -192,14 +192,14 @@ export default function TambahSatuanBarangPage() {
                   <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
                     Form Penerimaan
                   </li>
-                </Link>
+                </Link> */}
               </ul>
             </nav>
           </div>
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-8 bg-gray-200 overflow-y-auto ml-60">
+        <main className="text-black flex-1 p-8 bg-gray-200 overflow-y-auto ml-60">
           <h2 className="text-3xl font-semibold mb-6 text-gray-800">Satuan Barang</h2>
 
           <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
@@ -235,7 +235,7 @@ export default function TambahSatuanBarangPage() {
                       name="nama_satuan"
                       value={formData.nama_satuan}
                       onChange={handleChange}
-                      className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                      className="text-black w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                       placeholder="Contoh: Pack, Unit, Rim"
                       required
                     />

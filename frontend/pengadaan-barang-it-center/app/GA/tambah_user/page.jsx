@@ -217,10 +217,10 @@ export default function TambahUserPage() {
                   </li>
                 </Link>
 
-                <hr className="border-t border-white/30 my-2" />
+                {/* <hr className="border-t border-white/30 my-2" /> */}
 
                 {/* PEMESANAN */}
-                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                {/* <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
                   PEMESANAN
                 </li>
 
@@ -234,7 +234,7 @@ export default function TambahUserPage() {
                   <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
                     Form Penerimaan
                   </li>
-                </Link>
+                </Link> */}
               </ul>
             </nav>
           </div>
@@ -243,8 +243,8 @@ export default function TambahUserPage() {
         {/* Main Content - Scrollable dengan padding yang lebih baik */}
         <main className="flex-1 text-black p-6 bg-gray-200 overflow-y-auto ml-60">
           {/* Fixed header untuk judul halaman */}
-          <div className="bg-gray-200 pt-4 pb-4 mb-6">
-            <h2 className="text-2xl text-black font-semibold">Manajemen User</h2>
+          <div className="bg-gray-200 mb-6">
+            <h2 className="text-3xl text-black font-semibold">Manajemen User</h2>
           </div>
 
           {/* Card container */}
@@ -412,7 +412,7 @@ export default function TambahUserPage() {
                     />
                     <span className="text-sm">Admin</span>
                   </label>
-                  <label className="flex items-center gap-2">
+                  {/* <label className="flex items-center gap-2">
                     <input
                       type="radio"
                       name="role"
@@ -422,7 +422,7 @@ export default function TambahUserPage() {
                       className="text-teal-600 focus:ring-teal-500"
                     />
                     <span className="text-sm">Validator</span>
-                  </label>
+                  </label> */}
                 </div>
               </div>
 

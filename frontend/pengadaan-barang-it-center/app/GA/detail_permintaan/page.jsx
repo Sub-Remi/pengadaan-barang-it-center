@@ -455,7 +455,7 @@ export default function DetailPermintaanPage() {
     <div className="flex flex-col h-screen font-poppins bg-gray-100">
       {/* Header - Tetap fixed di atas */}
       <header className="fixed top-0 left-0 right-0 z-50 flex bg-white shadow-sm items-center h-16">
-        <div className="bg-white w-60 h-16 flex items-center justify-center border-r border-gray-200">
+        <div className="bg-white w-60 h-16 flex items-center justify-center border-r border-white">
           <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
         </div>
         <div className="flex-1 h-16 flex items-center px-8"></div>
@@ -570,10 +570,10 @@ export default function DetailPermintaanPage() {
                   </li>
                 </Link>
 
-                <hr className="border-t border-white/30 my-2" />
+                {/* <hr className="border-t border-white/30 my-2" /> */}
 
                 {/* PEMESANAN */}
-                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                {/* <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
                   PEMESANAN
                 </li>
 
@@ -587,7 +587,7 @@ export default function DetailPermintaanPage() {
                   <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
                     Form Penerimaan
                   </li>
-                </Link>
+                </Link> */}
               </ul>
             </nav>
           </div>
@@ -610,7 +610,7 @@ export default function DetailPermintaanPage() {
           <h2 className="text-3xl font-semibold mb-6 text-gray-800">Permintaan</h2>
 
           <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-            <div className="flex justify-between items-center px-6 py-5 border-b">
+            <div className="flex justify-between items-center px-6 py-4 border-black border-b">
               <h3 className="text-xl font-semibold text-teal-600">
                 Detail Permintaan
               </h3>
@@ -635,7 +635,7 @@ export default function DetailPermintaanPage() {
             )}
 
             {/* Data Permintaan */}
-            <div className="px-6 py-4 border-b">
+            <div className="text-black px-6 py-4 border-b">
               <h4 className="text-lg font-semibold mb-4 text-gray-800">
                 Data Permintaan
               </h4>
@@ -793,7 +793,7 @@ export default function DetailPermintaanPage() {
             {barangData.map((barang, index) => (
               <div
                 key={barang.id}
-                className="px-6 py-4 border-b"
+                className="text-black px-6 py-4 border-b"
               >
                 <div className="flex justify-between items-center mb-4">
                   <div>

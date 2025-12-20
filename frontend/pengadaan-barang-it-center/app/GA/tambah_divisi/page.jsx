@@ -182,10 +182,10 @@ export default function TambahDivisiPage() {
                   </li>
                 </Link>
 
-                <hr className="border-t border-white/30 my-2" />
+                {/* <hr className="border-t border-white/30 my-2" /> */}
 
                 {/* PEMESANAN */}
-                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                {/* <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
                   PEMESANAN
                 </li>
 
@@ -199,7 +199,7 @@ export default function TambahDivisiPage() {
                   <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
                     Form Penerimaan
                   </li>
-                </Link>
+                </Link> */}
               </ul>
             </nav>
           </div>
@@ -211,7 +211,7 @@ export default function TambahDivisiPage() {
 
           <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
             {/* Header */}
-            <div className="flex justify-between items-center px-6 py-5 border-b">
+            <div className="text-black flex justify-between items-center px-6 py-5 border-b">
               <h3 className="text-xl font-semibold text-teal-600">
                 Tambah Divisi
               </h3>

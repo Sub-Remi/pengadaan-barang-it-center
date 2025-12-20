@@ -225,10 +225,10 @@ export default function DataStokBarangPage() {
                   </li>
                 </Link>
 
-                <hr className="border-t border-white/30 my-2" />
+                {/* <hr className="border-t border-white/30 my-2" /> */}
 
                 {/* PEMESANAN */}
-                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                {/* <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
                   PEMESANAN
                 </li>
 
@@ -242,7 +242,7 @@ export default function DataStokBarangPage() {
                   <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
                     Form Penerimaan
                   </li>
-                </Link>
+                </Link> */}
               </ul>
             </nav>
           </div>
@@ -253,7 +253,7 @@ export default function DataStokBarangPage() {
 
           <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
             {/* Header atas */}
-            <div className="flex justify-between items-center px-6 py-4 border-b">
+            <div className="flex justify-between items-center px-6 py-4 border-black border-b">
               <h3 className="text-xl font-semibold text-teal-600">
                 Data Stok Barang
               </h3>
@@ -267,7 +267,7 @@ export default function DataStokBarangPage() {
             </div>
 
             {/* Search */}
-            <div className="px-6 py-4 border-b bg-white">
+            <div className="text-black px-6 py-4 border-b bg-white">
               <form onSubmit={handleSearch} className="flex items-center gap-3">
                 <label htmlFor="search" className="text-gray-700 font-medium">
                   Search
@@ -298,7 +298,7 @@ export default function DataStokBarangPage() {
 
             {/* Tabel */}
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
+              <table className="text-black w-full border-collapse">
                 <thead>
                   <tr className="bg-gray-50 text-left">
                     <th className="px-6 py-3 font-semibold text-x1">No</th>
@@ -351,7 +351,7 @@ export default function DataStokBarangPage() {
             </div>
 
             {/* Pagination */}
-            <div className="flex justify-between items-center px-6 py-4 bg-white border-t">
+            <div className="text-black flex justify-between items-center px-6 py-4 bg-white border-t">
               <div className="text-sm text-gray-600">
                 Menampilkan {data.length} dari {pagination.totalItems} data
               </div>

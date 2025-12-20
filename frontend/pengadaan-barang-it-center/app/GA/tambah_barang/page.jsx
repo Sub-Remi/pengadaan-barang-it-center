@@ -111,7 +111,7 @@ export default function TambahBarangPage() {
     <div className="flex flex-col h-screen font-poppins bg-gray-100">
       {/* Header - Tetap fixed di atas */}
       <header className="fixed top-0 left-0 right-0 z-50 flex bg-white shadow-sm items-center h-16">
-        <div className="bg-white w-60 h-16 flex items-center justify-center border-r border-gray-200">
+        <div className="bg-white w-60 h-16 flex items-center justify-center border-r border-white">
           <img src="/logo/ItCenter.png" alt="IT Center" className="w-32" />
         </div>
         <div className="flex-1 h-16 flex items-center px-8"></div>
@@ -226,10 +226,10 @@ export default function TambahBarangPage() {
                   </li>
                 </Link>
 
-                <hr className="border-t border-white/30 my-2" />
+                {/* <hr className="border-t border-white/30 my-2" /> */}
 
                 {/* PEMESANAN */}
-                <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
+                {/* <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
                   PEMESANAN
                 </li>
 
@@ -243,7 +243,7 @@ export default function TambahBarangPage() {
                   <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
                     Form Penerimaan
                   </li>
-                </Link>
+                </Link> */}
               </ul>
             </nav>
           </div>
@@ -255,7 +255,7 @@ export default function TambahBarangPage() {
 
           <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
             {/* Header */}
-            <div className="flex justify-between items-center px-6 py-5 border-b">
+            <div className="text-black flex justify-between items-center px-6 py-5 border-b">
               <h3 className="text-xl font-semibold text-teal-600">
                 Tambah Barang
               </h3>
@@ -269,10 +269,10 @@ export default function TambahBarangPage() {
             {/* Form Input */}
             <div className="px-8 py-6">
               <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="text-black grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Kode Barang */}
                   <div>
-                    <label className="font-medium text-gray-700 block mb-1">
+                    <label className="font-medium block mb-1">
                       Kode Barang *
                     </label>
                     <input
@@ -288,7 +288,7 @@ export default function TambahBarangPage() {
 
                   {/* Nama Barang */}
                   <div>
-                    <label className="font-medium text-gray-700 block mb-1">
+                    <label className="font-medium block mb-1">
                       Nama Barang *
                     </label>
                     <input
@@ -304,7 +304,7 @@ export default function TambahBarangPage() {
 
                   {/* Kategori Barang (Dropdown) */}
                   <div>
-                    <label className="font-medium text-gray-700 block mb-1">
+                    <label className="font-medium block mb-1">
                       Kategori Barang *
                     </label>
                     <select
@@ -325,7 +325,7 @@ export default function TambahBarangPage() {
 
                   {/* Satuan */}
                   <div>
-                    <label className="font-medium text-gray-700 block mb-1">
+                    <label className="font-medium block mb-1">
                       Satuan *
                     </label>
                     <select
@@ -346,7 +346,7 @@ export default function TambahBarangPage() {
 
                   {/* Spesifikasi */}
                   <div>
-                    <label className="font-medium text-gray-700 block mb-1">
+                    <label className="font-medium block mb-1">
                       Spesifikasi
                     </label>
                     <input
@@ -361,7 +361,7 @@ export default function TambahBarangPage() {
 
                   {/* Stok Minimum */}
                   <div>
-                    <label className="font-medium text-gray-700 block mb-1">
+                    <label className="font-medium block mb-1">
                       Stok Minimum
                     </label>
                     <input

@@ -203,9 +203,9 @@ function DashboardGA() {
                   </li>
                 </Link>
 
-                <hr className="border-t border-white/30 my-2" />
+                {/* <hr className="border-t border-white/30 my-2" /> */}
 
-                {/* PEMESANAN */}
+                {/* PEMESANAN
                 <li className="px-5 py-2 font-semibold text-gray-200 cursor-default text-sm">
                   PEMESANAN
                 </li>
@@ -220,7 +220,7 @@ function DashboardGA() {
                   <li className="px-5 py-2 hover:bg-blue-500 cursor-pointer transition-colors duration-200 rounded">
                     Form Penerimaan
                   </li>
-                </Link>
+                </Link> */}
               </ul>
             </nav>
           </div>
@@ -230,7 +230,7 @@ function DashboardGA() {
         <main className="flex-1 p-8 bg-gray-200 overflow-y-auto ml-60">
           <h2 className="text-3xl font-semibold mb-6 text-gray-800">Dashboard</h2>
 
-          <div className="flex flex-wrap gap-6">
+          <div className="flex text-black flex-wrap gap-6">
             {/* Permintaan Baru */}
             <Link href="/GA/data_permintaan">
               <div className="relative bg-white w-66 h-28 rounded-lg shadow-md p-4 border-l-8 border-blue-800 text-xl hover:shadow-lg transition-shadow duration-200">
@@ -263,7 +263,7 @@ function DashboardGA() {
             </Link>
 
             {/* Pemesanan */}
-            <Link href="/GA/list_pemesanan">
+            {/* <Link href="/GA/list_pemesanan">
               <div className="bg-white w-64 h-28 rounded-lg shadow-md p-4 border-l-8 border-teal-500 text-xl hover:shadow-lg transition-shadow duration-200">
                 <h3 className="text-teal-600 font-medium mb-2">Pemesanan</h3>
                 <p className="text-2xl font-semibold">
@@ -275,7 +275,7 @@ function DashboardGA() {
                 </p>
                 <p className="text-xs text-gray-500 mt-1">Total Pemesanan</p>
               </div>
-            </Link>
+            </Link> */}
 
             {/* Total Barang (diubah dari Total Divisi) */}
             <Link href="/GA/data_barang">
