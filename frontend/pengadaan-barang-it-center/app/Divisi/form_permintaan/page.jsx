@@ -472,6 +472,11 @@ export default function FormPermintaanBarangPage() {
   // Handle select stok barang
   const handleSelectStokBarang = (stokBarang) => {
     if (stokBarang) {
+      if (stokBarang.stok <= 0) {
+        alert("⚠️ Barang ini tidak memiliki stok yang tersedia. Stok: 0");
+        return;
+      }
+
       setBarangForm((prev) => ({
         ...prev,
         nama_barang: stokBarang.nama_barang,
@@ -511,39 +516,42 @@ export default function FormPermintaanBarangPage() {
     setStokBarangOptions([]);
   };
 
-  const validateBarangForm = () => {
-    if (!barangForm.nama_barang.trim()) {
-      alert("Nama barang harus diisi! Silakan pilih dari dropdown.");
-      return false;
-    }
+const validateBarangForm = () => {
+  if (!barangForm.nama_barang.trim()) {
+    alert("Nama barang harus diisi! Silakan pilih dari dropdown.");
+    return false;
+  }
 
-    if (!barangForm.jumlah || parseInt(barangForm.jumlah) <= 0) {
-      alert("Jumlah harus lebih dari 0!");
-      return false;
-    }
+  // ✅ VALIDASI 1: Pastikan barang memiliki stok yang tersedia
+  if (barangForm.stok_available <= 0) {
+    alert(`Barang "${barangForm.nama_barang}" tidak memiliki stok yang tersedia. Stok: ${barangForm.stok_available}`);
+    return false;
+  }
 
-    if (!barangForm.isFromStok) {
-      alert("Barang harus dipilih dari daftar stok yang tersedia!");
-      return false;
-    }
+  // ✅ VALIDASI 2: Jumlah harus lebih dari 0
+  if (!barangForm.jumlah || parseInt(barangForm.jumlah) <= 0) {
+    alert("Jumlah harus lebih dari 0!");
+    return false;
+  }
 
-    const jumlahValue = parseInt(barangForm.jumlah);
-    const stokTersedia = barangForm.stok_available || 0;
+  // ✅ VALIDASI 3: Jumlah tidak boleh melebihi stok tersedia
+  const jumlahValue = parseInt(barangForm.jumlah);
+  const stokTersedia = barangForm.stok_available || 0;
 
-    if (stokTersedia > 0 && jumlahValue > stokTersedia) {
-      alert(
-        `Jumlah melebihi stok tersedia! Stok tersedia: ${stokTersedia} ${barangForm.satuan}`
-      );
-      return false;
-    }
+  if (jumlahValue > stokTersedia) {
+    alert(
+      `Jumlah melebihi stok tersedia! Stok tersedia: ${stokTersedia} ${barangForm.satuan}`
+    );
+    return false;
+  }
 
-    if (barangForm.jumlahError) {
-      alert(barangForm.jumlahError);
-      return false;
-    }
+  if (barangForm.jumlahError) {
+    alert(barangForm.jumlahError);
+    return false;
+  }
 
-    return true;
-  };
+  return true;
+};
 
   // Fungsi untuk validasi semua barang di daftar
   const validateAllBarang = () => {

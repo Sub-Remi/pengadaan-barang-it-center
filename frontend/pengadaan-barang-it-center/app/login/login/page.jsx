@@ -175,14 +175,6 @@ export default function LoginPage() {
         </form>
 
         {/* Demo Credentials Info */}
-        <div className="mt-6 text-center text-gray-200 text-sm">
-          <p className="font-semibold mb-2">Demo Credentials:</p>
-          <div className="bg-black/20 p-3 rounded-lg text-left space-y-1">
-            <p><span className="font-medium">Admin:</span> ga_admin / password123</p>
-            <p><span className="font-medium">Validator:</span> finance_val / password123</p>
-            <p><span className="font-medium">Pemohon:</span> kepala_it / password123</p>
-          </div>
-        </div>
       </div>
     </div>
   );

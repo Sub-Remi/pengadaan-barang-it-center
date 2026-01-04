@@ -244,7 +244,7 @@ export default function TambahDivisiPage() {
                     name="nama_divisi"
                     value={formData.nama_divisi}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-black placeholder:text-gray-290"
                     placeholder="Masukkan nama divisi"
                     required
                   />
