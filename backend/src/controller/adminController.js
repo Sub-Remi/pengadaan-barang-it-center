@@ -28,7 +28,7 @@ export const getAllPermintaan = async (req, res) => {
     });
 
     // Kirim parameter sort ke model
-    const result = await Permintaan.findAllRiwayatWithFilters(
+    const result = await Permintaan.findAllWithFilters(
       filters,
       page,
       limit,

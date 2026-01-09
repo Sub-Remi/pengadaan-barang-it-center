@@ -1,7 +1,6 @@
 import BarangPermintaan from "../models/barang_permintaan.js";
 import Permintaan from "../models/permintaan.js";
 
-// Di barangPermintaanController.js, update fungsi addBarangToPermintaan
 export const addBarangToPermintaan = async (req, res) => {
   try {
     const { id } = req.params;
@@ -15,12 +14,7 @@ export const addBarangToPermintaan = async (req, res) => {
       stok_barang_id,
     } = req.body;
 
-    console.log("📦 Adding barang to permintaan:", { 
-      id, 
-      user_id,
-      stok_barang_id,
-      jumlah 
-    });
+    console.log("📦 Adding barang to permintaan:", { id, user_id });
 
     // Cek apakah permintaan milik user dan status draft
     const permintaan = await Permintaan.findByIdAndUserId(id, user_id);
@@ -37,34 +31,9 @@ export const addBarangToPermintaan = async (req, res) => {
 
     // Validasi input
     if (!kategori_barang || !nama_barang || !jumlah) {
-      return res.status(400).json({
-        error: "Kategori, nama barang, dan jumlah harus diisi.",
-      });
-    }
-
-    // ✅ VALIDASI STOK: Jika barang berasal dari stok, cek ketersediaan
-    if (stok_barang_id) {
-      const stokBarang = await StokBarang.findById(stok_barang_id);
-      
-      if (!stokBarang) {
-        return res.status(404).json({ 
-          error: "Data stok barang tidak ditemukan." 
-        });
-      }
-
-      // Cek apakah stok mencukupi
-      if (stokBarang.stok <= 0) {
-        return res.status(400).json({
-          error: `Stok "${nama_barang}" habis. Stok tersedia: ${stokBarang.stok}`,
-        });
-      }
-
-      // Cek apakah jumlah melebihi stok
-      if (parseInt(jumlah) > stokBarang.stok) {
-        return res.status(400).json({
-          error: `Jumlah melebihi stok tersedia. Stok tersedia: ${stokBarang.stok}`,
-        });
-      }
+      return res
+        .status(400)
+        .json({ error: "Kategori, nama barang, dan jumlah harus diisi." });
     }
 
     // Tambah barang ke permintaan
@@ -75,7 +44,7 @@ export const addBarangToPermintaan = async (req, res) => {
       spesifikasi: spesifikasi || "",
       jumlah,
       keterangan: keterangan || "",
-      stok_barang_id: stok_barang_id || null,
+      stok_barang_id: stok_barang_id, // Link ke stok jika berhasil
     });
 
     console.log("✅ Barang added with ID:", barangId);
@@ -83,7 +52,8 @@ export const addBarangToPermintaan = async (req, res) => {
     res.status(201).json({
       message: "Barang berhasil ditambahkan ke permintaan.",
       data: { id: barangId },
-      stok_barang_id: stok_barang_id || null,
+      stok_barang_id: stok_barang_id,
+      stok_created: stok_barang_id ? true : false,
     });
   } catch (error) {
     console.error("💥 Add barang to permintaan error:", error);

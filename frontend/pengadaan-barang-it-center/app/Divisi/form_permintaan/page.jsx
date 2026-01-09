@@ -1147,17 +1147,29 @@ const validateBarangForm = () => {
                   <button
                     onClick={handleTambahBarang}
                     disabled={
-                      isSaving || !barangForm.nama_barang || !barangForm.jumlah
+                      isSaving || 
+                      !barangForm.nama_barang || 
+                      !barangForm.jumlah ||
+                      barangForm.stok_available <= 0
                     }
                     className={`px-6 py-2 rounded font-medium ${
-                      barangForm.nama_barang && barangForm.jumlah
+                      barangForm.nama_barang && 
+                      barangForm.jumlah &&
+                      barangForm.stok_available > 0
                         ? "bg-green-500 hover:bg-green-600 text-white"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                     }`}
+                    title={
+                      barangForm.stok_available <= 0 
+                        ? "Stok barang habis, tidak bisa ditambahkan" 
+                        : "Tambah barang ke daftar"
+                    }
                   >
-                    {barangForm.nama_barang && barangForm.jumlah
+                    {barangForm.nama_barang && barangForm.jumlah && barangForm.stok_available > 0
                       ? "➕ Tambah Barang"
-                      : "Lengkapi data terlebih dahulu"}
+                      : barangForm.stok_available <= 0
+                        ? "❌ Stok habis"
+                        : "Lengkapi data terlebih dahulu"}
                   </button>
                 </div>
               </div>
