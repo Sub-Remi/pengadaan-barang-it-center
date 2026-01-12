@@ -177,6 +177,15 @@ export const getPermintaanDetail = async (req, res) => {
     const barangResult =
       await BarangPermintaan.findByPermintaanIdWithPagination(id, page, limit);
 
+          // Tambahkan log untuk debugging
+    console.log("📝 Barang dengan catatan_admin:", 
+      barangResult.data.filter(b => b.catatan_admin).map(b => ({
+        id: b.id,
+        nama: b.nama_barang,
+        catatan: b.catatan_admin
+      }))
+    );
+
     // LOG untuk debug
     console.log("📊 Permintaan data:", permintaan);
     console.log("📦 Barang result:", barangResult);

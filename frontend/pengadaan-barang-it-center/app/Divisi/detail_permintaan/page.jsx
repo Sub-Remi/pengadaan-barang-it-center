@@ -64,15 +64,16 @@ export default function DetailPermintaanPage() {
   };
 
   // Fungsi untuk mendapatkan catatan penolakan dari berbagai field yang mungkin
-  const getCatatanPenolakan = (barang) => {
-    return (
-      barang.catatan_admin ||
-      barang.alasan_penolakan ||
-      barang.catatan ||
-      barang.keterangan_penolakan ||
-      ""
-    );
-  };
+const getCatatanPenolakan = (barang) => {
+  // Prioritas: catatan_admin (dari admin) > catatan_validator > field lainnya
+  if (barang.catatan_admin && barang.catatan_admin.trim() !== "") {
+    return barang.catatan_admin;
+  }
+  if (barang.catatan_validator && barang.catatan_validator.trim() !== "") {
+    return barang.catatan_validator;
+  }
+  return barang.alasan_penolakan || barang.catatan || barang.keterangan_penolakan || "";
+};
 
   // Load divisi data
   useEffect(() => {
@@ -122,6 +123,14 @@ export default function DetailPermintaanPage() {
 
         // Ambil data barang dan simpan catatan
         const barangList = response.data.barang?.data || response.data.barang || [];
+        console.log("🔍 Data barang yang diterima:", barangList.map(b => ({
+          id: b.id,
+          nama: b.nama_barang,
+          status: b.status,
+          catatan_admin: b.catatan_admin,
+          catatan_validator: b.catatan_validator
+        })));
+
         const catatanMap = {};
         barangList.forEach(barang => {
           if (barang.status === 'ditolak' || barang.catatan_admin) {
@@ -549,43 +558,43 @@ export default function DetailPermintaanPage() {
                           />
                         </div>
 
-                        {/* Tampilkan Alasan Penolakan jika barang ditolak */}
-                        {barang.status === 'ditolak' && catatanPenolakan && (
-                          <div className="md:col-span-2">
-                            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
-                              <div className="flex items-center">
-                                <div className="flex-shrink-0 text-red-500">
-                                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                  </svg>
-                                </div>
-                                <div className="ml-3">
-                                  <h3 className="text-sm font-medium text-red-800">
-                                    Alasan Penolakan
-                                  </h3>
-                                  <div className="mt-2 text-sm text-red-700">
-                                    <p>{catatanPenolakan}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
+{/* Tampilkan Alasan Penolakan jika barang ditolak */}
+{(barang.status === 'ditolak' && catatanPenolakan) && (
+  <div className="md:col-span-2 mt-4">
+    <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+      <div className="flex">
+        <div className="flex-shrink-0">
+          <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+          </svg>
+        </div>
+        <div className="ml-3">
+          <h3 className="text-sm font-semibold text-red-800">
+            📝 Alasan Penolakan (dari Admin):
+          </h3>
+          <div className="mt-1 text-sm text-red-700">
+            <p className="whitespace-pre-wrap">{catatanPenolakan}</p>
+          </div>
+          <div className="mt-1 text-xs text-red-600">
+            <i>Status: Barang ditolak oleh Admin</i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
-                        {/* Tampilkan catatan admin untuk status lain */}
-                        {barang.status !== 'ditolak' && catatanPenolakan && (
-                          <div className="md:col-span-2">
-                            <label className="font-medium  text-blue-600">
-                              Catatan Admin
-                            </label>
-                            <textarea
-                              value={catatanPenolakan}
-                              disabled
-                              className="w-full border border-blue-200 bg-blue-50 rounded px-3 py-2 mt-1 text-blue-700"
-                              rows="2"
-                            />
-                          </div>
-                        )}
+{/* Tampilkan catatan admin untuk status lain (jika ada) */}
+{(barang.status !== 'ditolak' && barang.catatan_admin) && (
+  <div className="md:col-span-2">
+    <label className="font-medium text-blue-600">
+      📌 Catatan dari Admin:
+    </label>
+    <div className="w-full border border-blue-200 bg-blue-50 rounded px-3 py-2 mt-1 text-blue-700">
+      {barang.catatan_admin}
+    </div>
+  </div>
+)}
 
                         {barang.catatan_validator && (
                           <div className="md:col-span-2">

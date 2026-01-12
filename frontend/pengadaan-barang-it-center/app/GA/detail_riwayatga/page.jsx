@@ -266,16 +266,6 @@ export default function DetailPermintaanPage() {
                     rows="3"
                   />
                 </div>
-
-                <div>
-                  <label className="font-medium text-gray-700">Status</label>
-                  <input
-                    type="text"
-                    value="Divalidasi"
-                    disabled
-                    className="w-full border border-gray-300 bg-green-600 text-white font-semibold rounded px-3 py-2 mt-1 mb-3"
-                  />
-                </div>
               </div>
             </div>
 

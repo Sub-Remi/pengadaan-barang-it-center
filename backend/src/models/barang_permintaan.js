@@ -101,25 +101,25 @@ const BarangPermintaan = {
     });
 
     // Query dengan LEFT JOIN ke stok_barang
-    const query = `
-    SELECT 
-      bp.*,
-      sb.kategori_barang_id as stok_kategori_id,
-      sb.nama_barang as stok_nama_barang,
-      sb.spesifikasi as stok_spesifikasi,
-      sb.satuan_barang_id as stok_satuan_id,
-      sb.stok as stok_jumlah,
-      sb.stok_minimum as stok_minimum,
-      kb.nama_kategori as stok_nama_kategori,
-      sbu.nama_satuan as stok_nama_satuan
-    FROM barang_permintaan bp
-    LEFT JOIN stok_barang sb ON bp.stok_barang_id = sb.id
-    LEFT JOIN kategori_barang kb ON sb.kategori_barang_id = kb.id
-    LEFT JOIN satuan_barang sbu ON sb.satuan_barang_id = sbu.id
-    WHERE bp.permintaan_id = ? 
-    ORDER BY bp.created_at DESC
-    LIMIT ${limitNum} OFFSET ${offsetNum}
-  `;
+const query = `
+  SELECT 
+    bp.*,  -- INI SUDAH BENAR, AKAN MENGAMBIL SEMUA FIELD TERMASUK catatan_admin
+    sb.kategori_barang_id as stok_kategori_id,
+    sb.nama_barang as stok_nama_barang,
+    sb.spesifikasi as stok_spesifikasi,
+    sb.satuan_barang_id as stok_satuan_id,
+    sb.stok as stok_jumlah,
+    sb.stok_minimum as stok_minimum,
+    kb.nama_kategori as stok_nama_kategori,
+    sbu.nama_satuan as stok_nama_satuan
+  FROM barang_permintaan bp
+  LEFT JOIN stok_barang sb ON bp.stok_barang_id = sb.id
+  LEFT JOIN kategori_barang kb ON sb.kategori_barang_id = kb.id
+  LEFT JOIN satuan_barang sbu ON sb.satuan_barang_id = sbu.id
+  WHERE bp.permintaan_id = ? 
+  ORDER BY bp.created_at DESC
+  LIMIT ${limitNum} OFFSET ${offsetNum}
+`;
 
     const countQuery = `
     SELECT COUNT(*) as total 
@@ -155,6 +155,8 @@ const BarangPermintaan = {
           status: row.status,
           stok_barang_id: row.stok_barang_id,
           stok_available: row.stok_available,
+          catatan_admin: row.catatan_admin,        // ← TAMBAHKAN INI
+          catatan_validator: row.catatan_validator,
           created_at: row.created_at,
           updated_at: row.updated_at,
         };
