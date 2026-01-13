@@ -583,12 +583,12 @@ WHERE 1=1
       throw error;
     }
   },
-  // permintaan.js - Tambahkan fungsi ini
+
 // permintaan.js - Pastikan fungsi findAllRiwayatWithFilters sudah benar
 findAllRiwayatWithFilters: async (
   filters = {},
   page = 1,
-  limit = 10,
+  limit = 5,
   sort = "terbaru"
 ) => {
   const offset = (page - 1) * limit;

@@ -392,6 +392,7 @@ export const getRiwayatPermintaan = async (req, res) => {
       start_date: req.query.start_date,
       end_date: req.query.end_date,
       search: req.query.search,
+      status: req.query.status,
     };
 
     console.log("📋 Admin getting riwayat permintaan with filters:", {
@@ -411,8 +412,15 @@ export const getRiwayatPermintaan = async (req, res) => {
 
     console.log("📊 Riwayat result:", {
       total: result.total,
+      total: result.total,
       dataLength: result.data.length,
-      sample: result.data.length > 0 ? result.data[0] : 'No data'
+      sample: result.data.length > 0 ? {
+        id: result.data[0].id,
+        nomor_permintaan: result.data[0].nomor_permintaan,
+        status: result.data[0].status,
+        // Untuk debug, tampilkan beberapa data pertama
+        firstThreeStatuses: result.data.slice(0, 3).map(item => item.status)
+      } : 'No data'
     });
 
     res.json({
