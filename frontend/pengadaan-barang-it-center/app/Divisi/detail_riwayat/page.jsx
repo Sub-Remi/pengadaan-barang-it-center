@@ -283,7 +283,7 @@ export default function DetailRiwayatPage() {
 
           {/* Main Content */}
           <main className="flex-1 mt-20 overflow-y-auto bg-gray-200 p-8">
-            <h2 className="text-3xl font-semibold mb-6">Detail Riwayat Permintaan</h2>
+            <h2 className="text-3xl text-black font-semibold mb-6">Detail Riwayat Permintaan</h2>
 
             <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
               {/* Header */}
@@ -314,7 +314,7 @@ export default function DetailRiwayatPage() {
               </div>
 
               {/* Data Permintaan */}
-              <div className="px-6 py-4 border-b-4 border-b-gray-300">
+              <div className="text-black px-6 py-4 border-b-4 border-b-gray-300">
                 <h4 className="text-lg font-semibold mb-4 text-gray-800">
                   Data Permintaan
                 </h4>
@@ -440,7 +440,7 @@ export default function DetailRiwayatPage() {
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="text-black grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="font-medium text-gray-700">
                             Kategori Barang

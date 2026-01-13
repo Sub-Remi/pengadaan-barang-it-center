@@ -112,14 +112,14 @@ export default function DetailPermintaanPage() {
       <div className="flex flex-col flex-1 ml-60 h-full">
         {/* Header */}
         <header className="flex bg-white shadow-sm items-center h-20 fixed top-0 left-60 right-0 z-10">
-          <div className="flex-1 h-full flex items-center px-8">
+          <div className="flex-1 h-full flex items-center px-8 broder-white">
 
           </div>
         </header>
 
         {/* Main Content Scrollable */}
         <main className="flex-1 mt-20 overflow-y-auto bg-gray-200 p-8">
-          <h2 className="text-3xl font-semibold mb-6">Riwayat</h2>
+          <h2 className="text-3xl text-black font-semibold mb-6">Riwayat</h2>
 
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             {/* Header */}
@@ -135,7 +135,7 @@ export default function DetailPermintaanPage() {
             </div>
 
             {/* Data Pemohon */}
-            <div className="px-6 py-4 border-b-4 border-b-gray-300">
+            <div className="text-black px-6 py-4 border-b-4 border-b-gray-300">
               <h4 className="text-lg font-semibold mb-4 text-gray-800">
                 Data Permintaan
               </h4>
@@ -213,7 +213,7 @@ export default function DetailPermintaanPage() {
             </div>
 
             {/* Data Barang */}
-            <div className="px-6 py-4 border-b">
+            <div className="text-black px-6 py-4 border-b">
               <h4 className="text-lg font-semibold mb-4 text-gray-800">Data Barang 1</h4>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
