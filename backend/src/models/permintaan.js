@@ -626,12 +626,8 @@ findAllRiwayatWithFilters: async (
   const values = [];
   const countValues = [];
 
-  // ✅ UNTUK RIWAYAT: Hanya tampilkan selesai dan ditolak
-  query += " AND p.status IN ('selesai', 'ditolak')";
-  countQuery += " AND p.status IN ('selesai', 'ditolak')";
-
-    if (filters.status && filters.status !== "") {
-    // Jika filter status adalah "selesai" atau "ditolak" saja
+  if (filters.status && filters.status !== "" && filters.status !== "semua") {
+    // Jika ada filter status spesifik
     query += " AND p.status = ?";
     countQuery += " AND p.status = ?";
     values.push(filters.status);
