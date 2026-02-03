@@ -100,6 +100,7 @@
    B. Isi File .env:
       1. Untuk isi dari file .env, lihat contoh di file .env_example
       2. Sesuaikan konfigurasi database sesuai dengan setup MySQL Anda (username, password, database name, dll)
+
 8. KONFIGURASI SERVER🖥️
    A. Buka File server.js:
       1. Di dalam folder backend, buka file "server.js" menggunakan text editor (misalnya VSCode atau Notepad++)
@@ -108,8 +109,8 @@
       1. Pastikan origin yang diizinkan sesuai dengan alamat frontend dan backend Anda
       2. Contoh:
          const allowedOrigins = [
-           "http://localhost:3000", // alamat frontend
-           "http://localhost:3200", // alamat backend
+           "http://localhost:3000", <-- alamat frontend
+           "http://localhost:3200", <-- alamat backend
            "https://pengadaan-barang-it-center.vercel.app",
          ];
       3. Cari baris yang tertulis:  
@@ -118,7 +119,6 @@
       4. Ubah "192.168.1." sesuai dengan subnet jaringan lokal Anda
 
 9. MENJALANKAN SERVER BACKEND 🚀
-
    A. Pastikan semua tahap sebelumnya sudah dilakukan dengan benar.
    B. Pastikan MySQL Server sudah aktif.
    C. Buka Command Prompt.
@@ -130,15 +130,13 @@
       atau
       npm start
 
-   F. Jika berhasil, akan muncul informasi bahwa server berjalan dan menampilkan alamat server (biasanya menggunakan port 3200).
+   F. Jika berhasil, akan muncul informasi bahwa server berjalan dan menampilkan alamat server
    G. Biarkan Command Prompt backend tetap terbuka selama aplikasi digunakan.
 
 ---
 
 10. SETUP FRONTEND (NEXT.JS) 🌐
-
    A. Masuk ke Folder Frontend
-
       1. Buka Command Prompt atau Terminal baru (jangan menutup CMD backend).
       2. Arahkan ke folder frontend dengan mengetik:
          cd/frontend/pengadaan-barang-it-center
@@ -159,7 +157,6 @@
 ---
 
 11. MENJALANKAN FRONTEND ▶️
-
    A. Pastikan backend sudah berjalan.
    B. Masih di folder frontend, jalankan aplikasi dengan mengetik:
     npm run dev
@@ -173,7 +170,6 @@
 ---
 
 12. TESTING APLIKASI 🔍
-
    A. Testing Akses Sistem
 
       1. Pastikan backend dan frontend berjalan bersamaan.
@@ -221,5 +217,14 @@ File README.md berada di folder utama sebagai panduan setup.
 18. Jangan menghapus file .env dan .env.local.
 
 19. Jika frontend tidak bisa mengambil data, periksa kembali alamat backend dan CORS.
+
+
+--untuk akun pemohon--
+username : Pemohon GA
+password : pemohon123
+
+--untuk akun admin--
+username : Admin GA
+password : general234
 
 ---
