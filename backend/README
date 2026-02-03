@@ -1,4 +1,4 @@
-# 📖PANDUAN SETUP BACKEND (SERVER DAN DATA) WEB PENGADAAN ITCENTER MANADO📖
+ 📖PANDUAN SETUP BACKEND (SERVER DAN DATA) WEB PENGADAAN ITCENTER MANADO📖
 
 ============================================
 🎯 DAFTAR ISI YANG AKAN KITA LAKUKAN
@@ -31,7 +31,7 @@
       3. Klik tombol "LTS" untuk mengunduh versi stabil terbaru
    B. Install Node.js:
       1. Buka file installer yang sudah diunduh
-      2. Ikuti petunjuk instalasi (klik "Next", "I Agree", "Install")
+      2. Ikuti petunjuk instalasi
       3. Setelah selesai, klik "Finish"
    C. Verifikasi Instalasi:
       1. Buka Command Prompt (tekan Win + R, ketik cmd, tekan Enter)
@@ -74,6 +74,7 @@
    C. Verifikasi Database:
       1. Setelah script dijalankan, refresh schema di MySQL Workbench
       2. Pastikan database yang sudah dibuaty muncul di daftar schema di bagian kiri
+
 6. SETUP APLIKASI⚙️
    A. Buka Folder Backend:
       1. Buka Command Prompt
@@ -82,6 +83,17 @@
    B. Install Dependencies:
       1. Di Command Prompt, ketik perintah:
          npm install
+      2. Buka file package.json di folder backend
+      3. cari baris ini sekitar baris 7:
+        "scripts": {
+            "test": "echo \"Error: no test specified\" && exit 1"
+         },
+      4. tambahkan ini: "dev": "nodemon src/server.js" tepat di bawah "test". hasilnya seperti ini...
+            "scripts": {
+            "test": "echo \"Error: no test specified\" && exit 1",
+            "dev": "nodemon src/server.js"
+         },
+
 7. SETUP FILE ENVIRONMENT (.env)🔧
    A. Buat File .env:
       1. Di dalam folder backend, buat file baru dengan nama ".env"
