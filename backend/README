@@ -53,7 +53,7 @@
       2. Coba buat koneksi baru dengan username "root" dan password yang sudah Anda buat
       3. Jika berhasil terhubung, berarti instalasi MySQL berhasil!
 
-4. DOWNLOAD FILE BACKEND📂
+4. DOWNLOAD FILE FRONTEND & BACKEND📂
    A. Unduh File Backend:
       1. Buka browser
       2. Kunjungi repository GitHub aplikasi: https://github.com/Sub-Remi/pengadaan-barang-it-center.git
@@ -104,3 +104,110 @@
          if (origin.startsWith("http://192.168.1."))...  Sekitar baris 63
          if (iface.address.startsWith("192.168.1."))...  Sekitar baris 213
       4. Ubah "192.168.1." sesuai dengan subnet jaringan lokal Anda
+
+9. MENJALANKAN SERVER BACKEND 🚀
+
+   A. Pastikan semua tahap sebelumnya sudah dilakukan dengan benar.
+   B. Pastikan MySQL Server sudah aktif.
+   C. Buka Command Prompt.
+   D. Arahkan ke folder backend dengan mengetik:
+   cd path\to\web pengadaan_itcenter\backend
+
+   E. Jalankan server backend dengan mengetik:
+      npm run dev
+      atau
+      npm start
+
+   F. Jika berhasil, akan muncul informasi bahwa server berjalan dan menampilkan alamat server (biasanya menggunakan port 3200).
+   G. Biarkan Command Prompt backend tetap terbuka selama aplikasi digunakan.
+
+---
+
+10. SETUP FRONTEND (NEXT.JS) 🌐
+
+   A. Masuk ke Folder Frontend
+
+      1. Buka Command Prompt atau Terminal baru (jangan menutup CMD backend).
+      2. Arahkan ke folder frontend dengan mengetik:
+         cd/frontend/pengadaan-barang-it-center
+
+   B.Install Dependency Frontend
+
+         1. Ketik perintah berikut untuk menginstall dependency:
+            npm install
+         2. Tunggu hingga proses selesai tanpa error.
+
+   C. Setup Environment Frontend
+
+      1. Di dalam folder frontend, buat file baru bernama .env.local.
+      2. File ini digunakan untuk menyimpan alamat backend.
+      3. Isi file sesuai dengan alamat backend yang digunakan (contoh: backend lokal menggunakan port 3200).
+      4. Pastikan alamat backend sesuai dengan konfigurasi CORS pada backend.
+
+---
+
+11. MENJALANKAN FRONTEND ▶️
+
+   A. Pastikan backend sudah berjalan.
+   B. Masih di folder frontend, jalankan aplikasi dengan mengetik:
+    npm run dev
+
+   C. Jika berhasil, akan muncul informasi bahwa frontend berjalan.
+   D. Buka browser dan akses:
+     [http://localhost:3000](http://localhost:3000)
+
+   E. Jika tampilan web muncul dengan normal, berarti frontend berhasil dijalankan.
+
+---
+
+12. TESTING APLIKASI 🔍
+
+   A. Testing Akses Sistem
+
+      1. Pastikan backend dan frontend berjalan bersamaan.
+      2. Akses halaman utama aplikasi melalui browser.
+
+   B. Testing Fitur Aplikasi
+
+      1. Lakukan login ke dalam sistem.
+      2. Coba menambahkan data pengadaan barang.
+      3. Coba mengedit data pengadaan.
+      4. Coba menghapus data.
+      5. Pastikan data tersimpan dan berubah di database MySQL.
+
+Jika seluruh fitur berjalan dengan baik, maka aplikasi berhasil terhubung antara frontend, backend, dan database.
+
+---
+
+13. BUILD APLIKASI (MODE PRODUKSI) 🏗️
+
+   A. Build digunakan ketika aplikasi akan dijalankan dalam mode produksi.
+   B. Masuk ke folder frontend.
+   C. Jalankan build dengan mengetik:
+      npm run build
+
+   D. Setelah build selesai, jalankan aplikasi production dengan mengetik:
+      npm run start
+
+---
+
+14. STRUKTUR FOLDER PROYEK 📁
+
+Folder utama bernama web pengadaan_itcenter.
+Di dalamnya terdapat folder backend yang berisi server, file .env, dan dependency.
+Terdapat folder frontend yang berisi aplikasi Next.js, file .env.local, dan konfigurasi tampilan.
+File README.md berada di folder utama sebagai panduan setup.
+
+---
+
+15. CATATAN PENTING ⚠️
+
+16. Jangan menutup CMD backend saat frontend digunakan.
+
+17. Pastikan Node.js dan MySQL selalu aktif.
+
+18. Jangan menghapus file .env dan .env.local.
+
+19. Jika frontend tidak bisa mengambil data, periksa kembali alamat backend dan CORS.
+
+---
